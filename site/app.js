@@ -26,7 +26,7 @@ const T = {
     validation_note: "Эрсдэлийн оноог дараа оны том малын хорогдол ÷ тухайн оны тооллого (хонин толгойд)-той харьцуулав. Илүүдэл хорогдол = тухайн сумын хоёр хэвийн өвлийн дунджаас давсан хэсэг. Жинг харьцуулахаас өмнө тогтоосон.",
     national: "Хорогдол өвөл бүрээр (аймгийн нийлбэр, УБ-гүй)",
     limits: "Хязгаарлалт",
-    limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. 2009/10, 2013/14, 2015/16 нь энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл өгөгдөлд байхгүй, гэтэл эдгээр нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
+    limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. 2009/10, 2013/14, 2015/16 нь энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). ҮСХ-ны бэлтгэсэн өвс тэжээлийг (зөвхөн аймгаар, сумаар байхгүй) хонин толгойд ногдуулж сургасан загварт оруулсан, тогтмол оноонд оруулаагүй; малчдын бэлтгэлийн өгөгдөл байхгүй хэвээр. Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
     sources: "Эх сурвалж",
     sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
     risk: "Эрсдэл", ind: { cold: "Хүйтэн", snow: "Цас", summer: "Зуны бэлчээр", pressure: "Ачаалал" },
@@ -58,7 +58,8 @@ const T = {
       : "Нэг өвлийг хасаж бусдаар нь сургахад тогтмол жинтэй оноо загвараас илүү сайн эрэмбэлсэн: загвар нь газрын зургийн эрсдэлийг орлохгүй, зөвхөн эмзэг байдлын давхаргад ашиглагдана. Ridge-ийн торгуулийг (λ = 1) тааруулаагүй.",
     model_by_winter: "Өвөл бүрийн ρ: тогтмол жин ба загвар", weights: "Загварын жин (стандартчилсан)",
     feat: { z_cold: "Хүйтэн z", z_snow: "Цас z", z_summer: "Зуны бэлчээр z", z_density: "Цасны нягт z", z_pressure: "Ачаалал z",
-      greenness_trend: "Ногоорлын чиг", herd_growth_5y: "Малын 5 жилийн өсөлт", past_mortality: "Өмнөх хорогдол" },
+      greenness_trend: "Ногоорлын чиг", herd_growth_5y: "Малын 5 жилийн өсөлт", hay_per_su: "Өвс тэжээл / хонин толгой (аймаг)", past_mortality: "Өмнөх хорогдол" },
+    hay: "Бэлтгэсэн өвс тэжээл (аймаг)", hay_unit: "кг / хонин толгой",
   },
   en: {
     title: "Dzud risk", subtitle: "Per soum: hindcasts of 15 winters, the 2026/27 outlook, vulnerability and the greenness trend", winter: "Winter",
@@ -76,7 +77,7 @@ const T = {
     validation_note: "Scores compared with the next year's adult losses ÷ that year's census, in sheep units. Excess mortality = a soum's losses above its mean in the two normal winters. Weights were fixed before any comparison.",
     national: "Losses by winter (aimag totals, excl. Ulaanbaatar)",
     limits: "Limits",
-    limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. 2009/10, 2013/14 and 2015/16 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness are not in the data, yet they explain about half of the variation in losses (Nandintsetseg et al. 2018). The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
+    limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. 2009/10, 2013/14 and 2015/16 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness explain about half of the variation in losses (Nandintsetseg et al. 2018). NSO's hay laid in (by aimag only; there is no soum figure), per sheep unit, enters the learned model, not the fixed score; herder preparedness is still not in the data. The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
     sources: "Sources",
     sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Livestock and losses: NSO Mongolia (1212.mn).",
     risk: "Risk", ind: { cold: "Cold", snow: "Snow", summer: "Summer pasture", pressure: "Pressure" },
@@ -108,13 +109,14 @@ const T = {
       : "Held out one winter at a time, the fixed-weight score ranked losses better than the model: the model does not replace the map's risk and is used only for the vulnerability layer. The ridge penalty (λ = 1) was not tuned.",
     model_by_winter: "ρ by winter: fixed weights and model", weights: "Model weights (standardised)",
     feat: { z_cold: "Cold z", z_snow: "Snow z", z_summer: "Summer pasture z", z_density: "Snow density z", z_pressure: "Pressure z",
-      greenness_trend: "Greenness trend", herd_growth_5y: "Herd growth, 5 years", past_mortality: "Past losses" },
+      greenness_trend: "Greenness trend", herd_growth_5y: "Herd growth, 5 years", hay_per_su: "Hay per sheep unit (aimag)", past_mortality: "Past losses" },
+    hay: "Hay laid in (aimag)", hay_unit: "kg / sheep unit",
   },
 };
 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
-let model = null, greenness = null, hist = null, byName = {};
+let model = null, greenness = null, hist = null, hay = null, byName = {};
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
 
 const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
@@ -206,9 +208,16 @@ function hbars(rows, colors, { d = 2, unit = "", aria = "" } = {}) {
   return `${s}</svg>`;
 }
 
+// Hay laid in per sheep unit in the aimag (NSO has no soum figure) for the winter on the map
+function hayLine(aimag) {
+  const t = T[lang], y = isOutlook() && outlook ? outlook.winter.slice(0, 4) : String(shown ?? "").slice(0, 4);
+  const v = hay?.by_aimag[aimag]?.[y];
+  return hay ? `<br>${t.hay}: <b>${v == null ? "–" : fmt(v, 1)}</b> ${t.hay_unit}` : "";
+}
+
 function extraLines(p) {
   const t = T[lang], v = model?.vulnerability[p.pcode], g = greenness?.per_decade[p.pcode];
-  return `<br>${t.vuln}: <b>${v == null ? "–" : `${Math.round(v * 100)}%`}</b> <small>(${t.vuln_unit})</small>` +
+  return hayLine(p.pcode.slice(0, 4)) + `<br>${t.vuln}: <b>${v == null ? "–" : `${Math.round(v * 100)}%`}</b> <small>(${t.vuln_unit})</small>` +
     `<br>${t.green}: <b>${g == null ? "–" : (g >= 0 ? "+" : "") + fmt(g, 3)}</b> NDVI${t.per_decade}`;
 }
 
@@ -219,7 +228,7 @@ function aimagPopup(p) {
   const counts = a.counts.map((n, i) => `<i class="chip" style="background:${COLORS[i]}"></i>${esc(t.classes[i])}: ${esc(n)}`)
     .reverse().join("<br>");
   return `<b>${esc(aimagName(p))}</b><br>${t.risk}: <b>${t.classes[a.risk_class]}</b> (${fmt(a.risk, 4)})<br>
-    <small>${t.aimag_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>${chart}`;
+    <small>${t.aimag_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>${hayLine(p.pcode)}${chart}`;
 }
 
 function popup(p) {
@@ -412,7 +421,8 @@ Promise.all([
   optional("data/model.json"),
   optional("data/greenness.json"),
   optional("data/history.json"),
-]).then(async ([w, p, a, o, g, m, gr, h]) => {
+  optional("data/hay.json"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy]) => {
   aimagGeo = g;
   winters = w;
   pooled = p;
@@ -421,6 +431,7 @@ Promise.all([
   model = m;
   greenness = gr;
   hist = h;
+  hay = hy;
   for (const opt of $("view").options) opt.disabled = (opt.value === "vuln" && !model) || (opt.value === "green" && !greenness);
   sel.innerHTML = (outlook ? '<option value="outlook"></option>' : "") +
     winters.map((x) => `<option value="${esc(x)}">${esc(x.replace("-", "/"))}</option>`).join("");

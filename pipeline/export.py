@@ -1,6 +1,7 @@
 """Write the site's data: simplified soum polygons carrying each winter's scores, and its validation."""
 import argparse
 import csv
+import functools
 import json
 import shutil
 import sys
@@ -16,14 +17,27 @@ from pipeline.nso import load_livestock, load_livestock_aimag
 from pipeline.validate import mortality, out_path_json
 
 SIMPLIFY_DEG = 0.005
+COVERAGE_TOL = 0.01  # coverage_simplify's tolerance; about the vertex count SIMPLIFY_DEG gave polygon by polygon
 MAX_BYTES = 2_000_000
 SITE = Path("site/data")
 NUMERIC = ["cold_c", "z_cold", "snow_m", "z_snow", "ndvi", "z_summer", "su_per_km2", "z_pressure", "risk",
            "z_snow_gldas", "snow_days", "density_kgm3", "z_density"]
 
 
-def feature(geom, props: dict) -> dict:
-    g = geom.simplify(SIMPLIFY_DEG, preserve_topology=True)
+def coverage(soums: list[dict]) -> dict[str, object]:
+    """Simplify the soums together, so a border two soums share stays one line: simplified one by one they
+    overlapped by 0.032 square degrees and left 0.027 open."""
+    shapes = shapely.coverage_simplify(np.array([s["geom"] for s in soums], dtype=object), COVERAGE_TOL)
+    return {s["pcode"]: g for s, g in zip(soums, shapes)}
+
+
+@functools.cache
+def soum_shapes() -> dict[str, object]:
+    return coverage(load_soums())
+
+
+def feature(geom, props: dict, simplify: bool = True) -> dict:
+    g = geom.simplify(SIMPLIFY_DEG, preserve_topology=True) if simplify else geom
     g = shapely.transform(g, lambda xy: np.round(xy, 4))
     return {"type": "Feature", "properties": props, "geometry": mapping(g)}
 
@@ -55,7 +69,7 @@ def main(year: int) -> None:
         scores = {r["pcode"]: {k: v or None for k, v in r.items()} for r in csv.DictReader(f)}
     from pipeline import aimags  # aimags imports this module
     props = {s["pcode"]: props_for(s, scores.get(s["pcode"], {})) for s in load_soums()}
-    feats = [feature(s["geom"], props[s["pcode"]]) for s in load_soums()]
+    feats = [feature(soum_shapes()[s["pcode"]], props[s["pcode"]], simplify=False) for s in load_soums()]
     aimags.write_scores(label(year), props, load_livestock(), census_year(year, winter_end(year)))
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
@@ -99,6 +113,17 @@ def check() -> None:
     assert f["properties"] == {"pcode": "X", "risk": None}
     assert all(c == round(c, 4) for xy in f["geometry"]["coordinates"][0] for c in xy)
     assert winters_index([2023, 2009]) == ["2009-10", "2023-24"]
+    teeth = [(0, 0)] + [(0.0005 * (i % 2), i / 100) for i in range(1, 100)] + [(0, 1)]  # a jagged shared border
+    left = Polygon([(-1, 0), *teeth, (-1, 1)])
+    right = Polygon([(1, 0), (1, 1), *reversed(teeth)])
+    shapes = coverage([{"pcode": "L", "geom": left}, {"pcode": "R", "geom": right}])
+    both = shapely.union_all(list(shapes.values()))
+    assert shapes["L"].intersection(shapes["R"]).area < 1e-12, "neighbours simplified apart overlap"
+    assert abs(both.area - (left.area + right.area)) < 1e-9, "neighbours simplified apart leave a gap"
+    assert shapely.get_num_coordinates(shapes["L"]) < shapely.get_num_coordinates(left), "it still simplifies"
+    kept = feature(shapes["L"], {}, simplify=False)
+    assert len(kept["geometry"]["coordinates"][0]) == shapely.get_num_coordinates(shapes["L"])
+
     full = {"camel": 0, "horse": 0, "cattle": 0, "goat": 0}
     herds = {("A", 2011, "stock"): {**full, "sheep": 100.0}, ("A", 2012, "loss"): {**full, "sheep": 12.5}}
     aherds = {("X", 2011, "stock"): {**full, "sheep": 1000.0}, ("X", 2012, "loss"): {**full, "sheep": 50.0}}

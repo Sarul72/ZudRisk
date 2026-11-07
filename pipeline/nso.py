@@ -17,6 +17,9 @@ YEARS = range(2000, 2026)
 BATCH = 60
 OUT = Path("data/derived/livestock.csv")
 OUT_AIMAG = Path("data/derived/livestock_aimag.csv")
+# Gross hay harvest and laying-in of fodder, thousand tonnes, aimags and the Capital: no soum rows exist
+HAY = "https://data.1212.mn/api/v1/en/NSO/Industry,%20service/Agriculture/DT_NSO_1002_007V1.px"
+OUT_HAY = Path("data/derived/hay_aimag.csv")
 
 
 def norm(name: str) -> str:
@@ -58,6 +61,44 @@ def aimag_crosswalk(nso_regions: dict[str, str], soums: list[dict]) -> dict[str,
     return {c: by_name[norm(t)] for c, t in nso_regions.items() if len(c) == 3 and norm(t) in by_name}
 
 
+def hay_crosswalk(nso_regions: dict[str, str], soums: list[dict]) -> dict[str, str]:
+    """aimag_crosswalk plus Ulaanbaatar, whose herding districts lay in hay like any aimag."""
+    ub = {norm(s["aimag_mn"]) for s in soums if s["aimag_pcode"] == UB_PCODE}
+    return {**aimag_crosswalk(nso_regions, soums),
+            **{c: UB_PCODE for c, t in nso_regions.items() if len(c) == 3 and norm(t) in ub}}
+
+
+def parse_hay(resp: dict, years: dict[str, str], xwalk: dict[str, str]) -> list[tuple]:
+    rows = []
+    for cell in resp["data"]:
+        region, y = cell["key"]
+        value = cell["values"][0]
+        if region in xwalk and value not in ("..", ""):
+            rows.append((xwalk[region], int(years[y]), 0.0 if value == "-" else float(value)))
+    return sorted(rows)
+
+
+def main_hay(regions: dict[str, str]) -> None:
+    xwalk = hay_crosswalk(regions, load_soums())
+    meta = get_json(HAY)
+    yvar = next(v for v in meta["variables"] if v["code"].lower() == "он")
+    years = {c: t for c, t in zip(yvar["values"], yvar["valueTexts"]) if int(t) in YEARS}
+    body = {"query": [{"code": "Бүс", "selection": {"filter": "item", "values": sorted(xwalk)}},
+                      {"code": yvar["code"], "selection": {"filter": "item", "values": list(years)}}],
+            "response": {"format": "json"}}
+    rows = parse_hay(post_json(HAY, body), years, xwalk)
+    OUT_HAY.parent.mkdir(parents=True, exist_ok=True)
+    with OUT_HAY.open("w", newline="") as f:
+        csv.writer(f).writerows([("aimag_pcode", "year", "thousand_tonnes"), *rows])
+    print(f"hay: {len(xwalk)} aimags, {len(rows)} rows -> {OUT_HAY}")
+
+
+def load_hay() -> dict[tuple[str, int], float]:
+    """(aimag_pcode, year) -> hay laid in, thousand tonnes."""
+    with OUT_HAY.open() as f:
+        return {(a, int(y)): float(v) for a, y, v in list(csv.reader(f))[1:]}
+
+
 def parse(resp: dict, years: dict[str, str], xwalk: dict[str, str], kind: str) -> list[tuple]:
     rows = []
     for cell in resp["data"]:
@@ -84,6 +125,7 @@ def main() -> None:
     arows = fetch(axwalk)
     write(OUT_AIMAG, "aimag_pcode", arows)
     print(f"{len(arows)} rows -> {OUT_AIMAG}")
+    main_hay(regions)
 
 
 def fetch(xwalk: dict[str, str]) -> list[tuple]:
@@ -168,8 +210,22 @@ def check() -> None:
     except ValueError:
         pass
     assert aimag_crosswalk({"183": "Баян-Өлгий", "511": "Улаанбаатар", "18301": "Өлгий"}, soums) == {"183": "MN83"}
+    hay = parse_hay({"data": [{"key": ["183", "0"], "values": ["57.69"]}, {"key": ["183", "1"], "values": [".."]},
+                              {"key": ["0", "0"], "values": ["1809.49"]}, {"key": ["511", "0"], "values": ["-"]}]},
+                    years={"0": "2025", "1": "2024"}, xwalk={"183": "MN83", "511": "MN11"})
+    assert hay == [("MN11", 2025, 0.0), ("MN83", 2025, 57.69)], hay  # the national total and '..' are left out
+    assert hay_crosswalk({"183": "Баян-Өлгий", "511": "Улаанбаатар", "18301": "Өлгий"}, soums + [
+        {"pcode": "MN1101", "aimag_pcode": "MN11", "aimag_mn": "Улаанбаатар", "name_mn": "Багануур"}]) == \
+        {"183": "MN83", "511": "MN11"}, "hay keeps Ulaanbaatar: its districts graze too"
     print("nso check: ok")
 
 
 if __name__ == "__main__":
-    check() if "--check" in sys.argv else main()
+    if "--check" in sys.argv:
+        check()
+    elif "--hay" in sys.argv:  # hay alone, leaving the livestock files as they are
+        m = get_json(BASE + TABLES["stock"])
+        v = next(x for x in m["variables"] if x["code"] == "Бүс")
+        main_hay(dict(zip(v["values"], v["valueTexts"])))
+    else:
+        main()

@@ -6,7 +6,7 @@ import sys
 import shapely
 
 from pipeline.boundaries import load_soums
-from pipeline.export import SITE, feature
+from pipeline.export import SITE, feature, soum_shapes
 from pipeline.nso import sheep_units
 from pipeline.score import risk_class
 
@@ -49,12 +49,14 @@ def summary(soums: list[dict], rows: dict[str, dict], weights: dict[str, float])
 
 
 def write_shapes() -> None:
-    soums = load_soums()
+    """Dissolved from the soums as the map draws them, so an aimag border lies exactly on soum borders."""
+    shapes = soum_shapes()
+    soums = [{**s, "geom": shapes[s["pcode"]]} for s in load_soums()]
     first = {}
     for s in soums:
         first.setdefault(s["aimag_pcode"], s)
     feats = [feature(g, {"pcode": a, "name_mn": first[a]["aimag_mn"], "name_en": first[a]["aimag_en"],
-                         "is_ub": first[a]["is_ub"]}) for a, g in dissolve(soums).items()]
+                         "is_ub": first[a]["is_ub"]}, simplify=False) for a, g in dissolve(soums).items()]
     out = SITE / "aimags.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
     print(f"{out}: {len(feats)} aimags, {out.stat().st_size / 1e6:.2f} MB")

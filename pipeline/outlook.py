@@ -8,7 +8,7 @@ from datetime import date
 from pipeline import aimags, indicators
 from pipeline.asof import STAGES, stage_date
 from pipeline.boundaries import load_soums
-from pipeline.export import SITE, feature, label, props_for
+from pipeline.export import SITE, feature, label, props_for, soum_shapes
 from pipeline.nso import load_livestock
 
 STAGE_OF_MONTH = {m: stage for stage, (_, m, _) in STAGES.items()}
@@ -60,7 +60,9 @@ def main(through: str) -> None:
         sys.exit(f"{label(year)} stage {stage}: {len(short)} soums lack indicators the stage's validation used: "
                  f"{', '.join(short[:10])}")
     extra = {"stage": stage, "data_through": through}
-    feats = [feature(s["geom"], {**props_for(s, rows.get(s["pcode"], {})), **extra}) for s in load_soums()]
+    shapes = soum_shapes()
+    feats = [feature(shapes[s["pcode"]], {**props_for(s, rows.get(s["pcode"], {})), **extra}, simplify=False)
+             for s in load_soums()]
     (SITE / f"outlook_{label(year)}.geojson").write_text(
         json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
     aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)

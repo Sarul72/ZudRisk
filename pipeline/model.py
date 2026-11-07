@@ -14,7 +14,8 @@ import numpy as np
 from pipeline import indicators
 from pipeline.export import SITE, label
 from pipeline.gldas import load_series
-from pipeline.nso import load_livestock, sheep_units
+from pipeline.boundaries import load_soums
+from pipeline.nso import load_hay, load_livestock, sheep_units
 from pipeline.score import WEIGHTS
 from pipeline.trends import greenness_trend, latest_summer
 from pipeline.validate import _ranks, mortality, spearman
@@ -25,7 +26,7 @@ NOW = 2025  # the newest census
 HIGH_LOSS = 0.05  # the target, fixed before any fit: adult losses of 5 % of the herd or more
 LAM = 1.0  # ridge penalty on standardised features; not tuned, so the held-out skill is not tuned either
 CLIMATE = ["z_cold", "z_snow", "z_summer", "z_density"]  # what a replayed winter brings
-FEATURES = CLIMATE + ["z_pressure", "greenness_trend", "herd_growth_5y", "past_mortality"]  # _fold_x needs it last
+FEATURES = CLIMATE + ["z_pressure", "greenness_trend", "herd_growth_5y", "hay_per_su", "past_mortality"]  # _fold_x needs it last
 OUT = Path("data/derived/model.json")
 
 
@@ -99,13 +100,30 @@ def past_mortality(herds: dict, pcode: str, year: int) -> float | None:
     return sum(ms) / len(ms) if ms else None
 
 
-def _x(climate_row: dict, now_row: dict, ndvi: dict, herds: dict, pcode: str, year: int, through: int) -> list[float]:
+def hay_per_su(hay: dict, herds: dict, soums: list[dict]) -> dict[tuple[str, int], float]:
+    """(aimag, year) -> log kg of hay laid in per sheep unit of that year's census, only where every soum was counted.
+    Aimag level: NSO publishes no soum hay. Harvested in summer Y for winter Y/Y+1; NSO's release date is
+    unverified, taken as before 31 March Y+1."""
+    by: dict[str, list[str]] = {}
+    for s in soums:
+        by.setdefault(s["aimag_pcode"], []).append(s["pcode"])
+    out = {}
+    for (a, y), kt in hay.items():
+        su = [sheep_units(herds.get((pc, y, "stock"), {})) for pc in by.get(a, [])]
+        if su and None not in su and sum(su) > 0 and kt > 0:
+            out[(a, y)] = math.log(kt * 1e6 / (sum(su) * 1e3))
+    return out
+
+
+def _x(climate_row: dict, now_row: dict, ndvi: dict, herds: dict, pcode: str, year: int, through: int,
+       hay_su: dict) -> list[float]:
     vals = [climate_row[k] for k in CLIMATE] + [now_row["z_pressure"], greenness_trend(ndvi.get(pcode, {}), through),
-                                              growth(herds, pcode, year), past_mortality(herds, pcode, year)]
+                                              growth(herds, pcode, year), hay_su.get((pcode[:4], year)),
+                                              past_mortality(herds, pcode, year)]
     return [math.nan if v is None else v for v in vals]
 
 
-def training_rows(herds: dict, ndvi: dict, years=TRAIN) -> list[dict]:
+def training_rows(herds: dict, ndvi: dict, hay_su: dict, years=TRAIN) -> list[dict]:
     rows = []
     for y in years:
         for pc, r in indicators.compute(y, indicators.winter_end(y)).items():
@@ -113,7 +131,7 @@ def training_rows(herds: dict, ndvi: dict, years=TRAIN) -> list[dict]:
             if r["risk"] is None or m is None:
                 continue
             earlier = {e: me for e in range(TRAIN.start, y) if (me := mortality(herds, pc, e)) is not None}
-            rows.append({"winter": y, "pcode": pc, "x": _x(r, r, ndvi, herds, pc, y, y), "y": float(m >= HIGH_LOSS),
+            rows.append({"winter": y, "pcode": pc, "x": _x(r, r, ndvi, herds, pc, y, y, hay_su), "y": float(m >= HIGH_LOSS),
                          "m": m, "risk": r["risk"], "earlier": earlier})
     return rows
 
@@ -127,7 +145,8 @@ def skill(prob: list[float], rows: list[dict]) -> dict:
 
 def main() -> dict:
     herds, ndvi = load_livestock(), load_series(indicators.NDVI_CSV)
-    rows = training_rows(herds, ndvi)
+    hay_su = hay_per_su(load_hay(), herds, load_soums())
+    rows = training_rows(herds, ndvi, hay_su)
     held = lowo(rows)
     per = {label(y): skill(held[y], [r for r in rows if r["winter"] == y]) for y in held}
     order = [r for y in held for r in rows if r["winter"] == y]
@@ -141,13 +160,17 @@ def main() -> dict:
     for pc, r in now.items():
         if r["su_per_km2"] is None:
             continue  # no herd, no risk
-        xs = [_x(weather[c][pc], r, ndvi, herds, pc, NOW, through) for c in REPLAY]
+        xs = [_x(weather[c][pc], r, ndvi, herds, pc, NOW, through, hay_su) for c in REPLAY]
         vuln[pc] = round(float(predict(s(xs), w, b).mean()), 4)
     out = {"target": f"adult losses >= {HIGH_LOSS:.0%} of the herd in sheep units", "lam": LAM, "features": FEATURES,
            "weights": {f: round(float(v), 3) for f, v in zip(FEATURES, w)}, "intercept": round(b, 3),
            "fixed_weights": WEIGHTS, "train": [label(y) for y in TRAIN], "lowo": per, "pooled": pooled_,
            "replay": [label(REPLAY.start), label(REPLAY.stop - 1)], "census": NOW, "greenness_through": through,
            "vulnerability": vuln}
+    hay = {}
+    for (a, y), v in sorted(hay_su.items()):
+        hay.setdefault(a, {})[str(y)] = round(math.exp(v), 1)
+    (SITE / "hay.json").write_text(json.dumps({"unit": "kg of hay laid in per sheep unit, aimag", "by_aimag": hay}))
     text = json.dumps(out, allow_nan=False)
     OUT.write_text(text)
     (SITE / "model.json").write_text(text)
@@ -195,10 +218,18 @@ def check() -> None:
     moved = [with_past(r["winter"], r["x"][0], {**r["earlier"], 1: 0.9}) if 1 in r["earlier"] else r for r in base]
     assert lowo(moved)[1] == lowo(base)[1], "a held-out winter's losses reach no training row's past_mortality"
 
+    soums = [{"pcode": "A1", "aimag_pcode": "X"}, {"pcode": "A2", "aimag_pcode": "X"}, {"pcode": "B1", "aimag_pcode": "Y"}]
+    st = {("A1", 2020, "stock"): {**full, "sheep": 100.0}, ("A2", 2020, "stock"): {**full, "sheep": 300.0},
+          ("A1", 2021, "stock"): {**full, "sheep": 100.0}}
+    hs = hay_per_su({("X", 2020): 2.0, ("X", 2021): 2.0, ("Y", 2020): 1.0}, st, soums)
+    assert abs(hs[("X", 2020)] - math.log(5.0)) < 1e-12, hs  # 2,000 t over 400,000 sheep units: 5 kg each
+    assert ("X", 2021) not in hs, "a soum without its census would inflate the aimag's hay per head"
+    assert ("Y", 2020) not in hs, "no herd counted, no ratio"
+
     real_herds, real_ndvi = load_livestock(), load_series(indicators.NDVI_CSV)
     later = {pc: {m: (0.0 if int(m[:4]) > 2012 else v) for m, v in s.items()} for pc, s in real_ndvi.items()}
-    at = {r["pcode"]: r["x"] for r in training_rows(real_herds, real_ndvi, [2012])}
-    assert at and at == {r["pcode"]: r["x"] for r in training_rows(real_herds, later, [2012])}, \
+    at = {r["pcode"]: r["x"] for r in training_rows(real_herds, real_ndvi, {}, [2012])}
+    assert at and at == {r["pcode"]: r["x"] for r in training_rows(real_herds, later, {}, [2012])}, \
         "a 2012/13 training row reads no summer after 2012"
     print("model check: ok")
 

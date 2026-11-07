@@ -22,6 +22,7 @@ uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2001
 uv run python -m pipeline.hindcast            # 15 winters scored (2009/10, 2011/12-2024/25), the pre-registered
                                               # pooled test, snow comparison, as-of stages, greenness trend
                                               # (pipeline.trends) and the learned vulnerability model (pipeline.model)
+uv run python -m pipeline.nso --hay           # NSO hay laid in per aimag (the model's hay_per_su), livestock untouched
 uv run python -m pipeline.outlook --through 2026-10   # the 2026/27 outlook at its latest stage
 python3 -m http.server -d site 8765           # open http://localhost:8765
 ```
