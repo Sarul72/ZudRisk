@@ -1,0 +1,9 @@
+[project]
+name = "zudrisk"
+version = "0.1.0"
+description = "Dzud risk per soum for Mongolia from public data"
+requires-python = ">=3.12"
+dependencies = ["shapely>=2", "numpy"]
+
+[tool.uv]
+package = false

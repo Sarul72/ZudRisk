@@ -1,0 +1,69 @@
+"""Write the site's data: simplified soum polygons carrying each winter's scores, and its validation."""
+import argparse
+import csv
+import json
+import shutil
+import sys
+from pathlib import Path
+
+import numpy as np
+import shapely
+from shapely.geometry import Polygon, mapping
+
+from pipeline.boundaries import load_soums
+from pipeline.indicators import out_path
+from pipeline.validate import out_path_json
+
+SIMPLIFY_DEG = 0.005
+MAX_BYTES = 2_000_000
+SITE = Path("site/data")
+NUMERIC = ["cold_c", "z_cold", "su_per_km2", "z_pressure", "risk"]
+
+
+def feature(geom, props: dict) -> dict:
+    g = geom.simplify(SIMPLIFY_DEG, preserve_topology=True)
+    g = shapely.transform(g, lambda xy: np.round(xy, 4))
+    return {"type": "Feature", "properties": props, "geometry": mapping(g)}
+
+
+def label(year: int) -> str:
+    return f"{year}-{(year + 1) % 100:02d}"
+
+
+def main(year: int) -> None:
+    with out_path(year).open() as f:
+        scores = {r["pcode"]: r for r in csv.DictReader(f)}
+    feats = []
+    for s in load_soums():
+        r = scores.get(s["pcode"], {})
+        props = {k: s[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
+        props.update({k: float(r[k]) if r.get(k) else None for k in NUMERIC})
+        props["risk_class"] = int(r["risk_class"]) if r.get("risk_class") else None
+        feats.append(feature(s["geom"], props))
+    SITE.mkdir(parents=True, exist_ok=True)
+    out = SITE / f"risk_{label(year)}.geojson"
+    out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,
+                              separators=(",", ":")))
+    shutil.copy(out_path_json(year), SITE / f"validation_{label(year)}.json")
+    size = out.stat().st_size
+    print(f"{out}: {len(feats)} soums, {size / 1e6:.2f} MB")
+    if size > MAX_BYTES:
+        sys.exit(f"{out} is over {MAX_BYTES / 1e6:.0f} MB: raise SIMPLIFY_DEG")
+
+
+def check() -> None:
+    import math
+    ring = [(math.cos(2 * math.pi * i / 1000), math.sin(2 * math.pi * i / 1000)) for i in range(1000)]
+    f = feature(Polygon(ring), {"pcode": "X", "risk": None})
+    assert len(f["geometry"]["coordinates"][0]) < 1000
+    assert f["properties"] == {"pcode": "X", "risk": None}
+    assert all(c == round(c, 4) for xy in f["geometry"]["coordinates"][0] for c in xy)
+    print("export check: ok")
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true")
+    ap.add_argument("--winter", type=int, default=2023)
+    a = ap.parse_args()
+    check() if a.check else main(a.winter)

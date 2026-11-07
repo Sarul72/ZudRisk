@@ -1,0 +1,10 @@
+data/raw/
+.venv/
+__pycache__/
+.superpowers/
+.DS_Store
+# credentials never enter the repo
+.env
+*.netrc
+*credentials*
+*service-account*.json

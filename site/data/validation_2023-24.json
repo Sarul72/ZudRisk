@@ -1,0 +1,18 @@
+{
+  "winter": "2023/24",
+  "indicators_used": [
+    "cold",
+    "pressure"
+  ],
+  "n": 330,
+  "n_dropped": 0,
+  "dropped_reasons": {
+    "unscored": 0,
+    "no mortality": 0
+  },
+  "spearman_soum": 0.42,
+  "n_aimag": 21,
+  "spearman_aimag": 0.409,
+  "top_quintile_hit": 0.47,
+  "mortality_pct_validated": 13.83
+}
