@@ -7,12 +7,18 @@ const VULN_CUTS = [0.1, 0.2, 0.3, 0.4];
 const GREEN_CUTS = [0, 0.01, 0.02, 0.04];
 const RISK_CUTS = [-1, -0.5, 0.5, 1]; // pipeline/score.py CUTS
 const GREY = "#bbbbbb";
+const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert_steppe: "#fdb863", desert: "#d95f0e" };
 const KEYS = ["cold", "snow", "summer", "pressure"];
 
 const T = {
   mn: {
     title: "Зудын эрсдэл", subtitle: "Сум бүрээр: 15 өвлийн ретро тооцоо, 2026/27 оны төлөв, эмзэг байдал, ногоорлын чиг хандлага", winter: "Өвөл",
-    view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)" },
+    view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)", zone: "Байгалийн бүс" },
+    zone: "Байгалийн бүс", zone_legend: "Монгол орны байгалийн бүс",
+    zones: { mountain: "Өндөр уулын бүс", taiga: "Тайгын бүс", forest_steppe: "Ойт хээрийн (хангайн) бүс", steppe: "Хээрийн бүс",
+      desert_steppe: "Цөлөрхөг хээрийн (говийн) бүс", desert: "Цөлийн бүс" },
+    zone_note: "RESOLVE Ecoregions 2017-ийн экобүсүүдийг нэрээр нь Монголын байгалийн зургаан бүсэд нэгтгэв (жишээ нь Selenge-Orkhon forest steppe → ойт хээр). Сум бүрийг талбайн ихэнхийг эзэлсэн бүсэд нь хамааруулна. Нарийн хил бүсчлэлийн эх сурвалжаас хамаарч өөр байж болно.",
+    zone_share: (s) => `сумын ${Math.round(s * 100)}%`,
     search: "Сум хайх", legend: "Тайлбар", validation: "Бодит хорогдолтой харьцуулалт",
     classes: ["Маш бага", "Бага", "Дунд", "Өндөр", "Маш өндөр"], none: "Тооцоогүй / мэдээлэл хүрэлцээгүй",
     no_herd: "Тооллогоор мал бүртгэлгүй тул тооцоогүй", ub_density: " (Улаанбаатарын дундаж)",
@@ -28,7 +34,7 @@ const T = {
     limits: "Хязгаарлалт",
     limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. 2009/10, 2013/14, 2015/16 нь энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). ҮСХ-ны бэлтгэсэн өвс тэжээлийг (зөвхөн аймгаар, сумаар байхгүй) хонин толгойд ногдуулж сургасан загварт оруулсан, тогтмол оноонд оруулаагүй; малчдын бэлтгэлийн өгөгдөл байхгүй хэвээр. Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
     sources: "Эх сурвалж",
-    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
+    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: RESOLVE Ecoregions 2017 (Dinerstein нар, 2017, CC BY 4.0). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
     risk: "Эрсдэл", ind: { cold: "Хүйтэн", snow: "Цас", summer: "Зуны бэлчээр", pressure: "Ачаалал" },
     cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / км²",
     missing: "Дутуу үзүүлэлт",
@@ -63,7 +69,12 @@ const T = {
   },
   en: {
     title: "Dzud risk", subtitle: "Per soum: hindcasts of 15 winters, the 2026/27 outlook, vulnerability and the greenness trend", winter: "Winter",
-    view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)" },
+    view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)", zone: "Natural zones" },
+    zone: "Natural zone", zone_legend: "Natural zones of Mongolia",
+    zones: { mountain: "High mountain", taiga: "Taiga", forest_steppe: "Forest steppe (khangai)", steppe: "Steppe",
+      desert_steppe: "Desert steppe (gobi)", desert: "Desert" },
+    zone_note: "RESOLVE Ecoregions 2017 grouped by name into Mongolia's six natural zones (Selenge-Orkhon forest steppe → forest steppe, say). Each soum takes the zone covering most of it. Exact borders differ between zonings.",
+    zone_share: (s) => `${Math.round(s * 100)}% of the soum`,
     search: "Find a soum", legend: "Legend", validation: "Against recorded losses",
     classes: ["Very low", "Low", "Medium", "High", "Very high"], none: "Not scored / insufficient data",
     no_herd: "The census records no livestock here, so not scored", ub_density: " (Ulaanbaatar's density)",
@@ -79,7 +90,7 @@ const T = {
     limits: "Limits",
     limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. 2009/10, 2013/14 and 2015/16 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness explain about half of the variation in losses (Nandintsetseg et al. 2018). NSO's hay laid in (by aimag only; there is no soum figure), per sheep unit, enters the learned model, not the fixed score; herder preparedness is still not in the data. The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
     sources: "Sources",
-    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Livestock and losses: NSO Mongolia (1212.mn).",
+    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: RESOLVE Ecoregions 2017 (Dinerstein et al. 2017, CC BY 4.0). Livestock and losses: NSO Mongolia (1212.mn).",
     risk: "Risk", ind: { cold: "Cold", snow: "Snow", summer: "Summer pasture", pressure: "Pressure" },
     cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km²",
     missing: "Missing indicators",
@@ -116,7 +127,7 @@ const T = {
 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
-let model = null, greenness = null, hist = null, hay = null, byName = {};
+let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
 
 const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
@@ -129,7 +140,7 @@ const topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
   attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | ' +
     'Map style &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
 });
-L.control.layers({ OpenStreetMap: osm, OpenTopoMap: topo }, null, { position: "topright" }).addTo(map);
+const control = L.control.layers({ OpenStreetMap: osm, OpenTopoMap: topo }, null, { position: "topright" }).addTo(map);
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const fmt = (v, d = 2) => (v === null || v === undefined ? "–" : Number(v).toFixed(d));
@@ -145,6 +156,7 @@ function fillOf(p) {
 }
 
 function style(f) {
+  if (view === "zone") return { color: "#555", weight: 0.3, fillOpacity: 0 }; // the zones lie under; soums keep popups
   return { color: "#555", weight: 0.4, fillOpacity: 0.78, fillColor: fillOf(f.properties) };
 }
 
@@ -217,7 +229,9 @@ function hayLine(aimag) {
 
 function extraLines(p) {
   const t = T[lang], v = model?.vulnerability[p.pcode], g = greenness?.per_decade[p.pcode];
-  return hayLine(p.pcode.slice(0, 4)) + `<br>${t.vuln}: <b>${v == null ? "–" : `${Math.round(v * 100)}%`}</b> <small>(${t.vuln_unit})</small>` +
+  const z = soumZones?.[p.pcode];
+  return (z ? `<br>${t.zone}: <b>${esc(t.zones[z[0]])}</b> <small>(${t.zone_share(z[1])})</small>` : "") +
+    hayLine(p.pcode.slice(0, 4)) + `<br>${t.vuln}: <b>${v == null ? "–" : `${Math.round(v * 100)}%`}</b> <small>(${t.vuln_unit})</small>` +
     `<br>${t.green}: <b>${g == null ? "–" : (g >= 0 ? "+" : "") + fmt(g, 3)}</b> NDVI${t.per_decade}`;
 }
 
@@ -258,6 +272,10 @@ function renderLegend(t) {
   if (view === "vuln" && model) {
     html = `<p class="note">${esc(t.vuln_legend)}</p>${legendRows(VULN, t.vuln_classes)}<div><i style="background:${GREY}"></i>${esc(t.layer_none)}</div>`;
     note = `${t.vuln_note(model)} ${t.model_verdict(modelBetter(model.pooled))}`;
+  } else if (view === "zone" && zones) {
+    html = `<p class="note">${esc(t.zone_legend)}</p>` + Object.keys(ZONE_COLORS)
+      .map((z) => `<div><i style="background:${ZONE_COLORS[z]}"></i>${esc(t.zones[z])}</div>`).join("");
+    note = t.zone_note;
   } else if (view === "green" && greenness) {
     html = `<p class="note">${esc(t.green_legend(greenness))}</p>${legendRows(GREEN, t.green_classes)}<div><i style="background:${GREY}"></i>${esc(t.nodata)}</div>`;
     note = t.green_note;
@@ -354,7 +372,11 @@ function render() {
 function draw() {
   if (layer) map.removeLayer(layer);
   if (borders) map.removeLayer(borders);
-  borders = null;
+  if (zoneFill) map.removeLayer(zoneFill);
+  borders = zoneFill = null;
+  if (view === "zone" && zones) {
+    zoneFill = L.geoJSON(zones, { style: (f) => ({ stroke: false, fillOpacity: 0.75, fillColor: ZONE_COLORS[f.properties.zone] }), interactive: false }).addTo(map);
+  }
   const tip = { sticky: true, direction: "top", opacity: 0.9 };
   if (level === "aimag" && view === "risk") {
     layer = L.geoJSON(aimagGeo, { style: aimagStyle, onEachFeature: (f, l) => l.bindPopup(() => aimagPopup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(aimagName(f.properties)), tip) }).addTo(map);
@@ -422,7 +444,9 @@ Promise.all([
   optional("data/greenness.json"),
   optional("data/history.json"),
   optional("data/hay.json"),
-]).then(async ([w, p, a, o, g, m, gr, h, hy]) => {
+  optional("data/zones.geojson"),
+  optional("data/soum_zones.json"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz]) => {
   aimagGeo = g;
   winters = w;
   pooled = p;
@@ -432,7 +456,13 @@ Promise.all([
   greenness = gr;
   hist = h;
   hay = hy;
-  for (const opt of $("view").options) opt.disabled = (opt.value === "vuln" && !model) || (opt.value === "green" && !greenness);
+  zones = zn;
+  soumZones = sz;
+  if (zones) {
+    control.addOverlay(L.geoJSON(zones, { style: (f) => ({ color: ZONE_COLORS[f.properties.zone], weight: 2.5, fill: false, dashArray: "6 4" }), interactive: false }),
+      "Байгалийн бүсийн хил / Natural zone borders");
+  }
+  for (const opt of $("view").options) opt.disabled = (opt.value === "vuln" && !model) || (opt.value === "green" && !greenness) || (opt.value === "zone" && !zones);
   sel.innerHTML = (outlook ? '<option value="outlook"></option>' : "") +
     winters.map((x) => `<option value="${esc(x)}">${esc(x.replace("-", "/"))}</option>`).join("");
   sel.value = outlook ? "outlook" : winters[winters.length - 1];
