@@ -84,6 +84,51 @@ def get_bytes_auth(url: str, opener=None) -> bytes:
     return check_payload(body, ctype, url)
 
 
+CDS_RC = Path.home() / ".cdsapirc"
+
+
+def cds_config(text: str) -> tuple[str, str]:
+    """(url, key) from the text of ~/.cdsapirc."""
+    cfg = {}
+    for line in text.splitlines():
+        name, sep, value = line.partition(":")
+        if sep:
+            cfg[name.strip()] = value.strip()
+    return cfg["url"], cfg["key"]
+
+
+def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, timeout_s: float = 3600,
+                 auth: tuple[str, str] | None = None) -> bytes:
+    """Submit a Copernicus CDS job, wait for it, and return the file it made. The token goes to the API only,
+    never to the object store the result is served from."""
+    url, key = auth or cds_config(CDS_RC.read_text())
+    headers = {"User-Agent": USER_AGENT, "PRIVATE-TOKEN": key}
+
+    def call(u: str, body: dict | None = None) -> dict:
+        data = None if body is None else json.dumps(body).encode()
+        req = urllib.request.Request(u, data=data, headers={**headers, **({"Content-Type": "application/json"} if data else {})})
+        try:
+            return json.loads(_open(req, opener))
+        except urllib.error.HTTPError as e:
+            if e.code in (401, 403):
+                raise RuntimeError(f"CDS login failed (HTTP {e.code}): ~/.cdsapirc key must be the API Token "
+                                   "from your CDS profile, and the dataset licence must be accepted") from e
+            raise
+
+    job = call(f"{url}/retrieve/v1/processes/{dataset}/execution", {"inputs": inputs})
+    job_id, deadline = job["jobID"], time.monotonic() + timeout_s
+    while job["status"] != "successful":
+        if job["status"] in ("failed", "rejected", "dismissed"):
+            detail = job.get("detail") or job.get("message") or job.get("title") or ""
+            raise RuntimeError(f"CDS job {job_id} {job['status']}: {detail}")
+        if time.monotonic() > deadline:
+            raise RuntimeError(f"CDS job {job_id} still {job['status']} after {timeout_s:.0f} s")
+        time.sleep(poll_s)
+        job = call(f"{url}/retrieve/v1/jobs/{job_id}")
+    href = call(f"{url}/retrieve/v1/jobs/{job_id}/results")["asset"]["value"]["href"]
+    return _open(urllib.request.Request(href, headers={"User-Agent": USER_AGENT}), opener)
+
+
 def cached(path: Path, get) -> Path:
     """Fetch once into path; a download cut short leaves no file, so a later run never trusts half a granule."""
     if not path.exists():
@@ -128,7 +173,60 @@ def check() -> None:
             pass
         assert not target.exists() and not list(Path(d).iterdir()), list(Path(d).iterdir())
         assert cached(target, lambda: b"\x89HDF").read_bytes() == b"\x89HDF"
+    _check_cds()
     print("http check: ok")
+
+
+def _check_cds() -> None:
+    assert cds_config("url: https://x/api\nkey: abc\n") == ("https://x/api", "abc")
+    assert cds_config("key:abc\nurl:https://x/api") == ("https://x/api", "abc")
+
+    class Resp:
+        def __init__(self, body: dict | bytes):
+            self.body = body if isinstance(body, bytes) else json.dumps(body).encode()
+            self.headers = {"Content-Type": "application/json"}
+        def __enter__(self):
+            return self
+        def __exit__(self, *a):
+            return False
+        def read(self):
+            return self.body
+
+    class FakeCds:
+        """Submit answers a job id; each poll walks the given statuses; results point at a public href."""
+        def __init__(self, statuses, submit_code=200):
+            self.statuses, self.submit_code, self.seen = list(statuses), submit_code, []
+        def open(self, req, timeout=None):
+            u = req.full_url
+            self.seen.append((u, req.get_header("Private-token")))
+            if u.endswith("/execution"):
+                if self.submit_code != 200:
+                    raise urllib.error.HTTPError(u, self.submit_code, "Unauthorized", {}, None)
+                return Resp({"status": "accepted", "jobID": "J1"})
+            if u.endswith("/jobs/J1"):
+                s = self.statuses.pop(0)
+                return Resp({"status": s, "jobID": "J1", **({"detail": "bad area"} if s == "failed" else {})})
+            if u.endswith("/jobs/J1/results"):
+                return Resp({"asset": {"value": {"href": "https://store/f.nc"}}})
+            if u == "https://store/f.nc":
+                return Resp(b"\x89HDF")
+            raise AssertionError(u)
+
+    auth = ("https://x/api", "K")
+    try:
+        cds_retrieve("ds", {}, opener=FakeCds([], submit_code=401), auth=auth, poll_s=0)
+        raise AssertionError("a 401 must name ~/.cdsapirc")
+    except RuntimeError as e:
+        assert "~/.cdsapirc" in str(e) and "API Token" in str(e), e
+    try:
+        cds_retrieve("ds", {}, opener=FakeCds(["accepted", "running", "failed"]), auth=auth, poll_s=0)
+        raise AssertionError("a failed job must raise")
+    except RuntimeError as e:
+        assert "J1" in str(e) and "failed" in str(e) and "bad area" in str(e), e
+    fake = FakeCds(["running", "successful"])
+    assert cds_retrieve("ds", {"a": 1}, opener=fake, auth=auth, poll_s=0) == b"\x89HDF"
+    assert fake.seen[0] == ("https://x/api/retrieve/v1/processes/ds/execution", "K")
+    assert fake.seen[-1] == ("https://store/f.nc", None), "the object store href is fetched without the token"
 
 
 if __name__ == "__main__":
