@@ -10,18 +10,18 @@
     2013,
     2021
   ],
-  "n_unscored": 0,
+  "n_unscored": 3,
   "validation_unit": "soum+aimag",
-  "n": 330,
-  "n_soum_losses": 330,
+  "n": 336,
+  "n_soum_losses": 336,
   "n_dropped": 0,
   "dropped_reasons": {
     "no mortality": 0
   },
-  "spearman_soum": 0.661,
-  "excess_spearman_soum": 0.682,
-  "top_quintile_hit": 0.697,
+  "spearman_soum": 0.655,
+  "excess_spearman_soum": 0.674,
+  "top_quintile_hit": 0.672,
   "n_aimag": 21,
-  "spearman_aimag": 0.714,
+  "spearman_aimag": 0.717,
   "mortality_pct": 13.83
 }

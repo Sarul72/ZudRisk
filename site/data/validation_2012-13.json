@@ -1,0 +1,27 @@
+{
+  "winter": "2012/13",
+  "indicators_used": [
+    "cold",
+    "pressure",
+    "snow",
+    "summer"
+  ],
+  "normal_winters": [
+    2013,
+    2021
+  ],
+  "n_unscored": 2,
+  "validation_unit": "soum+aimag",
+  "n": 319,
+  "n_soum_losses": 334,
+  "n_dropped": 18,
+  "dropped_reasons": {
+    "no mortality": 18
+  },
+  "spearman_soum": 0.291,
+  "excess_spearman_soum": 0.299,
+  "top_quintile_hit": 0.266,
+  "n_aimag": 21,
+  "spearman_aimag": 0.181,
+  "mortality_pct": 2.03
+}

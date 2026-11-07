@@ -8,7 +8,8 @@ from pipeline.nso import load_livestock, sheep_units
 from pipeline.validate import pooled, pooled_rows, rounded
 
 DZUD = [2009, 2015, 2022, 2023]
-NORMAL_FROM, NORMAL_TO = 2011, 2023  # soum-level losses start in 2012
+NORMAL_FROM, NORMAL_TO = 2011, 2023  # soum-level losses start in 2012; kept to 2023 so the normals stay the pre-registered pair
+WINTERS = [2009] + list(range(2011, 2025))  # every winter NSO has soum losses for (2012-2025), plus the 2009/10 dzud
 POOLED = Path("data/derived/pooled.json")
 
 
@@ -33,21 +34,23 @@ def normal_winters(herds: dict) -> list[int]:
 def main() -> None:
     herds = load_livestock()
     normals = normal_winters(herds)
-    winters = sorted(DZUD + normals)
-    print(f"winters {winters} (normal: {normals})")
-    rows = []
-    for y in winters:
+    winters = sorted(DZUD + normals)  # the pre-registered test; every other winter is scored and shown, not pooled
+    print(f"winters {WINTERS}, pooled test {winters} (normal: {normals})")
+    rows, every = [], []
+    for y in WINTERS:
         indicators.main(y)
         v = validate.main(y, normals)
         export.main(y)
         print(f"  {v['winter']}: unit {v['validation_unit']}, n {v['n']}, rho soum {v['spearman_soum']}, "
               f"excess {v['excess_spearman_soum']}, rho aimag {v['spearman_aimag']} (n={v['n_aimag']}), "
               f"mortality {v['mortality_pct']}%")
-        rows += pooled_rows(y, indicators.read_risk(y), herds, normals)
-    res = rounded(pooled(rows))
+        r = pooled_rows(y, indicators.read_risk(y), herds, normals)
+        every += r
+        rows += r if y in winters else []
+    res = {**rounded(pooled(rows)), "every_winter": rounded(pooled(every))}
     POOLED.write_text(json.dumps(res, indent=2))
     (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2))
-    export.write_index(winters)
+    export.write_index(WINTERS)
     aimags.write_shapes()
     print(f"pooled: {res}")
     snow = compare.main(winters)
@@ -64,6 +67,7 @@ def check() -> None:
         herds[("A", y, "stock")] = {**full, "sheep": 100.0}
         herds[("A", y + 1, "loss")] = {**full, "sheep": lost}
     assert normal_winters(herds) == [2013, 2021]
+    assert WINTERS == [2009] + list(range(2011, 2025)), WINTERS  # every winter NSO has soum losses for, plus 2009/10
     rows = [("A", 2013, 0.1, 0.01, 0.0), ("B", 2013, 0.2, 0.02, 0.01), ("A", 2023, 0.9, 0.3, 0.29), ("B", 2023, 0.5, 0.1, 0.09)]
     res = pooled(rows)
     assert res["spearman"] == 1.0 and res["n"] == 4 and res["winters"] == [2013, 2023], res

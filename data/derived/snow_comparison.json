@@ -2,8 +2,8 @@
   "winters": [
     {
       "winter": "2009/10",
-      "n_soums": 330,
-      "rho_depth": 0.755,
+      "n_soums": 328,
+      "rho_depth": 0.753,
       "median_era5_m": 0.101,
       "median_gldas_m": 0.44,
       "n": 0,
@@ -12,58 +12,58 @@
     },
     {
       "winter": "2013/14",
-      "n_soums": 330,
-      "rho_depth": 0.857,
-      "median_era5_m": 0.049,
+      "n_soums": 337,
+      "rho_depth": 0.858,
+      "median_era5_m": 0.05,
       "median_gldas_m": 0.05,
-      "n": 329,
-      "rho_soum_era5": 0.252,
-      "rho_soum_gldas": 0.196
+      "n": 337,
+      "rho_soum_era5": 0.249,
+      "rho_soum_gldas": 0.194
     },
     {
       "winter": "2015/16",
-      "n_soums": 330,
-      "rho_depth": 0.671,
-      "median_era5_m": 0.079,
-      "median_gldas_m": 0.097,
-      "n": 330,
+      "n_soums": 338,
+      "rho_depth": 0.666,
+      "median_era5_m": 0.08,
+      "median_gldas_m": 0.098,
+      "n": 338,
       "rho_soum_era5": 0.459,
-      "rho_soum_gldas": 0.298
+      "rho_soum_gldas": 0.301
     },
     {
       "winter": "2021/22",
-      "n_soums": 330,
-      "rho_depth": 0.589,
+      "n_soums": 336,
+      "rho_depth": 0.577,
       "median_era5_m": 0.039,
-      "median_gldas_m": 0.23,
-      "n": 330,
-      "rho_soum_era5": 0.064,
-      "rho_soum_gldas": 0.073
+      "median_gldas_m": 0.228,
+      "n": 336,
+      "rho_soum_era5": 0.08,
+      "rho_soum_gldas": 0.066
     },
     {
       "winter": "2022/23",
-      "n_soums": 330,
-      "rho_depth": 0.804,
-      "median_era5_m": 0.07,
-      "median_gldas_m": 0.117,
-      "n": 330,
-      "rho_soum_era5": 0.327,
-      "rho_soum_gldas": 0.328
+      "n_soums": 336,
+      "rho_depth": 0.795,
+      "median_era5_m": 0.071,
+      "median_gldas_m": 0.12,
+      "n": 336,
+      "rho_soum_era5": 0.332,
+      "rho_soum_gldas": 0.327
     },
     {
       "winter": "2023/24",
-      "n_soums": 330,
-      "rho_depth": 0.607,
-      "median_era5_m": 0.151,
-      "median_gldas_m": 0.145,
-      "n": 330,
-      "rho_soum_era5": 0.661,
-      "rho_soum_gldas": 0.593
+      "n_soums": 336,
+      "rho_depth": 0.604,
+      "median_era5_m": 0.152,
+      "median_gldas_m": 0.146,
+      "n": 336,
+      "rho_soum_era5": 0.655,
+      "rho_soum_gldas": 0.588
     }
   ],
   "pooled": {
-    "n": 1649,
-    "rho_era5": 0.594,
-    "rho_gldas": 0.434
+    "n": 1683,
+    "rho_era5": 0.596,
+    "rho_gldas": 0.44
   }
 }

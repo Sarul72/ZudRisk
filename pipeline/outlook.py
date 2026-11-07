@@ -45,7 +45,7 @@ def short_soums(rows: dict[str, dict], stage: str) -> list[str]:
     """Soums scored on fewer indicators than the stage's validation used: pre-winter has summer and pressure,
     every later stage all four."""
     need = 2 if stage == "oct" else 4
-    return sorted(pc for pc, r in rows.items() if r["n_indicators"] < need)
+    return sorted(pc for pc, r in rows.items() if r["su_per_km2"] is not None and r["n_indicators"] < need)
 
 
 def main(through: str) -> None:
@@ -90,7 +90,8 @@ def check() -> None:
     assert missing_months(2026, "oct", {**have, "ndvi": {"202607"}}) == ["MODIS NDVI 202608"]
     assert missing_months(2026, "feb", have) == ["ERA5-Land 202612", "ERA5-Land 202701", "ERA5-Land 202702",
                                                  "NSO census 2026"]
-    rows = {"A": {"n_indicators": 2}, "B": {"n_indicators": 1}, "C": {"n_indicators": 4}}
+    rows = {k: {"n_indicators": n, "su_per_km2": 1.0} for k, n in (("A", 2), ("B", 1), ("C", 4))}
+    rows["D"] = {"n_indicators": 1, "su_per_km2": None}  # a UB district with no herd is not scored, so not short
     assert short_soums(rows, "oct") == ["B"]
     assert short_soums(rows, "nov") == ["A", "B"]
     live_site = SITE

@@ -118,7 +118,7 @@ def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, f
     out = {}
     for s in soums:
         pc = s["pcode"]
-        if is_aimag_centre(s) and su[pc] is not None:
+        if (is_aimag_centre(s) or s["is_ub"]) and su[pc]:  # a UB district's herd grazes the city's land, as a centre's the aimag's
             a_su, a_km2 = aimag[s["aimag_pcode"]]
             out[pc] = math.log(a_su * 1000 / a_km2) if a_su > 0 else None
         else:
@@ -126,8 +126,8 @@ def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, f
     return out
 
 
-def score_row(z: dict[str, float | None]) -> dict:
-    r = risk(z)
+def score_row(z: dict[str, float | None], has_herd: bool = True) -> dict:
+    r = risk(z) if has_herd else None  # no herd, no dzud risk: a district with no registered stock is not scored
     return {"n_indicators": sum(v is not None for v in z.values()), "risk": r,
             "risk_class": None if r is None else risk_class(r)}
 
@@ -148,8 +148,7 @@ def census_year(year: int, as_of: date) -> int:
 
 @functools.cache
 def _inputs() -> tuple:
-    soums = [s for s in load_soums() if not s["is_ub"]]
-    return soums, load_livestock(), load_era5(), load_series(GLDAS_CSV), load_series(NDVI_CSV)
+    return load_soums(), load_livestock(), load_era5(), load_series(GLDAS_CSV), load_series(NDVI_CSV)
 
 
 def compute(year: int, as_of: date) -> dict[str, dict]:
@@ -182,7 +181,7 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
     for r in rows.values():
         p = r.pop("p")
         r["z_pressure"] = None if p is None else zscore(p, ps)
-        r.update(score_row({k: r[f"z_{k}"] for k in ("cold", "snow", "summer", "pressure")}))
+        r.update(score_row({k: r[f"z_{k}"] for k in ("cold", "snow", "summer", "pressure")}, r["su_per_km2"] is not None))
     return rows
 
 
@@ -202,7 +201,7 @@ def main(year: int, as_of: date | None = None) -> None:
             w.writerow({k: ("" if r[k] is None else round(r[k], 4) if isinstance(r[k], float) else r[k]) for k in COLUMNS})
     scored = sum(r["risk"] is not None for r in rows.values())
     n4 = sum(r["n_indicators"] == 4 for r in rows.values())
-    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), UB skipped; "
+    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), {len(rows) - scored} with no herd; "
           f"missing {dict(missing)}; classes {dict(sorted(hist.items(), key=str))}")
 
 
@@ -251,6 +250,16 @@ def check() -> None:
     pr = pressure_by_soum([town, rural], herds, 2025)
     assert pr["MN4601"] == 0.0, "an aimag centre's herd grazes the aimag: 1000 sheep on 1000 km2"
     assert abs(pr["MN4616"] - math.log(900 / 990)) < 1e-12
+    ub_rural = {"pcode": "MN1101", "aimag_pcode": "MN11", "area_km2": 990.0, "is_ub": True}
+    ub_city = {"pcode": "MN1107", "aimag_pcode": "MN11", "area_km2": 10.0, "is_ub": True}
+    ub_herds = {("MN1101", 2025, "stock"): {**full, "sheep": 0.9}, ("MN1107", 2025, "stock"): {**full, "sheep": 0.1}}
+    ub = pressure_by_soum([ub_rural, ub_city], ub_herds, 2025)
+    assert ub["MN1107"] == 0.0 and ub["MN1101"] == 0.0, ub  # every district with a herd takes the city's density
+    empty = pressure_by_soum([ub_rural, ub_city], {("MN1101", 2025, "stock"): {**full, "sheep": 0.9},
+                                                    ("MN1107", 2025, "stock"): full}, 2025)
+    assert empty["MN1107"] is None, empty
+    assert score_row({"cold": 1.0, "pressure": None, "snow": 1.0, "summer": 1.0}, has_herd=False)["risk"] is None, \
+        "no herd, no dzud risk"
     row = score_row({"cold": 1.0, "pressure": 0.0, "snow": None, "summer": None})
     assert row["n_indicators"] == 2 and abs(row["risk"] - 0.35 / 0.64) < 1e-12
     print("indicators check: ok")

@@ -128,7 +128,7 @@ def rounded(d: dict) -> dict:
 
 def main(year: int, normals: list[int] = ()) -> dict:
     herds, aherds = load_livestock(), load_livestock_aimag()
-    soums = {s["pcode"]: s for s in load_soums() if not s["is_ub"]}
+    soums = {s["pcode"]: s for s in load_soums()}
     with out_path(year).open() as f:
         rows = list(csv.DictReader(f))
     scores = {r["pcode"]: (float(r["risk"]), soums[r["pcode"]]["aimag_pcode"]) for r in rows if r["risk"]}
