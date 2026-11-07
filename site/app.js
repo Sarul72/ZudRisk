@@ -42,7 +42,8 @@ const T = {
     aimag_risk: "Сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", soums_n: "сум", zoom_to: "Газрын зураг дээр харах",
     aimag_suffix: " (аймаг)", centre: " (аймгийн төв: аймгийн дундаж)",
     proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж (цасны зузаанаар жигнэсэн) 2001–2024 онд хамгийн ихдээ 240 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
-    hist_caption: "Хорогдол (багана, хамгийн ихийг дээр нь) ба эрсдэлийн ангилал (зурвас) өвөл бүрээр",
+    hist_caption: "Хорогдол (багана, хамгийн ихийг дээр нь) ба эрсдэлийн ангилал (зурвас) өвөл бүрээр.",
+    hist_outlook: "Сүүлийн зурвас: энэ өвлийн төлөв, хорогдол хараахан мэдэгдээгүй.",
     vuln: "Эмзэг байдал", vuln_unit: "хорогдол ≥5% болох магадлал",
     vuln_legend: "Хорогдол ≥5% болох магадлал, 20 өвлийн дундаж", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
     vuln_note: (m) => `Загвар нь ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")} оны ${m.train.length} өвлийн сум-өвөл бүрээс хорогдол 5%-иас давах эсэхийг сурсан (ridge логистик регресс). Эмзэг байдал = ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} оны 20 өвлийн цаг агаарыг ${m.census} оны малын тоо, бэлчээрийн одоогийн чиг хандлага дээр давтан тооцоход гарах дундаж магадлал. Цаг агаар нь сум бүрийн өөрийн хэвийн утгаас хазайлтаар ордог тул 20 өвлийн дунджаар 0 орчим болно: давхарга нь уур амьсгалын хатуу ширүүнийг бус, малын ачаалал, өмнөх хорогдол, малын өсөлт, ногоорлоос хамаарах мэдрэмтгий байдлыг голчлон харуулна. Урьдчилсан таамаг биш, судалгааны давхарга.`,
@@ -52,7 +53,7 @@ const T = {
     green_note: "Theil–Sen налуу (10-аас цөөн зун бол тооцоогүй). Цөлжилтийн албан ёсны зураг биш: NDVI нь хур тунадас, бэлчээрлэлт, ургамлын бүрхэвчийн өөрчлөлтийг ялгадаггүй.",
     layer_none: "Мэдээлэл байхгүй / мал бүртгэлгүй",
     model: "Сургасан загвар", model_rows: ["Spearman ρ (нэг өвлийг хассан)", "AUC (хорогдол ≥5%)"], fixed: "Тогтмол жин", learned: "Загвар",
-    model_verdict: (better) => better
+    model_verdict: (better) => better === null ? "" : better
       ? "Нэг өвлийг хасаж бусдаар нь сургахад загвар тогтмол жинтэй онооноос илүү сайн эрэмбэлсэн."
       : "Нэг өвлийг хасаж бусдаар нь сургахад тогтмол жинтэй оноо загвараас илүү сайн эрэмбэлсэн: загвар нь газрын зургийн эрсдэлийг орлохгүй, зөвхөн эмзэг байдлын давхаргад ашиглагдана. Ridge-ийн торгуулийг (λ = 1) тааруулаагүй.",
     model_by_winter: "Өвөл бүрийн ρ: тогтмол жин ба загвар", weights: "Загварын жин (стандартчилсан)",
@@ -91,7 +92,8 @@ const T = {
     aimag_risk: "Soum risk weighted by herd size", soums_n: "soums", zoom_to: "Show on the map",
     aimag_suffix: " (aimag)", centre: " (aimag centre: the aimag's density)",
     proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means (weighted by snow depth) peaked near 240 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
-    hist_caption: "Losses (bars, the largest marked above) and risk class (strip) by winter",
+    hist_caption: "Losses (bars, the largest marked above) and risk class (strip) by winter.",
+    hist_outlook: "Last strip: this winter's outlook, losses not known yet.",
     vuln: "Vulnerability", vuln_unit: "chance of losing ≥5%",
     vuln_legend: "Chance of losing ≥5% of the herd, mean over 20 winters", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
     vuln_note: (m) => `The model learned from ${m.train.length} winters, ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")}, which soum-winters lost 5% of the herd or more (ridge logistic regression). Vulnerability = the mean chance when the weather of the 20 winters ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} is replayed on the ${m.census} herds and today's pasture trend. Weather enters as each soum's own anomalies, which average near zero over 20 winters, so the layer mostly shows sensitivity (herd pressure, past losses, herd growth, greenness), not how harsh a soum's climate is. A research layer, not a forecast.`,
@@ -101,7 +103,7 @@ const T = {
     green_note: "Theil–Sen slope (no trend under 10 summers). Not the official desertification map: NDVI cannot tell rain from grazing or a change in what grows.",
     layer_none: "No data / no registered herd",
     model: "Learned model", model_rows: ["Spearman ρ (one winter held out)", "AUC (losses ≥5%)"], fixed: "Fixed weights", learned: "Model",
-    model_verdict: (better) => better
+    model_verdict: (better) => better === null ? "" : better
       ? "Held out one winter at a time, the model ranked losses better than the fixed-weight score."
       : "Held out one winter at a time, the fixed-weight score ranked losses better than the model: the model does not replace the map's risk and is used only for the vulnerability layer. The ridge penalty (λ = 1) was not tuned.",
     model_by_winter: "ρ by winter: fixed weights and model", weights: "Model weights (standardised)",
@@ -130,6 +132,7 @@ L.control.layers({ OpenStreetMap: osm, OpenTopoMap: topo }, null, { position: "t
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const fmt = (v, d = 2) => (v === null || v === undefined ? "–" : Number(v).toFixed(d));
 const bin = (v, cuts) => cuts.filter((c) => v >= c).length;
+const modelBetter = (p) => (p.rho_model == null || p.rho_fixed == null ? null : p.rho_model > p.rho_fixed); // null: no verdict
 const sel = document.getElementById("winter");
 const $ = (id) => document.getElementById(id);
 
@@ -156,25 +159,31 @@ function soumName(p) {
   return lang === "mn" ? `${p.name_mn}, ${p.aimag_mn}` : `${p.name_en}, ${p.aimag_en}`;
 }
 
-// Mortality bars over a risk-class strip, one column per hindcast winter; the chosen winter is drawn dark.
-function histChart(h) {
+// Mortality bars over a risk-class strip, one slot per winter year so a winter with no data leaves a gap; the chosen
+// winter is drawn dark, and in the outlook a last strip-only column carries this winter's risk (losses not known yet).
+function histChart(h, nowRisk) {
   if (!hist || !h) return "";
-  const t = T[lang], n = hist.winters.length, W = 280, top = 12, mh = 46, bw = W / n, idx = hist.winters.indexOf(shown);
+  const t = T[lang], years = hist.winters.map((w) => parseInt(w, 10));
+  const out = isOutlook() && outlook ? parseInt(outlook.winter, 10) : null;
+  const first = years[0], last = Math.max(years[years.length - 1], out ?? -Infinity);
+  const W = 280, top = 12, mh = 46, bw = W / (last - first + 1), ys = top + mh + 4;
   const ms = h.mort.filter((v) => v != null), mx = Math.max(0.05, ...ms);
+  const strip = (x, r, hi, label) => `<rect x="${x + 1}" y="${ys}" width="${bw - 2}" height="10" fill="${r == null ? GREY : COLORS[bin(r, RISK_CUTS)]}"` +
+    `${hi ? ' stroke="#1d2433" stroke-width="1.5"' : ""}><title>${esc(label)}: ${r == null ? "–" : fmt(r, 3)}</title></rect>`;
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 92" width="${W}" role="img" aria-label="${esc(t.hist_caption)}">`;
   s += `<text x="0" y="9" font-size="9" fill="#5b6475">${Math.round(mx * 100)}%</text>`;
   s += `<line x1="0" x2="${W}" y1="${top + mh}" y2="${top + mh}" stroke="#d9dde5"/>`;
   hist.winters.forEach((w, i) => {
-    const m = h.mort[i], r = h.risk[i], x = i * bw;
+    const m = h.mort[i], x = (years[i] - first) * bw, label = w.replace("-", "/");
     if (m != null) {
       const bh = Math.max(1, (m / mx) * mh);
-      s += `<rect x="${x + 1}" y="${top + mh - bh}" width="${bw - 2}" height="${bh}" fill="${i === idx ? "#1d2433" : "#8a93a6"}"><title>${esc(w.replace("-", "/"))}: ${fmt(m * 100, 1)}%</title></rect>`;
+      s += `<rect x="${x + 1}" y="${top + mh - bh}" width="${bw - 2}" height="${bh}" fill="${w === shown ? "#1d2433" : "#8a93a6"}"><title>${esc(label)}: ${fmt(m * 100, 1)}%</title></rect>`;
     }
-    s += `<rect x="${x + 1}" y="${top + mh + 4}" width="${bw - 2}" height="10" fill="${r == null ? GREY : COLORS[bin(r, RISK_CUTS)]}"` +
-      `${i === idx ? ' stroke="#1d2433" stroke-width="1.5"' : ""}><title>${esc(w.replace("-", "/"))}: ${r == null ? "–" : fmt(r, 3)}</title></rect>`;
-    if (i % 2 === 0) s += `<text x="${x + bw / 2}" y="88" font-size="9" text-anchor="middle" fill="#5b6475">'${w.slice(2, 4)}</text>`;
+    s += strip(x, h.risk[i], w === shown, label);
   });
-  return `${s}</svg><br><small>${esc(t.hist_caption)}</small>`;
+  if (out !== null) s += strip((out - first) * bw, nowRisk, true, `${outlook.winter.replace("-", "/")} ${t.outlook_opt(t.months[outlook.stage])}`);
+  for (let y = first; y <= last; y += 2) s += `<text x="${(y - first + 0.5) * bw}" y="88" font-size="9" text-anchor="middle" fill="#5b6475">'${String(y).slice(2)}</text>`;
+  return `${s}</svg><br><small>${esc(t.hist_caption)}${out !== null ? ` ${esc(t.hist_outlook)}` : ""}</small>`;
 }
 
 // Horizontal bars: rows [{label, values, hi}] against series colours; values printed at the right.
@@ -205,7 +214,7 @@ function extraLines(p) {
 
 function aimagPopup(p) {
   const t = T[lang], a = aimagScores[p.pcode];
-  const chart = `<br>${histChart(hist?.aimag[p.pcode])}`;
+  const chart = `<br>${histChart(hist?.aimag[p.pcode], a?.risk)}`;
   if (!a || a.risk_class === null) return `<b>${esc(aimagName(p))}</b><br>${t.nodata}${chart}`;
   const counts = a.counts.map((n, i) => `<i class="chip" style="background:${COLORS[i]}"></i>${esc(t.classes[i])}: ${esc(n)}`)
     .reverse().join("<br>");
@@ -214,7 +223,7 @@ function aimagPopup(p) {
 }
 
 function popup(p) {
-  const t = T[lang], chart = `<br>${histChart(hist?.soum[p.pcode])}`;
+  const t = T[lang], chart = `<br>${histChart(hist?.soum[p.pcode], p.risk)}`;
   if (p.risk_class === null) return `<b>${esc(soumName(p))}</b><br>${p.no_herd ? t.no_herd : t.nodata}${extraLines(p)}${chart}`;
   const unseen = (k) => p.stage === "oct" && (k === "cold" || k === "snow"); // pre-winter: no winter month yet
   const z = KEYS.map((k) => `${t.ind[k]} z: ${unseen(k) ? t.not_observed : fmt(p[`z_${k}`])}`).join("<br>");
@@ -239,7 +248,7 @@ function renderLegend(t) {
   let html, note = "";
   if (view === "vuln" && model) {
     html = `<p class="note">${esc(t.vuln_legend)}</p>${legendRows(VULN, t.vuln_classes)}<div><i style="background:${GREY}"></i>${esc(t.layer_none)}</div>`;
-    note = `${t.vuln_note(model)} ${t.model_verdict(model.pooled.rho_model > model.pooled.rho_fixed)}`;
+    note = `${t.vuln_note(model)} ${t.model_verdict(modelBetter(model.pooled))}`;
   } else if (view === "green" && greenness) {
     html = `<p class="note">${esc(t.green_legend(greenness))}</p>${legendRows(GREEN, t.green_classes)}<div><i style="background:${GREY}"></i>${esc(t.nodata)}</div>`;
     note = t.green_note;
@@ -255,7 +264,7 @@ function renderModel(t) {
   const p = model.pooled;
   $("model_table").innerHTML = `<tr><td></td><td>${esc(t.fixed)} / ${esc(t.learned)}</td></tr>` +
     table([[t.model_rows[0], `${fmt(p.rho_fixed, 3)} / ${fmt(p.rho_model, 3)}`], [t.model_rows[1], `${fmt(p.auc_fixed, 3)} / ${fmt(p.auc_model, 3)}`]]);
-  $("model_note").textContent = t.model_verdict(p.rho_model > p.rho_fixed);
+  $("model_note").textContent = t.model_verdict(modelBetter(p));
   $("model_chart").innerHTML = hbars(Object.entries(model.lowo).map(([w, v]) => ({ label: w.replace("-", "/"), values: [v.rho_fixed, v.rho_model], hi: w === shown })),
     ["#8a93a6", "#d95f02"], { aria: t.model_by_winter }) +
     `<div class="note"><i class="chip" style="background:#8a93a6"></i>${esc(t.fixed)} <i class="chip" style="background:#d95f02;margin-left:8px"></i>${esc(t.learned)}</div>`;
@@ -329,14 +338,8 @@ function render() {
       .map((n) => `<option value="${esc(n)}"></option>`).join("");
     for (const f of soumGeo.features) byName[soumName(f.properties)] = f.properties.pcode;
   }
-  if (layer) {
-    const aimagLevel = level === "aimag" && view === "risk";
-    layer.eachLayer((l) => {
-      const p = l.feature.properties;
-      l.setPopupContent(aimagLevel ? aimagPopup(p) : popup(p));
-      l.setTooltipContent(aimagLevel ? aimagName(p) : soumName(p));
-    });
-  }
+  // popups and tooltips are built when opened; only an open one needs redrawing (a language or winter change)
+  if (layer) layer.eachLayer((l) => { if (l.isPopupOpen()) l.getPopup().update(); });
 }
 
 function draw() {
@@ -345,9 +348,9 @@ function draw() {
   borders = null;
   const tip = { sticky: true, direction: "top", opacity: 0.9 };
   if (level === "aimag" && view === "risk") {
-    layer = L.geoJSON(aimagGeo, { style: aimagStyle, onEachFeature: (f, l) => l.bindPopup(aimagPopup(f.properties), { maxWidth: 320 }).bindTooltip(aimagName(f.properties), tip) }).addTo(map);
+    layer = L.geoJSON(aimagGeo, { style: aimagStyle, onEachFeature: (f, l) => l.bindPopup(() => aimagPopup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(aimagName(f.properties)), tip) }).addTo(map);
   } else {
-    layer = L.geoJSON(soumGeo, { style, onEachFeature: (f, l) => l.bindPopup(popup(f.properties), { maxWidth: 320 }).bindTooltip(soumName(f.properties), tip) }).addTo(map);
+    layer = L.geoJSON(soumGeo, { style, onEachFeature: (f, l) => l.bindPopup(() => popup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(soumName(f.properties)), tip) }).addTo(map);
     borders = L.geoJSON(aimagGeo, { style: { color: "#222", weight: 1.6, fill: false }, interactive: false }).addTo(map);
   }
   render();

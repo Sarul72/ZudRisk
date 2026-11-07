@@ -1,6 +1,9 @@
 """A small learned model beside the fixed score: ridge logistic regression on soum-winters, asked which soums lose
 heavily, validated leave-one-winter-out against the fixed score, then replayed over the last 20 winters' weather on
-today's herds and pasture. The replay is structural vulnerability for research, not a forecast."""
+today's herds and pasture. The replay is structural vulnerability for research, not a forecast.
+
+No look-ahead, with one exception shared by both scores: the indicator z-scores stand on the 2001-2020 baseline,
+which post-dates the 2011-2019 training winters. Every other feature of winter Y is out by 31 March Y+1."""
 import json
 import math
 import sys
@@ -22,7 +25,7 @@ NOW = 2025  # the newest census
 HIGH_LOSS = 0.05  # the target, fixed before any fit: adult losses of 5 % of the herd or more
 LAM = 1.0  # ridge penalty on standardised features; not tuned, so the held-out skill is not tuned either
 CLIMATE = ["z_cold", "z_snow", "z_summer", "z_density"]  # what a replayed winter brings
-FEATURES = CLIMATE + ["z_pressure", "greenness_trend", "herd_growth_5y", "past_mortality"]
+FEATURES = CLIMATE + ["z_pressure", "greenness_trend", "herd_growth_5y", "past_mortality"]  # _fold_x needs it last
 OUT = Path("data/derived/model.json")
 
 
@@ -64,13 +67,21 @@ def _scaler(train_x):
     return lambda v: np.nan_to_num((np.asarray(v, float) - mu) / sd)
 
 
+def _fold_x(r: dict, held: int) -> list[float]:
+    """A row's features with the held-out winter's losses taken out of its past_mortality (the last feature)."""
+    if "earlier" not in r:
+        return r["x"]
+    ms = [m for y, m in r["earlier"].items() if y != held]
+    return r["x"][:-1] + [sum(ms) / len(ms) if ms else math.nan]
+
+
 def lowo(rows: list[dict], lam: float = LAM) -> dict:
     """Each winter predicted by a model fitted on every other winter: winter -> probabilities in row order."""
     out = {}
     for held in sorted({r["winter"] for r in rows}):
-        train = [r for r in rows if r["winter"] != held]
-        s = _scaler([r["x"] for r in train])
-        w, b = fit(s([r["x"] for r in train]), [r["y"] for r in train], lam)
+        train = [_fold_x(r, held) for r in rows if r["winter"] != held]
+        s = _scaler(train)
+        w, b = fit(s(train), [r["y"] for r in rows if r["winter"] != held], lam)
         out[held] = [float(p) for p in predict(s([r["x"] for r in rows if r["winter"] == held]), w, b)]
     return out
 
@@ -94,15 +105,16 @@ def _x(climate_row: dict, now_row: dict, ndvi: dict, herds: dict, pcode: str, ye
     return [math.nan if v is None else v for v in vals]
 
 
-def training_rows(herds: dict, ndvi: dict) -> list[dict]:
+def training_rows(herds: dict, ndvi: dict, years=TRAIN) -> list[dict]:
     rows = []
-    for y in TRAIN:
+    for y in years:
         for pc, r in indicators.compute(y, indicators.winter_end(y)).items():
             m = mortality(herds, pc, y)
             if r["risk"] is None or m is None:
                 continue
+            earlier = {e: me for e in range(TRAIN.start, y) if (me := mortality(herds, pc, e)) is not None}
             rows.append({"winter": y, "pcode": pc, "x": _x(r, r, ndvi, herds, pc, y, y), "y": float(m >= HIGH_LOSS),
-                         "m": m, "risk": r["risk"]})
+                         "m": m, "risk": r["risk"], "earlier": earlier})
     return rows
 
 
@@ -175,6 +187,19 @@ def check() -> None:
     held = lowo(rows)
     flipped = [{**r, "y": 1 - r["y"]} if r["winter"] == 2 else r for r in rows]
     assert lowo(flipped)[2] == held[2], "a held-out winter's labels never reach its own prediction"
+
+    def with_past(wi, v, earlier):  # x as training_rows builds it: past_mortality is the mean of the earlier winters
+        return {"winter": wi, "x": [float(v), sum(earlier.values()) / len(earlier) if earlier else math.nan],
+                "y": float(v > 0), "earlier": earlier}
+    base = [with_past(wi, v, {e: 0.01 * e * (v + 3) for e in (1, 2) if e < wi}) for wi in (1, 2, 3) for v in (-2, -1, 1, 2)]
+    moved = [with_past(r["winter"], r["x"][0], {**r["earlier"], 1: 0.9}) if 1 in r["earlier"] else r for r in base]
+    assert lowo(moved)[1] == lowo(base)[1], "a held-out winter's losses reach no training row's past_mortality"
+
+    real_herds, real_ndvi = load_livestock(), load_series(indicators.NDVI_CSV)
+    later = {pc: {m: (0.0 if int(m[:4]) > 2012 else v) for m, v in s.items()} for pc, s in real_ndvi.items()}
+    at = {r["pcode"]: r["x"] for r in training_rows(real_herds, real_ndvi, [2012])}
+    assert at and at == {r["pcode"]: r["x"] for r in training_rows(real_herds, later, [2012])}, \
+        "a 2012/13 training row reads no summer after 2012"
     print("model check: ok")
 
 
