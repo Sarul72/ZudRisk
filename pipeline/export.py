@@ -17,7 +17,8 @@ from pipeline.validate import out_path_json
 SIMPLIFY_DEG = 0.005
 MAX_BYTES = 2_000_000
 SITE = Path("site/data")
-NUMERIC = ["cold_c", "z_cold", "snow_m", "z_snow", "ndvi", "z_summer", "su_per_km2", "z_pressure", "risk"]
+NUMERIC = ["cold_c", "z_cold", "snow_m", "z_snow", "ndvi", "z_summer", "su_per_km2", "z_pressure", "risk",
+           "z_snow_gldas", "snow_days", "density_kgm3", "z_density"]
 
 
 def feature(geom, props: dict) -> dict:
