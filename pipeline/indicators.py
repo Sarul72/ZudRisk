@@ -46,11 +46,12 @@ def snow_months(year: int, as_of: date) -> list[str]:
 
 
 def shift_as_of(as_of: date, years: int) -> date:
-    """The same calendar day in another winter, so a baseline winter sees the same months as the scored one."""
-    try:
-        return as_of.replace(year=as_of.year + years)
-    except ValueError:  # 29 February in a non-leap year
-        return as_of.replace(year=as_of.year + years, day=28)
+    """The same calendar day in another winter, so a baseline winter sees the same months as the scored one.
+    A month's last day maps to that month's last day: 28 Feb 2023 is 29 Feb 2004, or a leap baseline loses February."""
+    y = as_of.year + years
+    last = calendar.monthrange(as_of.year, as_of.month)[1]
+    day = calendar.monthrange(y, as_of.month)[1] if as_of.day == last else as_of.day
+    return as_of.replace(year=y, day=day)
 
 
 def cold(series: dict[str, float], year: int, as_of: date) -> float | None:
@@ -190,6 +191,8 @@ def check() -> None:
     assert winter_months(2023, date(2023, 11, 29)) == []
     assert shift_as_of(date(2024, 1, 15), -18) == date(2006, 1, 15)
     assert shift_as_of(date(2024, 2, 29), -1) == date(2023, 2, 28)
+    assert shift_as_of(date(2023, 2, 28), -19) == date(2004, 2, 29), "a month's last day stays its last day"
+    assert len(winter_months(2003, shift_as_of(date(2023, 2, 28), -19))) == 4
     t2m = {"202311": -10.0, "202312": -20.0, "202401": -30.0, "202402": -20.0}
     assert cold(t2m, 2023, date(2024, 3, 31)) == -20.0
     assert cold({k: v for k, v in t2m.items() if k != "202402"}, 2023, date(2024, 3, 31)) is None

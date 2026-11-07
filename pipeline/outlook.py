@@ -37,6 +37,13 @@ def missing_months(year: int, stage: str, have: dict[str, set]) -> list[str]:
     return out + ([] if census in have["census"] else [f"NSO census {census}"])
 
 
+def short_soums(rows: dict[str, dict], stage: str) -> list[str]:
+    """Soums scored on fewer indicators than the stage's validation used: pre-winter has summer and pressure,
+    every later stage all four."""
+    need = 2 if stage == "oct" else 4
+    return sorted(pc for pc, r in rows.items() if r["n_indicators"] < need)
+
+
 def main(through: str) -> None:
     year, stage = parse_through(through)
     missing = missing_months(year, stage, available())
@@ -44,6 +51,10 @@ def main(through: str) -> None:
         sys.exit(f"{label(year)} stage {stage} cannot run yet; not published: {', '.join(missing)}")
     as_of = stage_date(year, stage)
     rows = indicators.compute(year, as_of)
+    short = short_soums(rows, stage)
+    if short:
+        sys.exit(f"{label(year)} stage {stage}: {len(short)} soums lack indicators the stage's validation used: "
+                 f"{', '.join(short[:10])}")
     extra = {"stage": stage, "data_through": through}
     feats = [feature(s["geom"], {**props_for(s, rows.get(s["pcode"], {})), **extra}) for s in load_soums()]
     (SITE / f"outlook_{label(year)}.geojson").write_text(
@@ -56,8 +67,11 @@ def main(through: str) -> None:
 
 
 def check() -> None:
+    import shutil
+    import tempfile
+    from pathlib import Path
     from pipeline import compare
-    from pipeline.export import SITE
+    global SITE
     assert parse_through("2026-10") == (2026, "oct") and parse_through("2027-02") == (2026, "feb")
     have = {"era5": {"202611"}, "ndvi": {"202607", "202608"}, "census": {2025}}
     assert missing_months(2026, "oct", have) == []
@@ -65,16 +79,30 @@ def check() -> None:
     assert missing_months(2026, "oct", {**have, "ndvi": {"202607"}}) == ["MODIS NDVI 202608"]
     assert missing_months(2026, "feb", have) == ["ERA5-Land 202612", "ERA5-Land 202701", "ERA5-Land 202702",
                                                  "NSO census 2026"]
-    index = (SITE / "winters.json").read_bytes()
-    try:
-        main("2030-11")
-        raise AssertionError("a stage with no data must refuse")
-    except SystemExit as e:
-        assert "ERA5-Land 203011" in str(e), e
-    assert not (SITE / "outlook_2030-31.geojson").exists()
-    main("2026-10")
-    assert (SITE / "winters.json").read_bytes() == index, "the outlook entered the hindcast index"
+    rows = {"A": {"n_indicators": 2}, "B": {"n_indicators": 1}, "C": {"n_indicators": 4}}
+    assert short_soums(rows, "oct") == ["B"]
+    assert short_soums(rows, "nov") == ["A", "B"]
+    live_site = SITE
+    live = live_site / "outlook.json"
+    live_mtime = live.stat().st_mtime_ns if live.exists() else None
+    with tempfile.TemporaryDirectory() as d:
+        SITE = Path(d)  # the self-check writes a scratch site, never the published outlook
+        try:
+            shutil.copy(live_site / "winters.json", SITE / "winters.json")
+            index = (SITE / "winters.json").read_bytes()
+            try:
+                main("2030-11")
+                raise AssertionError("a stage with no data must refuse")
+            except SystemExit as e:
+                assert "ERA5-Land 203011" in str(e), e
+            assert not (SITE / "outlook_2030-31.geojson").exists() and not (SITE / "outlook.json").exists()
+            main("2026-10")
+            assert (SITE / "outlook.json").exists() and (SITE / "winters.json").read_bytes() == index, \
+                "the outlook entered the hindcast index"
+        finally:
+            SITE = live_site
     compare.compare([2023])
+    assert (live.stat().st_mtime_ns if live.exists() else None) == live_mtime, "the self-check overwrote the live outlook"
     print("outlook check: ok")
 
 

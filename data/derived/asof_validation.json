@@ -272,10 +272,10 @@
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.245,
-        "excess_spearman_soum": -0.138,
+        "spearman_soum": 0.246,
+        "excess_spearman_soum": -0.136,
         "n_aimag": 21,
-        "spearman_aimag": 0.194
+        "spearman_aimag": 0.164
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
@@ -288,18 +288,18 @@
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.042,
-        "excess_spearman_soum": 0.045,
+        "spearman_soum": 0.041,
+        "excess_spearman_soum": 0.044,
         "n_aimag": 21,
         "spearman_aimag": 0.029
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.326,
-        "excess_spearman_soum": 0.322,
+        "spearman_soum": 0.324,
+        "excess_spearman_soum": 0.32,
         "n_aimag": 21,
-        "spearman_aimag": 0.364
+        "spearman_aimag": 0.355
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
@@ -319,9 +319,9 @@
         2022,
         2023
       ],
-      "spearman": 0.592,
+      "spearman": 0.593,
       "n_excess": 1649,
-      "spearman_excess": 0.576
+      "spearman_excess": 0.577
     }
   },
   "mar": {
