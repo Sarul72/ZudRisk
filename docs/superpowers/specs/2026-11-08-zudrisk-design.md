@@ -1,6 +1,18 @@
 # ZudRisk: design and roadmap
 
-Date: 2026-11-08. Status: **draft, waiting for approval**. Nothing is built yet.
+Date: 2026-11-08. Status: **approved and built through v0.5**. Below is the design as approved; the next
+section says where the build went its own way. What comes next is in [plan.md](../../../plan.md).
+
+## Where the build differs (2026-11-08)
+
+- **Boundaries** are OCHA COD-AB, not geoBoundaries.
+- **Snow** is ERA5-Land from v0.3, and **cold** too: POWER runs 5-6 weeks behind and is no longer scored.
+- **Winters** reach back to 2000/01. Soum losses exist only from 2011/12, so the winters before are checked by aimag.
+- **The ice-crust proxy** was tested from monthly melt and rain on snow and found no relation to losses. It is not
+  shown (README, "Tested and not used").
+- **v0.5** is a ridge logistic model shown beside the fixed weights, which it does not beat, plus the risk as a
+  calibrated chance. The fixed weights still make the score.
+- **v0.6**, the GEE path, has not been built.
 Evidence for every data and method claim is in [docs/research/data-sources.md](../../research/data-sources.md).
 
 ## Товч (Mongolian summary)
