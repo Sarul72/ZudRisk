@@ -55,6 +55,27 @@ def out_path_json(year: int) -> Path:
     return Path(f"data/derived/validation_{year}.json")
 
 
+def aimag_pairs(year: int, scores: dict[str, tuple[float, str]], herds: dict, aherds: dict) -> list[tuple]:
+    """(aimag, herd-weighted risk of its soums, NSO's aimag mortality) for each aimag with both."""
+    by_aimag: dict[str, list[tuple[float, float]]] = {}
+    for pcode, (r, aimag) in scores.items():
+        stock = sheep_units(herds.get((pcode, year, "stock"), {}))
+        if stock:
+            by_aimag.setdefault(aimag, []).append((r, stock))
+    out = []
+    for aimag, v in sorted(by_aimag.items()):
+        am = mortality(aherds, aimag, year)
+        if am is not None:
+            out.append((aimag, sum(r * st for r, st in v) / sum(st for _, st in v), am))
+    return out
+
+
+def pooled_aimag(rows: list[tuple]) -> dict:
+    """Spearman over every aimag-winter (winter, risk, mortality): the only test reaching back before soum losses."""
+    return {"n": len(rows), "winters": sorted({y for y, _, _ in rows}),
+            "spearman": spearman([r for _, r, _ in rows], [m for _, _, m in rows])}
+
+
 def evaluate(year: int, scores: dict[str, tuple[float, str]], herds: dict, aherds: dict,
              normals: list[int]) -> dict:
     """Score against losses at soum level where NSO has soum losses, and always at aimag level from NSO's aimag rows."""
@@ -73,12 +94,8 @@ def evaluate(year: int, scores: dict[str, tuple[float, str]], herds: dict, aherd
         normal = [x for x in (mortality(herds, pcode, n) for n in normals) if x is not None]
         if normal:
             excess_pairs.append((r, m - sum(normal) / len(normal)))
-    a_risk, a_mort = [], []
-    for aimag, v in sorted(by_aimag.items()):
-        am = mortality(aherds, aimag, year)
-        if am is not None:
-            a_risk.append(sum(r * st for r, st in v) / sum(st for _, st in v))
-            a_mort.append(am)
+    pairs_a = aimag_pairs(year, scores, herds, aherds)
+    a_risk, a_mort = [r for _, r, _ in pairs_a], [m for _, _, m in pairs_a]
     a_loss = sum(sheep_units(aherds.get((a, year + 1, "loss"), {})) or 0 for a in by_aimag)
     a_stock = sum(sheep_units(aherds.get((a, year, "stock"), {})) or 0 for a in by_aimag)
     risk_s, mort_s = [r for r, _ in pairs], [m for _, m in pairs]
@@ -162,6 +179,11 @@ def check() -> None:
     assert res["spearman_soum"] is None and res["validation_unit"] == "aimag" and res["n_soum_losses"] == 0, res
     assert res["spearman_aimag"] == 1.0 and res["n_aimag"] == 3 and res["mortality_pct"] == 5.0, res
     json.dumps(res, allow_nan=False)
+    pairs = aimag_pairs(2009, {"A": (0.1, "X"), "B": (0.5, "Y"), "C": (0.9, "Z")}, herds09, aherds)
+    assert pairs == [("X", 0.1, 0.01), ("Y", 0.5, 0.05), ("Z", 0.9, 0.09)], pairs
+    rows = [(2009, r, m) for _, r, m in pairs] + [(2010, 0.2, 0.09), (2010, 0.3, 0.01)]
+    pa = pooled_aimag(rows)
+    assert pa["n"] == 5 and pa["winters"] == [2009, 2010] and pa["spearman"] == spearman([.1, .5, .9, .2, .3], [.01, .05, .09, .09, .01]), pa
     print("validate check: ok")
 
 

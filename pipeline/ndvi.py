@@ -22,6 +22,7 @@ SCALE = 10000.0  # HDF-EOS convention: value = raw / scale_factor
 RAW = Path("data/raw/ndvi")
 OUT = Path("data/derived/soum_ndvi.csv")
 
+FIRST_SUMMER = 2000  # the pasture before winter 2000/01; MOD13C2 starts in February 2000
 
 def to_ndvi(raw: np.ndarray) -> np.ma.MaskedArray:
     raw = np.asarray(raw)
@@ -59,7 +60,7 @@ def read(path: Path) -> np.ma.MaskedArray:
 
 def main() -> None:
     RAW.mkdir(parents=True, exist_ok=True)
-    months = [(y, m) for y in range(2001, last_summer(date.today().year) + 1) for m in (7, 8)]
+    months = [(y, m) for y in range(FIRST_SUMMER, last_summer(date.today().year) + 1) for m in (7, 8)]
     for y, m in months:
         cached(RAW / f"{y}{m:02d}.nc4", lambda y=y, m=m: get_bytes_auth(granule_url(y, m)))
     lats, lons = grid_centres()

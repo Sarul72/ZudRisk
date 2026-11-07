@@ -1,5 +1,5 @@
 """ERA5-Land monthly snow depth, density, cover and 2 m temperature over Mongolia (Copernicus CDS), as a mean per soum.
-A history file holds 2001-2024; each later year has its own file, refetched under a new name as months land."""
+A history file holds 2001-2024 (and an early one Nov-Dec 2000); each later year has its own file, refetched under a new name as months land."""
 import csv
 import sys
 import urllib.error
@@ -25,6 +25,8 @@ INPUTS = {
 }
 RAW = Path("data/raw")
 HISTORY = RAW / "era5_land_2001_2024.nc"
+EARLY = RAW / "era5_land_2000_11_12.nc"  # the start of winter 2000/01, the first one hindcast
+EARLY_INPUTS = {**INPUTS, "year": ["2000"], "month": ["11", "12"]}
 FIRST_RECENT = 2025
 WINTER = ["01", "02", "03", "11", "12"]
 OUT = Path("data/derived/soum_era5.csv")
@@ -96,6 +98,7 @@ def recent_months(year: int, months_of=cds_months) -> list[str]:
 
 def fetch() -> None:
     RAW.mkdir(parents=True, exist_ok=True)
+    cached(EARLY, lambda: cds_retrieve(DATASET, EARLY_INPUTS))
     cached(HISTORY, lambda: cds_retrieve(DATASET, INPUTS))
     for year in range(FIRST_RECENT, date.today().year + 1):
         months = recent_months(year)
@@ -104,8 +107,8 @@ def fetch() -> None:
 
 
 def files() -> list[Path]:
-    """The history file, then each later year's newest file, oldest first."""
-    out = [HISTORY]
+    """Nov-Dec 2000, the history file, then each later year's newest file, oldest first."""
+    out = [EARLY, HISTORY]
     for year in range(FIRST_RECENT, date.today().year + 1):
         have = sorted(RAW.glob(f"era5_land_{year}_*.nc"))
         out += have[-1:]
@@ -150,6 +153,8 @@ def check() -> None:
     import tempfile
     import urllib.error
     assert yyyymm(1704067200) == "202401"  # 2024-01-01 00:00 UTC
+    assert files()[:2] == [EARLY, HISTORY], "winter 2000/01 needs Nov-Dec 2000, before the history file"
+    assert EARLY_INPUTS["year"] == ["2000"] and EARLY_INPUTS["month"] == ["11", "12"]
     assert yyyymm(1701388800) == "202312"  # 2023-12-01 00:00 UTC
     assert yyyymm(1701385200) == "202311"  # 2023-11-30 23:00 UTC: Ulaanbaatar's local clock already reads December
     with tempfile.TemporaryDirectory() as d:
