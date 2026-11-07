@@ -23,7 +23,7 @@ const T = {
     cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / км²",
     missing: "Дутуу үзүүлэлт",
     snow_days: "Цастай өдөр", density: "Цасны хамгийн их нягт", unit_density: "кг/м³",
-    proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сарын дундаж 2001–2024 онд 220-оос давсангүй тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
+    proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж 2001–2024 онд хамгийн ихдээ 220 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
   },
   en: {
     title: "Dzud risk", subtitle: "Per soum, hindcasts of past winters", winter: "Winter",
@@ -44,7 +44,7 @@ const T = {
     cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km²",
     missing: "Missing indicators",
     snow_days: "Snow-cover days", density: "Densest monthly snow", unit_density: "kg/m³",
-    proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land monthly means never passed 220 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
+    proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means peaked near 220 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
   },
 };
 

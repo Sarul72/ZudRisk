@@ -102,11 +102,12 @@ def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, ti
     """Submit a Copernicus CDS job, wait for it, and return the file it made. The token goes to the API only,
     never to the object store the result is served from."""
     url, key = auth or cds_config(CDS_RC.read_text())
-    headers = {"User-Agent": USER_AGENT, "PRIVATE-TOKEN": key}
+    headers = {"User-Agent": USER_AGENT}
 
     def call(u: str, body: dict | None = None) -> dict:
         data = None if body is None else json.dumps(body).encode()
         req = urllib.request.Request(u, data=data, headers={**headers, **({"Content-Type": "application/json"} if data else {})})
+        req.add_unredirected_header("PRIVATE-TOKEN", key)  # urllib copies plain headers onto a redirect to any host
         try:
             return json.loads(_open(req, opener))
         except urllib.error.HTTPError as e:
@@ -195,7 +196,7 @@ def _check_cds() -> None:
     class FakeCds:
         """Submit answers a job id; each poll walks the given statuses; results point at a public href."""
         def __init__(self, statuses, submit_code=200):
-            self.statuses, self.submit_code, self.seen = list(statuses), submit_code, []
+            self.statuses, self.submit_code, self.seen, self.redirected = list(statuses), submit_code, [], []
         def open(self, req, timeout=None):
             u = req.full_url
             self.seen.append((u, req.get_header("Private-token")))
@@ -204,6 +205,9 @@ def _check_cds() -> None:
                     raise urllib.error.HTTPError(u, self.submit_code, "Unauthorized", {}, None)
                 return Resp({"status": "accepted", "jobID": "J1"})
             if u.endswith("/jobs/J1"):
+                # the stdlib's own redirect handler builds the follow-up request: does the token ride along?
+                hop = urllib.request.HTTPRedirectHandler().redirect_request(req, None, 302, "Found", {}, "https://lb/x")
+                self.redirected.append(hop.get_header("Private-token"))
                 s = self.statuses.pop(0)
                 return Resp({"status": s, "jobID": "J1", **({"detail": "bad area"} if s == "failed" else {})})
             if u.endswith("/jobs/J1/results"):
@@ -227,6 +231,7 @@ def _check_cds() -> None:
     assert cds_retrieve("ds", {"a": 1}, opener=fake, auth=auth, poll_s=0) == b"\x89HDF"
     assert fake.seen[0] == ("https://x/api/retrieve/v1/processes/ds/execution", "K")
     assert fake.seen[-1] == ("https://store/f.nc", None), "the object store href is fetched without the token"
+    assert fake.redirected == [None, None], "a redirect off the CDS API must not carry the token"
 
 
 if __name__ == "__main__":
