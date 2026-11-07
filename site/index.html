@@ -24,6 +24,7 @@
   table { border-collapse: collapse; width: 100%; font-size: 14px; }
   td { padding: 3px 0; border-bottom: 1px solid #eef0f3; }
   td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  .banner { margin: 0 0 12px; padding: 8px 10px; border-radius: 6px; background: #fff4d6; border: 1px solid #f0c860; font-size: 14px; }
   .note, .attr { font-size: 13px; color: var(--muted); }
   .leaflet-popup-content { font-size: 14px; }
   @media (max-width: 760px) {
@@ -41,14 +42,17 @@
   <button id="lang" type="button">EN</button>
 </header>
 <aside>
+  <p class="banner" id="banner" hidden></p>
   <h2 data-t="legend"></h2>
   <div class="legend" id="legend"></div>
-  <h2 data-t="validation"></h2>
+  <h2 id="validation_h"></h2>
   <table id="validation"></table>
   <p class="note" id="unit_note"></p>
   <p class="note" data-t="validation_note"></p>
   <h2 data-t="pooled"></h2>
   <table id="pooled"></table>
+  <h2 data-t="stages"></h2>
+  <table id="stages"></table>
   <h2 data-t="limits"></h2>
   <p class="note" data-t="limits_text"></p>
   <h2 data-t="sources"></h2>
