@@ -98,6 +98,34 @@ def evaluate(year: int, scores: dict[str, tuple[float, str]], herds: dict, aherd
     }
 
 
+def pooled(rows: list[tuple]) -> dict:
+    """Spearman over every soum-winter: asks whether scores rise in dzud years, which one winter cannot show."""
+    ex = [(r, e) for _, _, r, _, e in rows if e is not None]
+    return {
+        "n": len(rows),
+        "winters": sorted({y for _, y, _, _, _ in rows}),
+        "spearman": spearman([r for _, _, r, _, _ in rows], [m for _, _, _, m, _ in rows]),
+        "n_excess": len(ex),
+        "spearman_excess": spearman([r for r, _ in ex], [e for _, e in ex]),
+    }
+
+
+def pooled_rows(year: int, risk: dict[str, float], herds: dict, normals: list[int]) -> list[tuple]:
+    """(pcode, winter, risk, mortality, excess) for each scored soum with losses; excess is None without a normal winter."""
+    rows = []
+    for pcode, r in risk.items():
+        m = mortality(herds, pcode, year)
+        if m is None:
+            continue
+        normal = [x for x in (mortality(herds, pcode, n) for n in normals) if x is not None]
+        rows.append((pcode, year, r, m, m - sum(normal) / len(normal) if normal else None))
+    return rows
+
+
+def rounded(d: dict) -> dict:
+    return {k: (round(v, 3) if isinstance(v, float) else v) for k, v in d.items()}
+
+
 def main(year: int, normals: list[int] = ()) -> dict:
     herds, aherds = load_livestock(), load_livestock_aimag()
     soums = {s["pcode"]: s for s in load_soums() if not s["is_ub"]}

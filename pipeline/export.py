@@ -39,17 +39,19 @@ def write_index(years: list[int]) -> None:
     (SITE / "winters.json").write_text(json.dumps(winters_index(years)))
 
 
+def props_for(soum: dict, row: dict) -> dict:
+    """A soum's map properties from an indicator row whose missing values are None."""
+    props = {k: soum[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
+    props.update({k: None if row.get(k) is None else round(float(row[k]), 4) for k in NUMERIC})
+    for k in ("risk_class", "n_indicators"):
+        props[k] = None if row.get(k) is None else int(row[k])
+    return props
+
+
 def main(year: int) -> None:
     with out_path(year).open() as f:
-        scores = {r["pcode"]: r for r in csv.DictReader(f)}
-    feats = []
-    for s in load_soums():
-        r = scores.get(s["pcode"], {})
-        props = {k: s[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
-        props.update({k: float(r[k]) if r.get(k) else None for k in NUMERIC})
-        for k in ("risk_class", "n_indicators"):
-            props[k] = int(r[k]) if r.get(k) else None
-        feats.append(feature(s["geom"], props))
+        scores = {r["pcode"]: {k: v or None for k, v in r.items()} for r in csv.DictReader(f)}
+    feats = [feature(s["geom"], props_for(s, scores.get(s["pcode"], {}))) for s in load_soums()]
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,

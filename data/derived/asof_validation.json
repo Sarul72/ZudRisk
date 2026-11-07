@@ -1,0 +1,392 @@
+{
+  "oct": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.464
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.01,
+        "excess_spearman_soum": -0.033,
+        "n_aimag": 21,
+        "spearman_aimag": 0.013
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.107,
+        "excess_spearman_soum": 0.071,
+        "n_aimag": 21,
+        "spearman_aimag": -0.101
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.1,
+        "excess_spearman_soum": 0.091,
+        "n_aimag": 21,
+        "spearman_aimag": 0.244
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.315,
+        "excess_spearman_soum": 0.333,
+        "n_aimag": 21,
+        "spearman_aimag": 0.379
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.186,
+        "excess_spearman_soum": 0.186,
+        "n_aimag": 21,
+        "spearman_aimag": -0.125
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.219,
+      "n_excess": 1649,
+      "spearman_excess": 0.205
+    }
+  },
+  "nov": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.842
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.216,
+        "excess_spearman_soum": -0.06,
+        "n_aimag": 21,
+        "spearman_aimag": 0.271
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.311,
+        "excess_spearman_soum": 0.39,
+        "n_aimag": 21,
+        "spearman_aimag": 0.523
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": -0.024,
+        "excess_spearman_soum": 0.007,
+        "n_aimag": 21,
+        "spearman_aimag": -0.161
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.212,
+        "excess_spearman_soum": 0.203,
+        "n_aimag": 21,
+        "spearman_aimag": 0.145
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.679,
+        "excess_spearman_soum": 0.698,
+        "n_aimag": 21,
+        "spearman_aimag": 0.852
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.483,
+      "n_excess": 1649,
+      "spearman_excess": 0.468
+    }
+  },
+  "dec": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.796
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.198,
+        "excess_spearman_soum": -0.099,
+        "n_aimag": 21,
+        "spearman_aimag": 0.201
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.343,
+        "excess_spearman_soum": 0.431,
+        "n_aimag": 21,
+        "spearman_aimag": 0.609
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.115,
+        "excess_spearman_soum": 0.065,
+        "n_aimag": 21,
+        "spearman_aimag": 0.156
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.274,
+        "excess_spearman_soum": 0.261,
+        "n_aimag": 21,
+        "spearman_aimag": 0.26
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.68,
+        "excess_spearman_soum": 0.706,
+        "n_aimag": 21,
+        "spearman_aimag": 0.809
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.627,
+      "n_excess": 1649,
+      "spearman_excess": 0.622
+    }
+  },
+  "jan": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.703
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.204,
+        "excess_spearman_soum": -0.177,
+        "n_aimag": 21,
+        "spearman_aimag": 0.062
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.417,
+        "excess_spearman_soum": 0.494,
+        "n_aimag": 21,
+        "spearman_aimag": 0.69
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.084,
+        "excess_spearman_soum": 0.077,
+        "n_aimag": 21,
+        "spearman_aimag": 0.077
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.338,
+        "excess_spearman_soum": 0.33,
+        "n_aimag": 21,
+        "spearman_aimag": 0.295
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.686,
+        "excess_spearman_soum": 0.713,
+        "n_aimag": 21,
+        "spearman_aimag": 0.786
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.626,
+      "n_excess": 1649,
+      "spearman_excess": 0.617
+    }
+  },
+  "feb": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.604
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.245,
+        "excess_spearman_soum": -0.138,
+        "n_aimag": 21,
+        "spearman_aimag": 0.194
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.432,
+        "excess_spearman_soum": 0.503,
+        "n_aimag": 21,
+        "spearman_aimag": 0.742
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.042,
+        "excess_spearman_soum": 0.045,
+        "n_aimag": 21,
+        "spearman_aimag": 0.029
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.326,
+        "excess_spearman_soum": 0.322,
+        "n_aimag": 21,
+        "spearman_aimag": 0.364
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.677,
+        "excess_spearman_soum": 0.7,
+        "n_aimag": 21,
+        "spearman_aimag": 0.757
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.592,
+      "n_excess": 1649,
+      "spearman_excess": 0.576
+    }
+  },
+  "mar": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.587
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 329,
+        "spearman_soum": 0.24,
+        "excess_spearman_soum": -0.136,
+        "n_aimag": 21,
+        "spearman_aimag": 0.2
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.427,
+        "excess_spearman_soum": 0.496,
+        "n_aimag": 21,
+        "spearman_aimag": 0.731
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.037,
+        "excess_spearman_soum": 0.045,
+        "n_aimag": 21,
+        "spearman_aimag": 0.029
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.332,
+        "excess_spearman_soum": 0.331,
+        "n_aimag": 21,
+        "spearman_aimag": 0.317
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 330,
+        "spearman_soum": 0.671,
+        "excess_spearman_soum": 0.694,
+        "n_aimag": 21,
+        "spearman_aimag": 0.749
+      }
+    },
+    "pooled": {
+      "n": 1649,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.591,
+      "n_excess": 1649,
+      "spearman_excess": 0.576
+    }
+  }
+}

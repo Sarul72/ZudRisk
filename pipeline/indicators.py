@@ -1,12 +1,12 @@
-"""Indicators per soum and winter: winter cold (NASA POWER), snow (ERA5-Land), summer pasture (MODIS NDVI)
+"""Indicators per soum and winter: winter cold and snow (ERA5-Land), summer pasture (MODIS NDVI)
 and grazing pressure (NSO herds), each as a z-score where higher means riskier, then the score (spec 4.3-4.4).
 GLDAS snow, snow-cover days and snow density are carried alongside for comparison and display, never scored."""
 import argparse
 import calendar
+import functools
 import csv
-import json
 import math
-from collections import Counter, defaultdict
+from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 
@@ -15,7 +15,6 @@ from pipeline.era5 import load_era5
 from pipeline.gldas import OUT as GLDAS_CSV, load_series
 from pipeline.ndvi import OUT as NDVI_CSV
 from pipeline.nso import load_livestock, sheep_units
-from pipeline.power import CELLS, T2M
 from pipeline.score import risk, risk_class, zscore
 
 BASELINE = range(2001, 2021)  # winters 2001/02 .. 2020/21, summers 2001 .. 2020
@@ -54,19 +53,12 @@ def shift_as_of(as_of: date, years: int) -> date:
         return as_of.replace(year=as_of.year + years, day=28)
 
 
-def cold(cells: list, t2m: dict, year: int, as_of: date) -> float | None:
-    """Mean 2 m air temperature over the soum's grid points and the winter months; None if any value is missing."""
+def cold(series: dict[str, float], year: int, as_of: date) -> float | None:
+    """Mean of the soum's monthly 2 m air temperature over the winter months so far; None if any month is missing."""
     months = winter_months(year, as_of)
-    if not months:
+    if not months or any(m not in series for m in months):
         return None
-    values = []
-    for p in cells:
-        series = t2m.get(tuple(p), {})
-        for m in months:
-            if m not in series:
-                return None
-            values.append(series[m])
-    return sum(values) / len(values)
+    return sum(series[m] for m in months) / len(months)
 
 
 def snow(series: dict[str, float], year: int, as_of: date) -> float | None:
@@ -127,36 +119,36 @@ def _neg(z: float | None) -> float | None:
     return None if z is None else -z
 
 
-def load_t2m() -> dict:
-    t2m: dict = defaultdict(dict)
-    with T2M.open() as f:
-        for r in csv.DictReader(f):
-            t2m[(float(r["lon"]), float(r["lat"]))][r["yyyymm"]] = float(r["t2m"])
-    return t2m
+def census_year(year: int, as_of: date) -> int:
+    """The newest census out by as_of. Census Y is counted in December Y; taken as published from 1 Feb Y+1
+    (NSO's date is unverified, and the later date can only understate an early stage, never leak)."""
+    return year if as_of >= date(year + 1, 2, 1) else year - 1
 
 
-def main(year: int, as_of: date | None = None) -> None:
-    as_of = as_of or date(year + 1, 3, 31)
-    all_soums = load_soums()
-    soums = [s for s in all_soums if not s["is_ub"]]
-    herds = load_livestock()
-    t2m = load_t2m()
-    cells = json.loads(CELLS.read_text())
-    era5, gldas_s, ndvi_s = load_era5(), load_series(GLDAS_CSV), load_series(NDVI_CSV)
-    rows, missing = {}, Counter()
+@functools.cache
+def _inputs() -> tuple:
+    soums = [s for s in load_soums() if not s["is_ub"]]
+    return soums, load_livestock(), load_era5(), load_series(GLDAS_CSV), load_series(NDVI_CSV)
+
+
+def compute(year: int, as_of: date) -> dict[str, dict]:
+    """Every soum's indicators and score for winter year/year+1, from what was published by as_of."""
+    soums, herds, era5, gldas_s, ndvi_s = _inputs()
+    census = census_year(year, as_of)
+    rows = {}
     for s in soums:
         pc = s["pcode"]
         then = {y: shift_as_of(as_of, y - year) for y in BASELINE}
-        e5 = era5.get(pc, {"sde": {}, "rsn": {}, "snowc": {}})
+        e5 = era5.get(pc, {"sde": {}, "rsn": {}, "snowc": {}, "t2m": {}})
         sde, gl = e5["sde"], gldas_s.get(pc, {})
-        c = cold(cells[pc], t2m, year, as_of)
+        c = cold(e5["t2m"], year, as_of)
         sn = snow(sde, year, as_of)
         dn = density(e5["rsn"], sde, year, as_of)
         nd = summer(ndvi_s.get(pc, {}), year)
-        p = pressure_raw(herds.get((pc, year, "stock"), {}), s["area_km2"])
+        p = pressure_raw(herds.get((pc, census, "stock"), {}), s["area_km2"])
         rows[pc] = {
             "pcode": pc, "cold_c": c, "snow_m": sn, "ndvi": nd,
-            "z_cold": _neg(_anomaly(c, [cold(cells[pc], t2m, y, then[y]) for y in BASELINE])),
+            "z_cold": _neg(_anomaly(c, [cold(e5["t2m"], y, then[y]) for y in BASELINE])),
             "z_snow": _anomaly(sn, [snow(sde, y, then[y]) for y in BASELINE]),
             "z_snow_gldas": _anomaly(snow(gl, year, as_of), [snow(gl, y, then[y]) for y in BASELINE]),
             "snow_days": snow_days(e5["snowc"], year, as_of), "density_kgm3": dn,
@@ -165,14 +157,17 @@ def main(year: int, as_of: date | None = None) -> None:
             "su_per_km2": None if p is None else math.exp(p), "p": p,
         }
     ps = [r["p"] for r in rows.values() if r["p"] is not None]
-    hist = Counter()
     for r in rows.values():
         p = r.pop("p")
         r["z_pressure"] = None if p is None else zscore(p, ps)
-        z = {"cold": r["z_cold"], "snow": r["z_snow"], "summer": r["z_summer"], "pressure": r["z_pressure"]}
-        missing.update(k for k, v in z.items() if v is None)
-        r.update(score_row(z))
-        hist[r["risk_class"]] += 1
+        r.update(score_row({k: r[f"z_{k}"] for k in ("cold", "snow", "summer", "pressure")}))
+    return rows
+
+
+def main(year: int, as_of: date | None = None) -> None:
+    rows = compute(year, as_of or date(year + 1, 3, 31))
+    missing = Counter(k for r in rows.values() for k in ("cold", "snow", "summer", "pressure") if r[f"z_{k}"] is None)
+    hist = Counter(r["risk_class"] for r in rows.values())
     with out_path(year).open("w", newline="") as f:
         w = csv.DictWriter(f, COLUMNS)
         w.writeheader()
@@ -180,7 +175,7 @@ def main(year: int, as_of: date | None = None) -> None:
             w.writerow({k: ("" if r[k] is None else round(r[k], 4) if isinstance(r[k], float) else r[k]) for k in COLUMNS})
     scored = sum(r["risk"] is not None for r in rows.values())
     n4 = sum(r["n_indicators"] == 4 for r in rows.values())
-    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), {len(all_soums) - len(soums)} UB skipped; "
+    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), UB skipped; "
           f"missing {dict(missing)}; classes {dict(sorted(hist.items(), key=str))}")
 
 
@@ -195,11 +190,10 @@ def check() -> None:
     assert winter_months(2023, date(2023, 11, 29)) == []
     assert shift_as_of(date(2024, 1, 15), -18) == date(2006, 1, 15)
     assert shift_as_of(date(2024, 2, 29), -1) == date(2023, 2, 28)
-    t2m = {(1, 2): {"202311": -10.0, "202312": -20.0, "202401": -30.0, "202402": -20.0},
-           (3, 4): {"202311": -12.0, "202312": -22.0, "202401": -32.0}}  # Feb fill value was dropped
-    assert cold([(1, 2)], t2m, 2023, date(2024, 3, 31)) == -20.0
-    assert cold([(1, 2), (3, 4)], t2m, 2023, date(2024, 3, 31)) is None
-    assert cold([(1, 2)], t2m, 2023, date(2023, 11, 1)) is None
+    t2m = {"202311": -10.0, "202312": -20.0, "202401": -30.0, "202402": -20.0}
+    assert cold(t2m, 2023, date(2024, 3, 31)) == -20.0
+    assert cold({k: v for k, v in t2m.items() if k != "202402"}, 2023, date(2024, 3, 31)) is None
+    assert cold(t2m, 2023, date(2023, 11, 1)) is None
     full = {"camel": 0, "horse": 0, "cattle": 0, "sheep": 0, "goat": 0}
     assert pressure_raw(full, 100.0) is None
     assert pressure_raw({**full, "sheep": 1.0}, 1000.0) == 0.0  # 1 thousand sheep units on 1000 km2
@@ -219,6 +213,9 @@ def check() -> None:
     rsn = {"202311": 400.0, "202312": 380.0, "202401": 300.0, "202402": 250.0, "202403": 100.0}
     assert density(rsn, depth, 2023, end) == 300.0  # bare-ground months carry a nominal density, never counted
     assert density(rsn, {k: 0.0 for k in depth}, 2023, end) is None
+    assert census_year(2023, date(2024, 1, 31)) == 2022  # census 2023 is not out before 1 Feb 2024
+    assert census_year(2023, date(2024, 2, 29)) == 2023
+    assert census_year(2023, date(2023, 10, 31)) == 2022
     row = score_row({"cold": 1.0, "pressure": 0.0, "snow": None, "summer": None})
     assert row["n_indicators"] == 2 and abs(row["risk"] - 0.35 / 0.64) < 1e-12
     print("indicators check: ok")
