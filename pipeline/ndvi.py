@@ -13,7 +13,7 @@ from pipeline.power import cells_for_xy
 from pipeline.boundaries import load_soums
 
 CMR = ("https://cmr.earthdata.nasa.gov/search/granules.json?short_name=MOD13C2&version=061"
-       "&temporal={y}-{m}-01T00:00:00Z,{y}-{m}-28T23:59:59Z&page_size=1")
+       "&temporal={y}-{m}-01T00:00:00Z,{y}-{m}-28T23:59:59Z&page_size=1&sort_key=-revision_date")
 VAR = "/MOD_Grid_monthly_CMG_VI/Data_Fields/CMG_0_05_Deg_Monthly_NDVI"
 ROWS, COLS = (755, 970), (5340, 6000)
 CE = f".dap.nc4?dap4.ce={VAR}%5B{ROWS[0]}:{ROWS[1]}%5D%5B{COLS[0]}:{COLS[1]}%5D"
@@ -25,7 +25,8 @@ OUT = Path("data/derived/soum_ndvi.csv")
 
 def to_ndvi(raw: np.ndarray) -> np.ma.MaskedArray:
     raw = np.asarray(raw)
-    return np.ma.masked_equal(raw, FILL).astype(float) / SCALE
+    v = np.ma.masked_equal(raw, FILL).astype(float) / SCALE
+    return np.ma.masked_less(v, 0)  # negative NDVI is open water (lakes), not pasture
 
 
 def grid_centres() -> tuple[np.ndarray, np.ndarray]:
@@ -84,6 +85,7 @@ def check() -> None:
     assert last_summer(2026, has_august=lambda y: y <= 2025) == 2025  # August not published yet
     v = to_ndvi(np.array([3861, -3000, 10000]))
     assert v.mask.tolist() == [False, True, False]
+    assert to_ndvi(np.array([-500, 0, 120])).mask.tolist() == [True, False, False], "open water is not pasture"
     assert abs(v[0] - 0.3861) < 1e-12 and v[2] == 1.0
     lats, lons = grid_centres()
     assert abs(lats[0] - 52.225) < 1e-9 and abs(lons[0] - 87.025) < 1e-9 and lats.size == 216 and lons.size == 661
