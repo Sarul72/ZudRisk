@@ -201,7 +201,7 @@ function histChart(h, nowRisk) {
   const strip = (x, r, hi, label) => `<rect x="${x + 1}" y="${ys}" width="${bw - 2}" height="10" fill="${r == null ? GREY : COLORS[bin(r, RISK_CUTS)]}"` +
     `${hi ? ' stroke="#1d2433" stroke-width="1.5"' : ""}><title>${esc(label)}: ${r == null ? "–" : fmt(r, 3)}</title></rect>`;
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 92" width="${W}" role="img" aria-label="${esc(t.hist_caption)}">`;
-  s += `<text x="0" y="9" font-size="9" fill="#5b6475">${Math.round(mx * 100)}%</text>`;
+  s += `<text x="0" y="10" font-size="11" fill="#5b6475">${Math.round(mx * 100)}%</text>`;
   s += `<line x1="0" x2="${W}" y1="${top + mh}" y2="${top + mh}" stroke="#d9dde5"/>`;
   hist.winters.forEach((w, i) => {
     const m = h.mort[i], x = (years[i] - first) * bw, label = w.replace("-", "/");
@@ -212,26 +212,29 @@ function histChart(h, nowRisk) {
     s += strip(x, h.risk[i], w === shown, label);
   });
   if (out !== null) s += strip((out - first) * bw, nowRisk, true, `${outlook.winter.replace("-", "/")} ${t.outlook_opt(t.months[outlook.stage])}`);
-  for (let y = first; y <= last; y += 2) s += `<text x="${(y - first + 0.5) * bw}" y="88" font-size="9" text-anchor="middle" fill="#5b6475">'${String(y).slice(2)}</text>`;
+  for (let y = first; y <= last; y++) if (y % 5 === 0) s += `<text x="${(y - first + 0.5) * bw}" y="88" font-size="11" text-anchor="middle" fill="#5b6475">'${String(y).slice(2)}</text>`;
   return `${s}</svg><br><small>${esc(t.hist_caption)}${out !== null ? ` ${esc(t.hist_outlook)}` : ""}</small>`;
 }
 
 // Horizontal bars: rows [{label, values, hi}] against series colours; values printed at the right.
 function hbars(rows, colors, { d = 2, unit = "", aria = "" } = {}) {
-  const W = 300, LW = 56, VW = 72, bh = 7, rh = colors.length * (bh + 1) + 5;
   const vals = rows.flatMap((r) => r.values.filter((v) => v != null));
+  const texts = rows.map((r) => r.values.map((v) => fmt(v, d) + (v == null ? "" : unit)).join(" / "));
+  const em = 6.8; // a 12 px character's width, near enough: the columns grow to their longest label and value
+  const W = 300, LW = Math.min(130, 6 + em * Math.max(...rows.map((r) => r.label.length))), VW = 8 + em * Math.max(...texts.map((v) => v.length));
+  const bh = 7, rh = Math.max(18, colors.length * (bh + 1) + 6);
   const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals) || 1;
   const x = (v) => LW + ((v - lo) / (hi - lo)) * (W - LW - VW);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${rows.length * rh + 4}" width="100%" role="img" aria-label="${esc(aria)}">`;
   s += `<line x1="${x(0)}" x2="${x(0)}" y1="0" y2="${rows.length * rh + 2}" stroke="#9aa1ae"/>`;
   rows.forEach((r, i) => {
     const y = i * rh + 3, w = r.hi ? 700 : 400;
-    s += `<text x="${LW - 4}" y="${y + rh / 2}" font-size="10" text-anchor="end" font-weight="${w}" fill="#1d2433">${esc(r.label)}</text>`;
+    s += `<text x="${LW - 4}" y="${y + rh / 2}" font-size="12" text-anchor="end" dominant-baseline="middle" font-weight="${w}" fill="#1d2433">${esc(r.label)}</text>`;
     r.values.forEach((v, j) => {
       if (v == null) return;
-      s += `<rect x="${Math.min(x(0), x(v))}" y="${y + j * (bh + 1)}" width="${Math.max(1, Math.abs(x(v) - x(0)))}" height="${bh}" fill="${colors[j]}"/>`;
+      s += `<rect x="${Math.min(x(0), x(v))}" y="${y + rh / 2 - (colors.length * (bh + 1) - 1) / 2 + j * (bh + 1)}" width="${Math.max(1, Math.abs(x(v) - x(0)))}" height="${bh}" fill="${colors[j]}"/>`;
     });
-    s += `<text x="${W - VW + 4}" y="${y + rh / 2}" font-size="10" font-weight="${w}" fill="#1d2433">${esc(r.values.map((v) => fmt(v, d) + (v == null ? "" : unit)).join(" / "))}</text>`;
+    s += `<text x="${W - VW + 4}" y="${y + rh / 2}" font-size="12" dominant-baseline="middle" font-weight="${w}" fill="#1d2433">${esc(texts[i])}</text>`;
   });
   return `${s}</svg>`;
 }
