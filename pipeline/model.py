@@ -1,6 +1,6 @@
-"""A small learned model beside the fixed score: ridge logistic regression on soum-winters, asked which soums lose
-heavily, validated leave-one-winter-out against the fixed score, then replayed over the last 20 winters' weather on
-today's herds and pasture. The replay is structural vulnerability for research, not a forecast.
+"""A small learned model beside the fixed score: ridge logistic regression on soum-winters (2011-2024) and,
+before soum losses, aimag-winters (2000-2010), asked which lose heavily, validated leave-one-winter-out against
+the fixed score, then replayed over the last 20 winters' weather on today's herds and pasture. The replay is structural vulnerability for research, not a forecast.
 
 No look-ahead, with one exception shared by both scores: the indicator z-scores stand on the 2001-2020 baseline,
 which post-dates the 2011-2019 training winters. Every other feature of winter Y is out by 31 March Y+1."""
@@ -15,12 +15,13 @@ from pipeline import indicators
 from pipeline.export import SITE, label
 from pipeline.gldas import load_series
 from pipeline.boundaries import load_soums
-from pipeline.nso import load_hay, load_livestock, sheep_units
+from pipeline.nso import load_hay, load_livestock, load_livestock_aimag, sheep_units
 from pipeline.score import WEIGHTS
 from pipeline.trends import greenness_trend, latest_summer
 from pipeline.validate import _ranks, mortality, spearman
 
 TRAIN = range(2011, 2025)  # every winter NSO has soum losses for (losses 2012-2025)
+AIMAG_TRAIN = range(2000, 2011)  # winters with NSO aimag losses but no soum losses, 2000/01 to 2010/11
 REPLAY = range(2006, 2026)  # the last 20 winters whose weather is all in, 2006/07 to 2025/26
 NOW = 2025  # the newest census
 HIGH_LOSS = 0.05  # the target, fixed before any fit: adult losses of 5 % of the herd or more
@@ -40,16 +41,17 @@ def auc(score: list[float], label_: list[float]) -> float | None:
     return float((s1 - n1 * (n1 + 1) / 2) / (n1 * n0))
 
 
-def fit(x, y, lam: float = LAM, iters: int = 50) -> tuple[np.ndarray, float]:
-    """Ridge logistic regression by Newton steps; the intercept is not penalised."""
+def fit(x, y, lam: float = LAM, iters: int = 50, sw=None) -> tuple[np.ndarray, float]:
+    """Ridge logistic regression by Newton steps; the intercept is not penalised. A row of weight k counts k times."""
     a = np.column_stack([np.ones(len(x)), np.asarray(x, float)])
     y = np.asarray(y, float)
+    sw = np.ones(len(y)) if sw is None else np.asarray(sw, float)
     pen = np.full(a.shape[1], lam)
     pen[0] = 0.0
     beta = np.zeros(a.shape[1])
     for _ in range(iters):
         p = 1 / (1 + np.exp(-a @ beta))
-        step = np.linalg.solve((a * (p * (1 - p))[:, None]).T @ a + np.diag(pen), a.T @ (p - y) + pen * beta)
+        step = np.linalg.solve((a * (sw * p * (1 - p))[:, None]).T @ a + np.diag(pen), a.T @ (sw * (p - y)) + pen * beta)
         beta -= step
         if np.abs(step).max() < 1e-10:
             break
@@ -60,12 +62,19 @@ def predict(x, w: np.ndarray, b: float) -> np.ndarray:
     return 1 / (1 + np.exp(-(np.asarray(x, float) @ w + b)))
 
 
-def _scaler(train_x):
-    """Standardise on the training rows only; a missing value becomes the training mean (0)."""
+def _scaler(train_x, sw=None):
+    """Standardise on the training rows only, weighted as the fit weighs them; a missing value becomes the mean (0)."""
     x = np.asarray(train_x, float)
-    mu, sd = np.nanmean(x, 0), np.nanstd(x, 0)
+    w = (~np.isnan(x)) * (np.ones(len(x)) if sw is None else np.asarray(sw, float))[:, None]
+    n = np.maximum(w.sum(0), 1e-12)
+    mu = (np.nan_to_num(x) * w).sum(0) / n
+    sd = np.sqrt((np.nan_to_num(x - mu) ** 2 * w).sum(0) / n)
     sd[sd == 0] = 1.0
     return lambda v: np.nan_to_num((np.asarray(v, float) - mu) / sd)
+
+
+def _sw(rows: list[dict]) -> list[float]:
+    return [r.get("sw", 1.0) for r in rows]
 
 
 def _fold_x(r: dict, held: int) -> list[float]:
@@ -80,9 +89,10 @@ def lowo(rows: list[dict], lam: float = LAM) -> dict:
     """Each winter predicted by a model fitted on every other winter: winter -> probabilities in row order."""
     out = {}
     for held in sorted({r["winter"] for r in rows}):
-        train = [_fold_x(r, held) for r in rows if r["winter"] != held]
-        s = _scaler(train)
-        w, b = fit(s(train), [r["y"] for r in rows if r["winter"] != held], lam)
+        kept = [r for r in rows if r["winter"] != held]
+        train = [_fold_x(r, held) for r in kept]
+        s = _scaler(train, _sw(kept))
+        w, b = fit(s(train), [r["y"] for r in kept], lam, sw=_sw(kept))
         out[held] = [float(p) for p in predict(s([r["x"] for r in rows if r["winter"] == held]), w, b)]
     return out
 
@@ -110,9 +120,20 @@ def hay_per_su(hay: dict, herds: dict, soums: list[dict]) -> dict[tuple[str, int
     out = {}
     for (a, y), kt in hay.items():
         su = [sheep_units(herds.get((pc, y, "stock"), {})) for pc in by.get(a, [])]
-        if su and None not in su and sum(su) > 0 and kt > 0:
-            out[(a, y)] = math.log(kt * 1e6 / (sum(su) * 1e3))
+        if su and None not in su and (v := _log_kg_per_su(kt, sum(su))) is not None:
+            out[(a, y)] = v
     return out
+
+
+def _log_kg_per_su(kt: float | None, su: float | None) -> float | None:
+    """Thousand tonnes of hay over thousand sheep units, as log kg per sheep unit."""
+    return math.log(kt * 1e6 / (su * 1e3)) if kt and su and kt > 0 and su > 0 else None
+
+
+def _wmean(pairs) -> float | None:
+    """Weighted mean over the (value, weight) pairs that have a value."""
+    have = [(v, w) for v, w in pairs if v is not None and not (isinstance(v, float) and math.isnan(v))]
+    return sum(v * w for v, w in have) / sum(w for _, w in have) if have else None
 
 
 def _x(climate_row: dict, now_row: dict, ndvi: dict, herds: dict, pcode: str, year: int, through: int,
@@ -136,6 +157,35 @@ def training_rows(herds: dict, ndvi: dict, hay_su: dict, years=TRAIN) -> list[di
     return rows
 
 
+def aimag_rows(soums: list[dict], herds: dict, aherds: dict, ndvi: dict, hay: dict, years=AIMAG_TRAIN,
+               compute=None) -> list[dict]:
+    """Aimag-winters for the winters before soum losses: the soums' features herd-weighted over their aimag, the aimag's
+    own herd growth, hay and earlier losses, and NSO's aimag mortality as the target. A row weighs as many soums as it
+    stands for, so an aimag winter counts in the fit as much as a soum winter does."""
+    compute = compute or (lambda y: indicators.compute(y, indicators.winter_end(y)))
+    by: dict[str, list[str]] = {}
+    for s in soums:
+        by.setdefault(s["aimag_pcode"], []).append(s["pcode"])
+    rows = []
+    for y in years:
+        soum_rows = compute(y)
+        for a, pcs in sorted(by.items()):
+            m = mortality(aherds, a, y)
+            parts = [(pc, r, st) for pc in pcs if (r := soum_rows.get(pc)) and r["risk"] is not None
+                     and (st := sheep_units(herds.get((pc, y, "stock"), {})))]
+            if m is None or not parts:
+                continue
+            cols = [[r[k] for k in CLIMATE] + [r["z_pressure"], greenness_trend(ndvi.get(pc, {}), y)] for pc, r, _ in parts]
+            mean = [_wmean([(c[i], st) for c, (_, _, st) in zip(cols, parts)]) for i in range(len(cols[0]))]
+            earlier = {e: me for e in range(years.start, y) if (me := mortality(aherds, a, e)) is not None}
+            vals = mean + [growth(aherds, a, y), _log_kg_per_su(hay.get((a, y)), sheep_units(aherds.get((a, y, "stock"), {}))),
+                           sum(earlier.values()) / len(earlier) if earlier else None]
+            rows.append({"winter": y, "pcode": a, "x": [math.nan if v is None else v for v in vals],
+                         "y": float(m >= HIGH_LOSS), "m": m, "risk": _wmean([(r["risk"], st) for _, r, st in parts]),
+                         "earlier": earlier, "sw": len(parts)})
+    return rows
+
+
 def skill(prob: list[float], rows: list[dict]) -> dict:
     m, y, risk = [r["m"] for r in rows], [r["y"] for r in rows], [r["risk"] for r in rows]
     rd = lambda v: None if v is None else round(v, 3)  # noqa: E731
@@ -145,14 +195,21 @@ def skill(prob: list[float], rows: list[dict]) -> dict:
 
 def main() -> dict:
     herds, ndvi = load_livestock(), load_series(indicators.NDVI_CSV)
-    hay_su = hay_per_su(load_hay(), herds, load_soums())
-    rows = training_rows(herds, ndvi, hay_su)
+    soums, hay = load_soums(), load_hay()
+    hay_su = hay_per_su(hay, herds, soums)
+    soum_rows = training_rows(herds, ndvi, hay_su)
+    rows = soum_rows + aimag_rows(soums, herds, load_livestock_aimag(), ndvi, hay)
     held = lowo(rows)
     per = {label(y): skill(held[y], [r for r in rows if r["winter"] == y]) for y in held}
-    order = [r for y in held for r in rows if r["winter"] == y]
-    pooled_ = skill([p for y in held for p in held[y]], order)
-    s = _scaler([r["x"] for r in rows])
-    w, b = fit(s([r["x"] for r in rows]), [r["y"] for r in rows])
+
+    def pooled_over(winters, held_) -> dict:
+        return skill([p for y in winters for p in held_[y]], [r for y in winters for r in rows if r["winter"] == y])
+    pooled_ = pooled_over(TRAIN, held)  # soum-winters, the test the fixed score faces
+    pooled_aimag = pooled_over(AIMAG_TRAIN, held)  # aimag-winters before soum losses, against the aimag fixed risk
+    alone = lowo(soum_rows)
+    without = skill([p for y in TRAIN for p in alone[y]], [r for y in TRAIN for r in soum_rows if r["winter"] == y])
+    s = _scaler([r["x"] for r in rows], _sw(rows))
+    w, b = fit(s([r["x"] for r in rows]), [r["y"] for r in rows], sw=_sw(rows))
     now = indicators.compute(NOW, indicators.winter_end(NOW))
     through = latest_summer(ndvi)
     weather = {c: (now if c == NOW else indicators.compute(c, indicators.winter_end(c))) for c in REPLAY}
@@ -164,7 +221,8 @@ def main() -> dict:
         vuln[pc] = round(float(predict(s(xs), w, b).mean()), 4)
     out = {"target": f"adult losses >= {HIGH_LOSS:.0%} of the herd in sheep units", "lam": LAM, "features": FEATURES,
            "weights": {f: round(float(v), 3) for f, v in zip(FEATURES, w)}, "intercept": round(b, 3),
-           "fixed_weights": WEIGHTS, "train": [label(y) for y in TRAIN], "lowo": per, "pooled": pooled_,
+           "fixed_weights": WEIGHTS, "train": [label(y) for y in TRAIN], "train_aimag": [label(AIMAG_TRAIN.start), label(AIMAG_TRAIN.stop - 1)],
+           "lowo": per, "pooled": pooled_, "pooled_aimag": pooled_aimag, "pooled_without_aimag": without,
            "replay": [label(REPLAY.start), label(REPLAY.stop - 1)], "census": NOW, "greenness_through": through,
            "vulnerability": vuln}
     hay = {}
@@ -175,7 +233,8 @@ def main() -> dict:
     OUT.write_text(text)
     (SITE / "model.json").write_text(text)
     v = sorted(vuln.values())
-    print(f"model: {len(rows)} soum-winters, {int(sum(r['y'] for r in rows))} high-loss; held-out pooled {pooled_}; "
+    print(f"model: {len(soum_rows)} soum-winters + {len(rows) - len(soum_rows)} aimag-winters; held-out soum {pooled_}; "
+          f"without aimag rows {without}; held-out aimag {pooled_aimag}; "
           f"weights {out['weights']}; vulnerability {len(v)} soums, median {v[len(v) // 2]}, max {v[-1]}")
     return out
 
@@ -194,6 +253,11 @@ def check() -> None:
     assert ((p > 0) & (p < 1)).all() and auc(list(p), list(y)) > 0.9
     w_ridge, _ = fit(x, y, lam=1e4)
     assert abs(w_ridge[0]) < abs(w[0]) / 5, "the penalty shrinks"
+    sw = np.ones(50)
+    sw[:10] = 2.0
+    w_dup, b_dup = fit(np.vstack([x[:50], x[:10]]), np.concatenate([y[:50], y[:10]]))
+    w_sw, b_sw = fit(x[:50], y[:50], sw=sw)
+    assert np.allclose(w_dup, w_sw) and abs(b_dup - b_sw) < 1e-9, "a weight of 2 is the row twice"
 
     full = {"camel": 0, "horse": 0, "cattle": 0, "goat": 0}
     herds = {("A", y_, "stock"): {**full, "sheep": 100.0 * (1.1 ** (y_ - 2010))} for y_ in range(2010, 2026)}
@@ -210,6 +274,9 @@ def check() -> None:
     held = lowo(rows)
     flipped = [{**r, "y": 1 - r["y"]} if r["winter"] == 2 else r for r in rows]
     assert lowo(flipped)[2] == held[2], "a held-out winter's labels never reach its own prediction"
+    doubled = rows + [r for r in rows if r["winter"] == 1 and r["x"][0] < 0]
+    weighted = [{**r, "sw": 2.0} if r["winter"] == 1 and r["x"][0] < 0 else r for r in rows]
+    assert np.allclose(lowo(doubled)[2], lowo(weighted)[2]), "lowo fits and scales with the row weights"
 
     def with_past(wi, v, earlier):  # x as training_rows builds it: past_mortality is the mean of the earlier winters
         return {"winter": wi, "x": [float(v), sum(earlier.values()) / len(earlier) if earlier else math.nan],
@@ -225,6 +292,26 @@ def check() -> None:
     assert abs(hs[("X", 2020)] - math.log(5.0)) < 1e-12, hs  # 2,000 t over 400,000 sheep units: 5 kg each
     assert ("X", 2021) not in hs, "a soum without its census would inflate the aimag's hay per head"
     assert ("Y", 2020) not in hs, "no herd counted, no ratio"
+
+    two = [{"pcode": "X1", "aimag_pcode": "X"}, {"pcode": "X2", "aimag_pcode": "X"}, {"pcode": "X3", "aimag_pcode": "X"}]
+    sh = {("X1", 2001, "stock"): {**full, "sheep": 100.0}, ("X2", 2001, "stock"): {**full, "sheep": 300.0},
+          ("X3", 2001, "stock"): {**full, "sheep": 50.0}}
+    ah = {("X", 1996, "stock"): {**full, "sheep": 200.0}, ("X", 2001, "stock"): {**full, "sheep": 400.0},
+          ("X", 2000, "stock"): {**full, "sheep": 400.0}, ("X", 2001, "loss"): {**full, "sheep": 40.0},
+          ("X", 2002, "loss"): {**full, "sheep": 8.0}}
+    z = dict.fromkeys(["z_snow", "z_summer", "z_density"], 0.0)
+    fake = {"X1": {**z, "z_cold": 1.0, "z_pressure": None, "risk": 1.0},
+            "X2": {**z, "z_cold": -1.0, "z_pressure": 2.0, "risk": -1.0},
+            "X3": {**z, "z_cold": 9.0, "z_pressure": 9.0, "risk": None}}  # unscored: left out of its aimag
+    ar = aimag_rows(two, sh, ah, {}, {("X", 2001): 2.0}, range(2000, 2002), compute=lambda y: fake)
+    assert [r["winter"] for r in ar] == [2001], "no soum census in 2000, no aimag row"
+    r = ar[0]
+    assert r["x"][0] == -0.5 and r["risk"] == -0.5, r  # (100 * 1 - 300 * 1) / 400, herd-weighted
+    assert r["x"][4] == 2.0, "a soum missing a value leaves it to the soums that have it"
+    assert math.isnan(r["x"][5]), "no NDVI, no greenness trend"
+    assert abs(r["x"][6] - math.log(2.0)) < 1e-12 and abs(r["x"][7] - math.log(5.0)) < 1e-12, r["x"]
+    assert r["x"][8] == 0.1 and r["earlier"] == {2000: 0.1}, "past mortality is the aimag's own earlier winters"
+    assert r["m"] == 0.02 and r["y"] == 0.0 and r["sw"] == 2, r  # 8 of 400; stands for its 2 scored soums
 
     real_herds, real_ndvi = load_livestock(), load_series(indicators.NDVI_CSV)
     later = {pc: {m: (0.0 if int(m[:4]) > 2012 else v) for m, v in s.items()} for pc, s in real_ndvi.items()}

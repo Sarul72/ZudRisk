@@ -55,13 +55,13 @@ const T = {
     hist_outlook: "Сүүлийн зурвас: энэ өвлийн төлөв, хорогдол хараахан мэдэгдээгүй.",
     vuln: "Эмзэг байдал", vuln_unit: "хорогдол ≥5% болох магадлал",
     vuln_legend: "Хорогдол ≥5% болох магадлал, 20 өвлийн дундаж", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
-    vuln_note: (m) => `Загвар нь ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")} оны ${m.train.length} өвлийн сум-өвөл бүрээс хорогдол 5%-иас давах эсэхийг сурсан (ridge логистик регресс). Эмзэг байдал = ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} оны 20 өвлийн цаг агаарыг ${m.census} оны малын тоо, бэлчээрийн одоогийн чиг хандлага дээр давтан тооцоход гарах дундаж магадлал. Цаг агаар нь сум бүрийн өөрийн хэвийн утгаас хазайлтаар ордог тул 20 өвлийн дунджаар 0 орчим болно: давхарга нь уур амьсгалын хатуу ширүүнийг бус, малын ачаалал, өмнөх хорогдол, малын өсөлт, ногоорлоос хамаарах мэдрэмтгий байдлыг голчлон харуулна. Урьдчилсан таамаг биш, судалгааны давхарга.`,
+    vuln_note: (m) => `Загвар нь ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")} оны ${m.train.length} өвлийн сум-өвөл${m.train_aimag ? `, ${m.train_aimag[0].replace("-", "/")}–${m.train_aimag[1].replace("-", "/")} оны аймаг-өвөл (нэг аймаг-өвөл нь сумдынхаа тоогоор жинтэй)` : ""} бүрээс хорогдол 5%-иас давах эсэхийг сурсан (ridge логистик регресс). Эмзэг байдал = ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} оны 20 өвлийн цаг агаарыг ${m.census} оны малын тоо, бэлчээрийн одоогийн чиг хандлага дээр давтан тооцоход гарах дундаж магадлал. Цаг агаар нь сум бүрийн өөрийн хэвийн утгаас хазайлтаар ордог тул 20 өвлийн дунджаар 0 орчим болно: давхарга нь уур амьсгалын хатуу ширүүнийг бус, малын ачаалал, өмнөх хорогдол, малын өсөлт, ногоорлоос хамаарах мэдрэмтгий байдлыг голчлон харуулна. Урьдчилсан таамаг биш, судалгааны давхарга.`,
     green: "Ногоорлын чиг", per_decade: "/10 жил",
     green_legend: (g) => `NDVI-ийн өөрчлөлт 10 жилд, 7–8 сар, ${g.from}–${g.through}`,
     green_classes: ["Буурсан (< 0)", "Бараг өөрчлөгдөөгүй (0–0.01)", "Бага зэрэг ногоорсон (0.01–0.02)", "Ногоорсон (0.02–0.04)", "Их ногоорсон (≥ 0.04)"],
     green_note: "Theil–Sen налуу (10-аас цөөн зун бол тооцоогүй). Цөлжилтийн албан ёсны зураг биш: NDVI нь хур тунадас, бэлчээрлэлт, ургамлын бүрхэвчийн өөрчлөлтийг ялгадаггүй.",
     layer_none: "Мэдээлэл байхгүй / мал бүртгэлгүй",
-    model: "Сургасан загвар", model_rows: ["Spearman ρ (нэг өвлийг хассан)", "AUC (хорогдол ≥5%)"], fixed: "Тогтмол жин", learned: "Загвар",
+    model: "Сургасан загвар", model_rows: ["Spearman ρ, сум-өвөл (нэг өвлийг хассан)", "AUC, сум-өвөл (хорогдол ≥5%)", "Spearman ρ, аймаг-өвөл 2000/01–2010/11", "AUC, аймаг-өвөл 2000/01–2010/11"], fixed: "Тогтмол жин", learned: "Загвар",
     model_verdict: (better) => better === null ? "" : better
       ? "Нэг өвлийг хасаж бусдаар нь сургахад загвар тогтмол жинтэй онооноос илүү сайн эрэмбэлсэн."
       : "Нэг өвлийг хасаж бусдаар нь сургахад тогтмол жинтэй оноо загвараас илүү сайн эрэмбэлсэн: загвар нь газрын зургийн эрсдэлийг орлохгүй, зөвхөн эмзэг байдлын давхаргад ашиглагдана. Ridge-ийн торгуулийг (λ = 1) тааруулаагүй.",
@@ -114,13 +114,13 @@ const T = {
     hist_outlook: "Last strip: this winter's outlook, losses not known yet.",
     vuln: "Vulnerability", vuln_unit: "chance of losing ≥5%",
     vuln_legend: "Chance of losing ≥5% of the herd, mean over 20 winters", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
-    vuln_note: (m) => `The model learned from ${m.train.length} winters, ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")}, which soum-winters lost 5% of the herd or more (ridge logistic regression). Vulnerability = the mean chance when the weather of the 20 winters ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} is replayed on the ${m.census} herds and today's pasture trend. Weather enters as each soum's own anomalies, which average near zero over 20 winters, so the layer mostly shows sensitivity (herd pressure, past losses, herd growth, greenness), not how harsh a soum's climate is. A research layer, not a forecast.`,
+    vuln_note: (m) => `The model learned from ${m.train.length} winters, ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")}, which soum-winters${m.train_aimag ? ` and ${m.train_aimag[0].replace("-", "/")}–${m.train_aimag[1].replace("-", "/")} aimag-winters (each weighted by its number of soums)` : ""} lost 5% of the herd or more (ridge logistic regression). Vulnerability = the mean chance when the weather of the 20 winters ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} is replayed on the ${m.census} herds and today's pasture trend. Weather enters as each soum's own anomalies, which average near zero over 20 winters, so the layer mostly shows sensitivity (herd pressure, past losses, herd growth, greenness), not how harsh a soum's climate is. A research layer, not a forecast.`,
     green: "Greenness trend", per_decade: "/decade",
     green_legend: (g) => `Change in Jul–Aug NDVI per decade, ${g.from}–${g.through}`,
     green_classes: ["Browning (< 0)", "Little change (0–0.01)", "Slight greening (0.01–0.02)", "Greening (0.02–0.04)", "Strong greening (≥ 0.04)"],
     green_note: "Theil–Sen slope (no trend under 10 summers). Not the official desertification map: NDVI cannot tell rain from grazing or a change in what grows.",
     layer_none: "No data / no registered herd",
-    model: "Learned model", model_rows: ["Spearman ρ (one winter held out)", "AUC (losses ≥5%)"], fixed: "Fixed weights", learned: "Model",
+    model: "Learned model", model_rows: ["Spearman ρ, soum-winters (one winter held out)", "AUC, soum-winters (losses ≥5%)", "Spearman ρ, aimag-winters 2000/01–2010/11", "AUC, aimag-winters 2000/01–2010/11"], fixed: "Fixed weights", learned: "Model",
     model_verdict: (better) => better === null ? "" : better
       ? "Held out one winter at a time, the model ranked losses better than the fixed-weight score."
       : "Held out one winter at a time, the fixed-weight score ranked losses better than the model: the model does not replace the map's risk and is used only for the vulnerability layer. The ridge penalty (λ = 1) was not tuned.",
@@ -311,9 +311,10 @@ function renderLegend(t) {
 
 function renderModel(t) {
   if (!model) return;
-  const p = model.pooled;
+  const p = model.pooled, a = model.pooled_aimag;
   $("model_table").innerHTML = `<tr><td></td><td>${esc(t.fixed)} / ${esc(t.learned)}</td></tr>` +
-    table([[t.model_rows[0], `${fmt(p.rho_fixed, 3)} / ${fmt(p.rho_model, 3)}`], [t.model_rows[1], `${fmt(p.auc_fixed, 3)} / ${fmt(p.auc_model, 3)}`]]);
+    table([[t.model_rows[0], `${fmt(p.rho_fixed, 3)} / ${fmt(p.rho_model, 3)}`], [t.model_rows[1], `${fmt(p.auc_fixed, 3)} / ${fmt(p.auc_model, 3)}`],
+      ...(a ? [[t.model_rows[2], `${fmt(a.rho_fixed, 3)} / ${fmt(a.rho_model, 3)}`], [t.model_rows[3], `${fmt(a.auc_fixed, 3)} / ${fmt(a.auc_model, 3)}`]] : [])]);
   $("model_note").textContent = t.model_verdict(modelBetter(p));
   $("model_chart").innerHTML = hbars(Object.entries(model.lowo).map(([w, v]) => ({ label: w.replace("-", "/"), values: [v.rho_fixed, v.rho_model], hi: w === shown })),
     ["#8a93a6", "#d95f02"], { aria: t.model_by_winter }) +
