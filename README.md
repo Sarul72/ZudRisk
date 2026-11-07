@@ -19,7 +19,9 @@ uv run python -m pipeline.nso                 # NSO herds and losses -> data/der
 uv run python -m pipeline.era5                # ERA5-Land t2m, snow depth/density/cover, Nov-Mar, to the latest month (CDS)
 uv run python -m pipeline.gldas               # GLDAS-2.1 snow depth, for the snow comparison only (Earthdata)
 uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2001 to the latest summer (Earthdata)
-uv run python -m pipeline.hindcast            # six winters, pooled, snow comparison, as-of stages
+uv run python -m pipeline.hindcast            # 15 winters scored (2009/10, 2011/12-2024/25), the pre-registered
+                                              # pooled test, snow comparison, as-of stages, greenness trend
+                                              # (pipeline.trends) and the learned vulnerability model (pipeline.model)
 uv run python -m pipeline.outlook --through 2026-10   # the 2026/27 outlook at its latest stage
 python3 -m http.server -d site 8765           # open http://localhost:8765
 ```

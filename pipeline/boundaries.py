@@ -1,4 +1,5 @@
 """Soum boundaries from OCHA COD-AB (NSO source, CC BY-IGO), trimmed to the fields the pipeline uses."""
+import functools
 import json
 import sys
 import zipfile
@@ -35,9 +36,14 @@ def trim(props: dict) -> dict:
     }
 
 
+@functools.cache
+def _parsed() -> tuple[dict, ...]:
+    return tuple({**f["properties"], "geom": shape(f["geometry"])} for f in json.loads(OUT.read_text())["features"])
+
+
 def load_soums() -> list[dict]:
-    fc = json.loads(OUT.read_text())
-    return [{**f["properties"], "geom": shape(f["geometry"])} for f in fc["features"]]
+    """Parsed once per process; each caller gets fresh dicts over the shared (immutable) shapes."""
+    return [dict(s) for s in _parsed()]
 
 
 def main() -> None:
@@ -63,6 +69,10 @@ def check() -> None:
                     "aimag_en": "Dundgovi", "name_mn": "Адаацаг", "name_en": "Adaacag",
                     "area_km2": 3321.9, "is_ub": False}, soum
     assert ub["is_ub"] is True
+    first, again = load_soums(), load_soums()
+    assert first[0]["geom"] is again[0]["geom"], "the boundaries file is parsed once per process"
+    first[0]["pcode"] = "changed"
+    assert again[0]["pcode"] != "changed" and load_soums()[0]["pcode"] != "changed", "each caller gets its own dicts"
     print("boundaries check: ok")
 
 

@@ -51,6 +51,7 @@ def main() -> None:
     POOLED.write_text(json.dumps(res, indent=2))
     (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2))
     export.write_index(WINTERS)
+    export.write_history(WINTERS)
     aimags.write_shapes()
     print(f"pooled: {res}")
     snow = compare.main(winters)

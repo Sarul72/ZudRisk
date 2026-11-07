@@ -12,8 +12,8 @@ from shapely.geometry import Polygon, mapping
 
 from pipeline.boundaries import is_aimag_centre, load_soums
 from pipeline.indicators import census_year, out_path, winter_end
-from pipeline.nso import load_livestock
-from pipeline.validate import out_path_json
+from pipeline.nso import load_livestock, load_livestock_aimag
+from pipeline.validate import mortality, out_path_json
 
 SIMPLIFY_DEG = 0.005
 MAX_BYTES = 2_000_000
@@ -68,6 +68,29 @@ def main(year: int) -> None:
         sys.exit(f"{out} is over {MAX_BYTES / 1e6:.0f} MB: raise SIMPLIFY_DEG")
 
 
+def history(years: list[int], risk: dict[int, dict], aimag_risk: dict[int, dict], soums: list[dict], herds: dict,
+            aherds: dict, national: dict[int, float]) -> dict:
+    """Every soum's and aimag's risk and recorded mortality across the winters, for the popup charts."""
+    r3 = lambda v: None if v is None else round(v, 3)  # noqa: E731
+    out = {"winters": [label(y) for y in years], "national_pct": [national.get(y) for y in years], "soum": {}, "aimag": {}}
+    for s in soums:
+        out["soum"][s["pcode"]] = {"risk": [r3(risk[y].get(s["pcode"])) for y in years],
+                                   "mort": [r3(mortality(herds, s["pcode"], y)) for y in years]}
+    for a in sorted({s["aimag_pcode"] for s in soums}):
+        out["aimag"][a] = {"risk": [r3(aimag_risk[y].get(a, {}).get("risk")) for y in years],
+                           "mort": [r3(mortality(aherds, a, y)) for y in years]}
+    return out
+
+
+def write_history(years: list[int]) -> None:
+    from pipeline.indicators import read_risk
+    national = {y: json.loads(out_path_json(y).read_text())["mortality_pct"] for y in years}
+    aimag_risk = {y: json.loads((SITE / f"aimag_{label(y)}.json").read_text()) for y in years}
+    h = history(years, {y: read_risk(y) for y in years}, aimag_risk, load_soums(), load_livestock(),
+                load_livestock_aimag(), national)
+    (SITE / "history.json").write_text(json.dumps(h, separators=(",", ":"), allow_nan=False))
+
+
 def check() -> None:
     import math
     ring = [(math.cos(2 * math.pi * i / 1000), math.sin(2 * math.pi * i / 1000)) for i in range(1000)]
@@ -76,6 +99,14 @@ def check() -> None:
     assert f["properties"] == {"pcode": "X", "risk": None}
     assert all(c == round(c, 4) for xy in f["geometry"]["coordinates"][0] for c in xy)
     assert winters_index([2023, 2009]) == ["2009-10", "2023-24"]
+    full = {"camel": 0, "horse": 0, "cattle": 0, "goat": 0}
+    herds = {("A", 2011, "stock"): {**full, "sheep": 100.0}, ("A", 2012, "loss"): {**full, "sheep": 12.5}}
+    aherds = {("X", 2011, "stock"): {**full, "sheep": 1000.0}, ("X", 2012, "loss"): {**full, "sheep": 50.0}}
+    h = history([2011, 2012], {2011: {"A": 0.51234}, 2012: {}}, {2011: {"X": {"risk": 0.3}}, 2012: {}},
+                [{"pcode": "A", "aimag_pcode": "X"}, {"pcode": "B", "aimag_pcode": "X"}], herds, aherds, {2011: 1.2})
+    assert h == {"winters": ["2011-12", "2012-13"], "national_pct": [1.2, None],
+                 "soum": {"A": {"risk": [0.512, None], "mort": [0.125, None]}, "B": {"risk": [None, None], "mort": [None, None]}},
+                 "aimag": {"X": {"risk": [0.3, None], "mort": [0.05, None]}}}, h
     print("export check: ok")
 
 

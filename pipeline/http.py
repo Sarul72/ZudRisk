@@ -14,17 +14,18 @@ BACKOFF_S = 5
 
 
 EDL_HOST = "urs.earthdata.nasa.gov"
+CONSTRAINTS_TIMEOUT_S = 30  # a constraints answer is small; three tries at 180 s held a run 9 minutes before the cache fallback
 _edl_opener = None
 
 
-def _open(req: urllib.request.Request, opener=None) -> bytes:
-    return _open_typed(req, opener)[0]
+def _open(req: urllib.request.Request, opener=None, timeout: float = 180) -> bytes:
+    return _open_typed(req, opener, timeout)[0]
 
 
-def _open_typed(req: urllib.request.Request, opener=None) -> tuple[bytes, str]:
+def _open_typed(req: urllib.request.Request, opener=None, timeout: float = 180) -> tuple[bytes, str]:
     for attempt in range(1, TRIES + 1):
         try:
-            with (opener or urllib.request.build_opener()).open(req, timeout=180) as resp:
+            with (opener or urllib.request.build_opener()).open(req, timeout=timeout) as resp:
                 return resp.read(), resp.headers.get("Content-Type", "")
         except urllib.error.HTTPError as e:
             if attempt == TRIES or not (e.code == 429 or e.code >= 500):
@@ -101,13 +102,13 @@ def cds_config(text: str) -> tuple[str, str]:
     return cfg["url"], cfg["key"]
 
 
-def _cds_call(u: str, key: str, body: dict | None = None, opener=None) -> dict:
+def _cds_call(u: str, key: str, body: dict | None = None, opener=None, timeout: float = 180) -> dict:
     data = None if body is None else json.dumps(body).encode()
     headers = {"User-Agent": USER_AGENT, **({"Content-Type": "application/json"} if data else {})}
     req = urllib.request.Request(u, data=data, headers=headers)
     req.add_unredirected_header("PRIVATE-TOKEN", key)  # urllib copies plain headers onto a redirect to any host
     try:
-        return json.loads(_open(req, opener))
+        return json.loads(_open(req, opener, timeout))
     except urllib.error.HTTPError as e:
         if e.code in (401, 403):
             raise RuntimeError(f"CDS login failed (HTTP {e.code}): ~/.cdsapirc key must be the API Token "
@@ -119,7 +120,8 @@ def cds_months(dataset: str, year: int, variable: str, auth: tuple[str, str] | N
     """Months of a year the dataset has published, so a request never asks for one that does not exist yet."""
     url, key = auth or cds_config(CDS_RC.read_text())
     inputs = {"product_type": ["monthly_averaged_reanalysis"], "year": [str(year)], "variable": [variable]}
-    return sorted(_cds_call(f"{url}/retrieve/v1/processes/{dataset}/constraints", key, {"inputs": inputs}, opener).get("month", []))
+    return sorted(_cds_call(f"{url}/retrieve/v1/processes/{dataset}/constraints", key, {"inputs": inputs}, opener,
+                            CONSTRAINTS_TIMEOUT_S).get("month", []))
 
 
 def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, timeout_s: float = 3600,
@@ -215,6 +217,14 @@ def _check_cds() -> None:
             return False
         def read(self):
             return self.body
+
+    class Timed:
+        timeout = None
+        def open(self, req, timeout=None):
+            Timed.timeout = timeout
+            return Resp({"month": ["02", "01"]})
+    assert cds_months("d", 2026, "v", auth=("https://cds.example", "k"), opener=Timed()) == ["01", "02"]
+    assert Timed.timeout == CONSTRAINTS_TIMEOUT_S < 60, "a stuck constraints call must not hold the run for minutes"
 
     class FakeCds:
         """Submit answers a job id; each poll walks the given statuses; results point at a public href."""
