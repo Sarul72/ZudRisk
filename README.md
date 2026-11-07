@@ -34,6 +34,17 @@ python3 -m http.server -d site 8765           # open http://localhost:8765
 
 ## Monthly outlook update (November 2026 to March 2027)
 
+`pipeline.update` does the whole update and is safe to run daily: it refreshes ERA5-Land and the NSO census, then
+publishes the newest stage whose data has landed, and does nothing out of season or when that stage is out.
+To run it every day at 09:30 on this Mac (a missed run happens at wake; log in `~/Library/Logs/zudrisk-update.log`):
+
+```bash
+sed "s|__HOME__|$HOME|g" docs/launchd/mn.zudrisk.update.plist > ~/Library/LaunchAgents/mn.zudrisk.update.plist && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/mn.zudrisk.update.plist
+```
+
+To stop it: `launchctl bootout gui/$(id -u)/mn.zudrisk.update && rm ~/Library/LaunchAgents/mn.zudrisk.update.plist`.
+By hand, the same steps:
+
 ERA5-Land publishes a month about 5 days after it ends. Once it has, re-run with that month:
 
 ```bash

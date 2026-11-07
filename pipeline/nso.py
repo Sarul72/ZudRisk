@@ -1,5 +1,6 @@
 """NSO Mongolia livestock stock and adult losses per soum (PxWeb API, no login), joined to COD soums."""
 import csv
+from datetime import date
 import re
 import sys
 from collections import defaultdict
@@ -13,7 +14,7 @@ TABLES = {"stock": "DT_NSO_1001_021V1.px", "loss": "DT_NSO_1001_029V1.px"}
 TYPES = {"1": "horse", "2": "cattle", "3": "camel", "4": "sheep", "5": "goat"}
 # Sheep units per head: Nandintsetseg et al. 2018, Sci. Rep. 8:14769
 SHEEP_UNITS = {"camel": 5, "horse": 7, "cattle": 6, "sheep": 1, "goat": 0.9}
-YEARS = range(2000, 2026)
+YEARS = range(2000, date.today().year + 1)  # filtered against the years NSO lists, so a census out next February is taken then
 BATCH = 60
 OUT = Path("data/derived/livestock.csv")
 OUT_AIMAG = Path("data/derived/livestock_aimag.csv")

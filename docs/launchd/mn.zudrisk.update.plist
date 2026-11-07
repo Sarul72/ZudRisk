@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- The daily outlook update (pipeline.update). __HOME__ is filled in at install; see README. A run missed while the
+     Mac sleeps happens at wake. Off season, or with nothing new, the run only reads site/data/outlook.json. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>mn.zudrisk.update</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string><string>-lc</string>
+    <string>cd "__HOME__/Projects/ZudRisk" &amp;&amp; uv run python -m pipeline.update</string>
+  </array>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>30</integer></dict>
+  <key>StandardOutPath</key><string>__HOME__/Library/Logs/zudrisk-update.log</string>
+  <key>StandardErrorPath</key><string>__HOME__/Library/Logs/zudrisk-update.log</string>
+</dict>
+</plist>
