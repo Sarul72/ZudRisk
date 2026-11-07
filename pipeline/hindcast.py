@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline import aimags, asof, compare, export, indicators, model, trends, validate, zones
+from pipeline import aimags, asof, calibrate, compare, export, indicators, model, trends, validate, zones
 from pipeline.boundaries import load_soums
 from pipeline.nso import load_livestock, load_livestock_aimag, sheep_units
 from pipeline.validate import aimag_pairs, pooled, pooled_aimag, pooled_rows, rounded
@@ -63,6 +63,7 @@ def main() -> None:
     print(f"snow comparison -> {compare.PAGE}: pooled {snow['pooled']}")
     stages = asof.main(winters, normals, WINTERS)
     print("as-of pooled rho by stage: " + ", ".join(f"{k} {v['pooled']['spearman']}" for k, v in stages.items()))
+    calibrate.main()
     trends.main()
     model.main()
 

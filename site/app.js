@@ -36,6 +36,7 @@ const T = {
     limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. ҮСХ сумын хорогдлыг 2011/12-оос эхэлж гаргадаг тул түүнээс өмнөх өвлүүдийг (2000/01–2010/11) бодит хорогдолтой зөвхөн аймгаар харьцуулна. 2001/02–2019/20 оны өвлүүд энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). ҮСХ-ны бэлтгэсэн өвс тэжээлийг (зөвхөн аймгаар, сумаар байхгүй) хонин толгойд ногдуулж сургасан загварт оруулсан, тогтмол оноонд оруулаагүй; малчдын бэлтгэлийн өгөгдөл байхгүй хэвээр. Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
     sources: "Эх сурвалж",
     sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: RESOLVE Ecoregions 2017 (Dinerstein нар, 2017, CC BY 4.0). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
+    chance: (p, bss) => `Хорогдол ≥5% болох магадлал: <b>${p}%</b> <small>(өнгөрсөн өвлүүдээр тохируулсан, Brier skill ${fmt(bss, 2)})</small>`,
     risk: "Эрсдэл", ind: { cold: "Хүйтэн", snow: "Цас", summer: "Зуны бэлчээр", pressure: "Ачаалал" },
     cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / км²",
     missing: "Дутуу үзүүлэлт",
@@ -95,6 +96,7 @@ const T = {
     limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. NSO publishes soum losses from 2011/12 only, so the winters before (2000/01–2010/11) are checked against losses by aimag. Winters 2001/02 to 2019/20 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness explain about half of the variation in losses (Nandintsetseg et al. 2018). NSO's hay laid in (by aimag only; there is no soum figure), per sheep unit, enters the learned model, not the fixed score; herder preparedness is still not in the data. The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
     sources: "Sources",
     sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: RESOLVE Ecoregions 2017 (Dinerstein et al. 2017, CC BY 4.0). Livestock and losses: NSO Mongolia (1212.mn).",
+    chance: (p, bss) => `Chance of losses ≥5%: <b>${p}%</b> <small>(calibrated on past winters, Brier skill ${fmt(bss, 2)})</small>`,
     risk: "Risk", ind: { cold: "Cold", snow: "Snow", summer: "Summer pasture", pressure: "Pressure" },
     cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km²",
     missing: "Missing indicators",
@@ -131,10 +133,17 @@ const T = {
   },
 };
 
+let calibration = null;
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
 let zoneGeo = null, zoneScores = {};
 let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
+// P(losses >= 5 %) from the risk, fitted per stage on 2011/12-2024/25 (pipeline.calibrate); none where it beats no base rate
+const chanceLine = (t, p) => {
+  const c = calibration?.stages[p.stage || "mar"];
+  if (!c || c.bss <= 0 || p.risk === null) return "";
+  return `${t.chance(Math.round(100 / (1 + Math.exp(-(c.a * p.risk + c.b)))), c.bss)}<br>`;
+};
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
 
 const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
@@ -274,7 +283,7 @@ function popup(p) {
   const unseen = (k) => p.stage === "oct" && (k === "cold" || k === "snow"); // pre-winter: no winter month yet
   const z = KEYS.map((k) => `${t.ind[k]} z: ${unseen(k) ? t.not_observed : fmt(p[`z_${k}`])}`).join("<br>");
   const missing = KEYS.filter((k) => p[`z_${k}`] === null && !unseen(k)).map((k) => t.ind[k]);
-  return `<b>${esc(soumName(p))}</b><br>${t.risk}: <b>${t.classes[p.risk_class]}</b> (${fmt(p.risk, 4)})<br>${z}<br>
+  return `<b>${esc(soumName(p))}</b><br>${t.risk}: <b>${t.classes[p.risk_class]}</b> (${fmt(p.risk, 4)})<br>${chanceLine(t, p)}${z}<br>
     <small>${t.cold_c}: ${fmt(p.cold_c, 1)} °C · ${t.snow_cm}: ${fmt(p.snow_m === null ? null : p.snow_m * 100, 0)} cm ·
     ${t.ndvi}: ${fmt(p.ndvi, 2)} · ${t.su}: ${fmt(p.su_per_km2, 0)}${p.is_centre ? t.centre : p.is_ub ? t.ub_density : ""}</small>
     <br><small>${t.snow_days}: ${fmt(p.snow_days, 0)} · ${t.density}: ${fmt(p.density_kgm3, 0)} ${t.unit_density} (z ${fmt(p.z_density)})
@@ -488,7 +497,9 @@ Promise.all([
   optional("data/zones.geojson"),
   optional("data/soum_zones.json"),
   optional("data/zone_soums.geojson"),
-]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg]) => {
+  optional("data/calibration.json"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg, cal]) => {
+  calibration = cal;
   aimagGeo = g;
   winters = w;
   pooled = p;
