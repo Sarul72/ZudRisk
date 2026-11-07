@@ -44,7 +44,9 @@ const T = {
     banner: "Өвөл үргэлжилж байна: энэ бол урьдчилсан төлөв, ажигласан өвөл биш. Хүйтэн ба цасны мэдээ сар бүр нэмэгдэнэ.",
     stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)",
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
-    level_soum: "Сум", level_aimag: "Аймаг", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
+    level_soum: "Сум", level_aimag: "Аймаг", level_zone: "Бүс", zone_table: "Байгалийн бүсүүд (эрсдэлээр)",
+    zone_risk: "Бүсийн сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", zone_mort: "Энэ өвлийн хорогдол",
+    zone_level_note: "Сум бүр талбайн ихэнхийг нь эзэлсэн бүсэд тоологдоно; бүсийн хил нь эдгээр сумдын хил.", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
     aimag_risk: "Сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", soums_n: "сум", zoom_to: "Газрын зураг дээр харах",
     aimag_suffix: " (аймаг)", centre: " (аймгийн төв: аймгийн дундаж)",
     proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж (цасны зузаанаар жигнэсэн) 2001–2024 онд хамгийн ихдээ 240 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
@@ -100,7 +102,9 @@ const T = {
     banner: "Winter under way: an outlook, not an observed winter. Cold and snow are added month by month.",
     stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)",
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
-    level_soum: "Soum", level_aimag: "Aimag", level: "Map level", aimags: "Aimags (by risk)",
+    level_soum: "Soum", level_aimag: "Aimag", level_zone: "Zone", zone_table: "Natural zones (by risk)",
+    zone_risk: "The zone's soum risk weighted by herd size", zone_mort: "Losses this winter",
+    zone_level_note: "Each soum counts in the zone covering most of it; a zone's border here is its soums' borders.", level: "Map level", aimags: "Aimags (by risk)",
     aimag_risk: "Soum risk weighted by herd size", soums_n: "soums", zoom_to: "Show on the map",
     aimag_suffix: " (aimag)", centre: " (aimag centre: the aimag's density)",
     proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means (weighted by snow depth) peaked near 240 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
@@ -127,6 +131,7 @@ const T = {
 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
+let zoneGeo = null, zoneScores = {};
 let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
 
@@ -233,6 +238,22 @@ function extraLines(p) {
   return (z ? `<br>${t.zone}: <b>${esc(t.zones[z[0]])}</b> <small>(${t.zone_share(z[1])})</small>` : "") +
     hayLine(p.pcode.slice(0, 4)) + `<br>${t.vuln}: <b>${v == null ? "–" : `${Math.round(v * 100)}%`}</b> <small>(${t.vuln_unit})</small>` +
     `<br>${t.green}: <b>${g == null ? "–" : (g >= 0 ? "+" : "") + fmt(g, 3)}</b> NDVI${t.per_decade}`;
+}
+
+function zoneStyle(f) {
+  const c = zoneScores[f.properties.pcode]?.risk_class ?? null;
+  return { color: ZONE_COLORS[f.properties.pcode], weight: 3, fillOpacity: 0.78, fillColor: c === null ? GREY : COLORS[c] };
+}
+
+function zonePopup(p) {
+  const t = T[lang], a = zoneScores[p.pcode], name = esc(t.zones[p.pcode]);
+  const chart = `<br>${histChart(hist?.zone?.[p.pcode], a?.risk)}`;
+  if (!a || a.risk_class === null) return `<b>${name}</b><br>${t.nodata}${chart}`;
+  const counts = a.counts.map((n, i) => `<i class="chip" style="background:${COLORS[i]}"></i>${esc(t.classes[i])}: ${esc(n)}`)
+    .reverse().join("<br>");
+  return `<b>${name}</b><br>${t.risk}: <b>${t.classes[a.risk_class]}</b> (${fmt(a.risk, 4)})<br>
+    <small>${t.zone_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>` +
+    `<br>${t.zone_mort}: <b>${a.mortality == null ? "–" : `${fmt(a.mortality * 100, 1)}%`}</b>${chart}`;
 }
 
 function aimagPopup(p) {
@@ -348,6 +369,16 @@ function render() {
     b.disabled = view !== "risk"; // vulnerability and greenness are per soum
   }
   $("level").setAttribute("aria-label", t.level);
+  if (zoneGeo) {
+    const rank = (z) => zoneScores[z]?.risk ?? -Infinity;
+    $("zones").innerHTML = zoneGeo.features.map((f) => f.properties.pcode).sort((a, b) => rank(b) - rank(a)).map((z) => {
+      const a = zoneScores[z], c = a?.risk_class ?? null;
+      return `<tr><td><button type="button" class="link" data-zone="${esc(z)}" title="${esc(t.zoom_to)}">` +
+        `<i class="chip" style="background:${c === null ? GREY : COLORS[c]};border-color:${ZONE_COLORS[z]}"></i>${esc(t.zones[z])}</button></td>` +
+        `<td>${c === null ? "–" : `${esc(t.classes[c])} ${fmt(a.risk)}`}${a?.mortality == null ? "" : ` · ${fmt(a.mortality * 100, 1)}%`}</td></tr>`;
+    }).join("");
+    $("zone_note").textContent = t.zone_level_note;
+  }
   if (aimagGeo) {
     const rank = (pc) => aimagScores[pc]?.risk ?? -Infinity;
     $("aimags").innerHTML = aimagGeo.features.map((f) => f.properties)
@@ -378,7 +409,9 @@ function draw() {
     zoneFill = L.geoJSON(zones, { style: (f) => ({ stroke: false, fillOpacity: 0.75, fillColor: ZONE_COLORS[f.properties.zone] }), interactive: false }).addTo(map);
   }
   const tip = { sticky: true, direction: "top", opacity: 0.9 };
-  if (level === "aimag" && view === "risk") {
+  if (level === "zone" && view === "risk" && zoneGeo) {
+    layer = L.geoJSON(zoneGeo, { style: zoneStyle, onEachFeature: (f, l) => l.bindPopup(() => zonePopup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(T[lang].zones[f.properties.pcode]), tip) }).addTo(map);
+  } else if (level === "aimag" && view === "risk") {
     layer = L.geoJSON(aimagGeo, { style: aimagStyle, onEachFeature: (f, l) => l.bindPopup(() => aimagPopup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(aimagName(f.properties)), tip) }).addTo(map);
   } else {
     layer = L.geoJSON(soumGeo, { style, onEachFeature: (f, l) => l.bindPopup(() => popup(f.properties), { maxWidth: 320 }).bindTooltip(() => esc(soumName(f.properties)), tip) }).addTo(map);
@@ -387,17 +420,17 @@ function draw() {
   render();
 }
 
-function zoomToAimag(pcode) {
-  const f = aimagGeo.features.find((x) => x.properties.pcode === pcode);
+function zoomTo(geo, at, pcode) {
+  const f = geo?.features.find((x) => x.properties.pcode === pcode);
   if (!f) return;
   map.fitBounds(L.geoJSON(f).getBounds());
-  if (level === "aimag" && view === "risk" && layer) layer.eachLayer((l) => { if (l.feature.properties.pcode === pcode) l.openPopup(); });
+  if (level === at && view === "risk" && layer) layer.eachLayer((l) => { if (l.feature.properties.pcode === pcode) l.openPopup(); });
 }
 
 function findSoum() {
   const pcode = byName[$("search").value];
   if (!pcode) return;
-  if (level === "aimag" && view === "risk") { level = "soum"; draw(); }
+  if (level !== "soum" && view === "risk") { level = "soum"; draw(); }
   layer.eachLayer((l) => {
     if (l.feature.properties.pcode === pcode) { map.fitBounds(l.getBounds(), { maxZoom: 9 }); l.openPopup(); }
   });
@@ -405,16 +438,18 @@ function findSoum() {
 
 async function load(label) {
   const key = label === "outlook" ? outlook.winter : label;
-  const [geo, v, a] = await Promise.all([
+  const [geo, v, a, z] = await Promise.all([
     fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
     label === "outlook" ? asof[outlook.stage] : fetch(`data/validation_${key}.json`).then((r) => r.json()),
     fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
+    fetch(`data/zone_${key}.json`).then((r) => (r.ok ? r.json() : {})),
   ]);
   if (label !== sel.value) return; // a later choice won the race; drawing this one would mislabel the map
   shown = label;
   validation = v;
   soumGeo = geo;
   aimagScores = a;
+  zoneScores = z;
   draw();
 }
 
@@ -424,7 +459,8 @@ for (const b of document.querySelectorAll("[data-level]")) {
 }
 $("view").addEventListener("change", (e) => { view = e.target.value; if (soumGeo) draw(); else render(); });
 $("search").addEventListener("change", findSoum);
-$("aimags").addEventListener("click", (e) => { const b = e.target.closest("[data-aimag]"); if (b) zoomToAimag(b.dataset.aimag); });
+$("aimags").addEventListener("click", (e) => { const b = e.target.closest("[data-aimag]"); if (b) zoomTo(aimagGeo, "aimag", b.dataset.aimag); });
+$("zones").addEventListener("click", (e) => { const b = e.target.closest("[data-zone]"); if (b) zoomTo(zoneGeo, "zone", b.dataset.zone); });
 sel.addEventListener("change", () => load(sel.value).catch(fail));
 
 function fail(e) {
@@ -446,7 +482,8 @@ Promise.all([
   optional("data/hay.json"),
   optional("data/zones.geojson"),
   optional("data/soum_zones.json"),
-]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz]) => {
+  optional("data/zone_soums.geojson"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg]) => {
   aimagGeo = g;
   winters = w;
   pooled = p;
@@ -458,6 +495,8 @@ Promise.all([
   hay = hy;
   zones = zn;
   soumZones = sz;
+  zoneGeo = zg;
+  if (!zoneGeo) document.querySelector('[data-level="zone"]').hidden = true;
   if (zones) {
     control.addOverlay(L.geoJSON(zones, { style: (f) => ({ color: ZONE_COLORS[f.properties.zone], weight: 2.5, fill: false, dashArray: "6 4" }), interactive: false }),
       "Байгалийн бүсийн хил / Natural zone borders");

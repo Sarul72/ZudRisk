@@ -36,6 +36,7 @@ def main() -> None:
     normals = normal_winters(herds)
     winters = sorted(DZUD + normals)  # the pre-registered test; every other winter is scored and shown, not pooled
     print(f"winters {WINTERS}, pooled test {winters} (normal: {normals})")
+    zones.main()  # each winter's zone scores need every soum's zone
     rows, every = [], []
     for y in WINTERS:
         indicators.main(y)
@@ -59,7 +60,6 @@ def main() -> None:
     stages = asof.main(winters, normals)
     print("as-of pooled rho by stage: " + ", ".join(f"{k} {v['pooled']['spearman']}" for k, v in stages.items()))
     trends.main()
-    zones.main()
     model.main()
 
 

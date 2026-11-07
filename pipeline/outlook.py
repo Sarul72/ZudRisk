@@ -5,7 +5,7 @@ import sys
 from collections import Counter
 from datetime import date
 
-from pipeline import aimags, indicators
+from pipeline import aimags, indicators, zones
 from pipeline.asof import STAGES, stage_date
 from pipeline.boundaries import load_soums
 from pipeline.export import SITE, feature, label, props_for, soum_shapes
@@ -66,6 +66,7 @@ def main(through: str) -> None:
     (SITE / f"outlook_{label(year)}.geojson").write_text(
         json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
     aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
+    zones.write_scores(label(year), year, rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     (SITE / "outlook.json").write_text(json.dumps({"winter": label(year), "stage": stage, "data_through": through,
                                                    "as_of": as_of.isoformat(), "made": date.today().isoformat()}))
     hist = Counter(r["risk_class"] for r in rows.values())

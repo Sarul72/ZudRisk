@@ -11,10 +11,10 @@ from pipeline.nso import sheep_units
 from pipeline.score import risk_class
 
 
-def dissolve(soums: list[dict]) -> dict[str, object]:
+def dissolve(soums: list[dict], key: str = "aimag_pcode") -> dict[str, object]:
     by: dict[str, list] = {}
     for s in soums:
-        by.setdefault(s["aimag_pcode"], []).append(s["geom"])
+        by.setdefault(s[key], []).append(s["geom"])
     return {a: shapely.union_all(g) for a, g in by.items()}
 
 
@@ -28,19 +28,19 @@ def herd_weights(soums: list[dict], herds: dict, census: int) -> dict[str, float
     return out
 
 
-def summary(soums: list[dict], rows: dict[str, dict], weights: dict[str, float]) -> dict[str, dict]:
-    """Per aimag: herd-weighted mean risk, its class, and how many soums fall in each class."""
+def summary(soums: list[dict], rows: dict[str, dict], weights: dict[str, float], key: str = "aimag_pcode") -> dict[str, dict]:
+    """Per aimag (or other group named by `key`): herd-weighted mean risk, its class, and soums per class."""
     out: dict[str, dict] = {}
     acc: dict[str, list[float]] = {}
     for s in soums:
-        a = out.setdefault(s["aimag_pcode"], {"risk": None, "risk_class": None, "counts": [0] * 5, "n": 0})
+        a = out.setdefault(s[key], {"risk": None, "risk_class": None, "counts": [0] * 5, "n": 0})
         r = rows.get(s["pcode"], {})
         if r.get("risk_class") is not None:
             a["counts"][r["risk_class"]] += 1
             a["n"] += 1
         w = weights.get(s["pcode"], 0.0)
         if r.get("risk") is not None and w > 0:
-            t = acc.setdefault(s["aimag_pcode"], [0.0, 0.0])
+            t = acc.setdefault(s[key], [0.0, 0.0])
             t[0], t[1] = t[0] + r["risk"] * w, t[1] + w
     for a, (num, den) in acc.items():
         out[a]["risk"] = round(num / den, 4)

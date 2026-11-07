@@ -11,7 +11,9 @@ from pathlib import Path
 import shapely
 from shapely.geometry import LinearRing, Polygon
 
+from pipeline import aimags
 from pipeline.boundaries import load_soums
+from pipeline.nso import sheep_units
 from pipeline.export import SITE, feature, soum_shapes
 
 URL = "https://storage.googleapis.com/teow2016/Ecoregions2017.zip"
@@ -103,6 +105,34 @@ def dominant(geom, zones: dict) -> tuple[str, float] | None:
     return None if best is None or shares[best] == 0 else (best, round(shares[best], 3))
 
 
+def pooled_mortality(pcodes: list[str], herds: dict, year: int) -> float | None:
+    """Losses over stock, both summed over the soums that have both, in sheep units: a zone's recorded mortality."""
+    stock = loss = 0.0
+    for pc in pcodes:
+        st = sheep_units(herds.get((pc, year, "stock"), {}))
+        lo = sheep_units(herds.get((pc, year + 1, "loss"), {}))
+        if st and lo is not None:
+            stock, loss = stock + st, loss + lo
+    return round(loss / stock, 4) if stock else None
+
+
+def zone_scores(soum_zone: dict[str, str], rows: dict[str, dict], herds: dict, census: int, year: int) -> dict:
+    """Per zone: the aimag summary (herd-weighted risk, class counts) plus the winter's recorded mortality."""
+    soums = [{"pcode": pc, "zone": z} for pc, z in soum_zone.items()]
+    out = aimags.summary(soums, rows, aimags.herd_weights(soums, herds, census), key="zone")
+    for z, v in out.items():
+        v["mortality"] = pooled_mortality([pc for pc, zz in soum_zone.items() if zz == z], herds, year)
+    return out
+
+
+def soum_zone(site=SITE) -> dict[str, str]:
+    return {pc: v[0] for pc, v in json.loads((site / "soum_zones.json").read_text()).items() if v}
+
+
+def write_scores(label: str, year: int, rows: dict[str, dict], herds: dict, census: int, site=SITE) -> None:
+    (site / f"zone_{label}.json").write_text(json.dumps(zone_scores(soum_zone(), rows, herds, census, year)))
+
+
 def ecoregions() -> list[tuple[str, object]]:
     """(ECO_NAME, geometry) for every ecoregion whose box touches Mongolia's."""
     if not RAW.exists():
@@ -130,6 +160,12 @@ def main() -> None:
     (SITE / "zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")))
     by_soum = {s["pcode"]: dominant(s["geom"], zones) for s in soums}
     (SITE / "soum_zones.json").write_text(json.dumps(by_soum, separators=(",", ":")))
+    # the zone level the scores are summed on: soums dissolved by their zone, so its borders are soum borders
+    shapes = soum_shapes()
+    grouped = aimags.dissolve([{"zone": by_soum[s["pcode"]][0], "geom": shapes[s["pcode"]]} for s in soums if by_soum[s["pcode"]]],
+                              key="zone")
+    (SITE / "zone_soums.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": [
+        feature(grouped[z], {"pcode": z}, simplify=False) for z in ZONE_ORDER if z in grouped]}, separators=(",", ":")))
     total = country.area
     print("zones: " + ", ".join(f"{z} {g.area / total:.1%}" for z, g in zones.items()) +
           f"; soums by zone {dict(sorted(Counter(v[0] for v in by_soum.values() if v).items()))}")
@@ -165,6 +201,17 @@ def check() -> None:
     zones = {"steppe": box(0, 0, 3, 1), "desert": box(3, 0, 4, 1)}
     assert dominant(box(0, 0, 4, 1), zones) == ("steppe", 0.75)
     assert dominant(box(10, 10, 11, 11), zones) is None
+    full = {"camel": 0, "horse": 0, "cattle": 0, "goat": 0}
+    herds = {("A", 2020, "stock"): {**full, "sheep": 100.0}, ("A", 2021, "loss"): {**full, "sheep": 10.0},
+             ("B", 2020, "stock"): {**full, "sheep": 300.0}, ("B", 2021, "loss"): {**full, "sheep": 30.0},
+             ("C", 2020, "stock"): {**full, "sheep": 600.0}}
+    assert pooled_mortality(["A", "B", "C"], herds, 2020) == 0.1, "a soum with no loss row counts in neither sum"
+    assert pooled_mortality(["C"], herds, 2020) is None
+    sz = {"A": "steppe", "B": "steppe", "C": "desert"}
+    rows = {"A": {"risk": 1.0, "risk_class": 4}, "B": {"risk": -1.0, "risk_class": 0}, "C": {"risk": None, "risk_class": None}}
+    sc = zone_scores(sz, rows, herds, 2020, 2020)
+    assert sc["steppe"]["risk"] == -0.5 and sc["steppe"]["counts"] == [1, 0, 0, 0, 1], sc  # (100*1 - 300*1) / 400
+    assert sc["steppe"]["mortality"] == 0.1 and sc["desert"]["mortality"] is None and sc["desert"]["risk"] is None, sc
     print("zones check: ok")
 
 

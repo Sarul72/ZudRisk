@@ -71,6 +71,8 @@ def main(year: int) -> None:
     props = {s["pcode"]: props_for(s, scores.get(s["pcode"], {})) for s in load_soums()}
     feats = [feature(soum_shapes()[s["pcode"]], props[s["pcode"]], simplify=False) for s in load_soums()]
     aimags.write_scores(label(year), props, load_livestock(), census_year(year, winter_end(year)))
+    from pipeline import zones  # zones imports this module
+    zones.write_scores(label(year), year, props, load_livestock(), census_year(year, winter_end(year)))
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,
@@ -83,8 +85,8 @@ def main(year: int) -> None:
 
 
 def history(years: list[int], risk: dict[int, dict], aimag_risk: dict[int, dict], soums: list[dict], herds: dict,
-            aherds: dict, national: dict[int, float]) -> dict:
-    """Every soum's and aimag's risk and recorded mortality across the winters, for the popup charts."""
+            aherds: dict, national: dict[int, float], zones: dict[int, dict] | None = None) -> dict:
+    """Every soum's, aimag's and natural zone's risk and recorded mortality across the winters, for the popup charts."""
     r3 = lambda v: None if v is None else round(v, 3)  # noqa: E731
     out = {"winters": [label(y) for y in years], "national_pct": [national.get(y) for y in years], "soum": {}, "aimag": {}}
     for s in soums:
@@ -93,6 +95,10 @@ def history(years: list[int], risk: dict[int, dict], aimag_risk: dict[int, dict]
     for a in sorted({s["aimag_pcode"] for s in soums}):
         out["aimag"][a] = {"risk": [r3(aimag_risk[y].get(a, {}).get("risk")) for y in years],
                            "mort": [r3(mortality(aherds, a, y)) for y in years]}
+    if zones is not None:
+        out["zone"] = {z: {"risk": [r3(zones[y].get(z, {}).get("risk")) for y in years],
+                           "mort": [r3(zones[y].get(z, {}).get("mortality")) for y in years]}
+                       for z in sorted({z for y in years for z in zones[y]})}
     return out
 
 
@@ -100,8 +106,10 @@ def write_history(years: list[int]) -> None:
     from pipeline.indicators import read_risk
     national = {y: json.loads(out_path_json(y).read_text())["mortality_pct"] for y in years}
     aimag_risk = {y: json.loads((SITE / f"aimag_{label(y)}.json").read_text()) for y in years}
+    zone_path = {y: SITE / f"zone_{label(y)}.json" for y in years}
+    zones = {y: json.loads(p.read_text()) for y, p in zone_path.items()} if all(p.exists() for p in zone_path.values()) else None
     h = history(years, {y: read_risk(y) for y in years}, aimag_risk, load_soums(), load_livestock(),
-                load_livestock_aimag(), national)
+                load_livestock_aimag(), national, zones)
     (SITE / "history.json").write_text(json.dumps(h, separators=(",", ":"), allow_nan=False))
 
 
@@ -132,6 +140,9 @@ def check() -> None:
     assert h == {"winters": ["2011-12", "2012-13"], "national_pct": [1.2, None],
                  "soum": {"A": {"risk": [0.512, None], "mort": [0.125, None]}, "B": {"risk": [None, None], "mort": [None, None]}},
                  "aimag": {"X": {"risk": [0.3, None], "mort": [0.05, None]}}}, h
+    hz = history([2011, 2012], {2011: {}, 2012: {}}, {2011: {}, 2012: {}}, [], {}, {}, {},
+                 zones={2011: {"steppe": {"risk": 0.2, "mortality": 0.05}}, 2012: {}})
+    assert hz["zone"] == {"steppe": {"risk": [0.2, None], "mort": [0.05, None]}}, hz
     print("export check: ok")
 
 
