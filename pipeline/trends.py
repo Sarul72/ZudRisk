@@ -25,9 +25,13 @@ def greenness_trend(series: dict[str, float], through: int) -> float | None:
     return 10 * theil_sen([y for y, _ in pts], [v for _, v in pts])
 
 
+def latest_summer(ndvi: dict[str, dict[str, float]]) -> int:
+    return max(int(m[:4]) for s in ndvi.values() for m in s if m.endswith("08"))
+
+
 def main() -> None:
     ndvi = load_series(NDVI_CSV)
-    through = max(int(m[:4]) for s in ndvi.values() for m in s if m.endswith("08"))
+    through = latest_summer(ndvi)
     trend = {pc: round(t, 4) for pc, s in ndvi.items() if (t := greenness_trend(s, through)) is not None}
     (SITE / "greenness.json").write_text(json.dumps({"from": FIRST, "through": through, "per_decade": trend}))
     v = sorted(trend.values())
