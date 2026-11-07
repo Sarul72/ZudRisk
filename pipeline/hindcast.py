@@ -61,7 +61,7 @@ def main() -> None:
     print(f"pooled: {res}")
     snow = compare.main(winters)
     print(f"snow comparison -> {compare.PAGE}: pooled {snow['pooled']}")
-    stages = asof.main(winters, normals)
+    stages = asof.main(winters, normals, WINTERS)
     print("as-of pooled rho by stage: " + ", ".join(f"{k} {v['pooled']['spearman']}" for k, v in stages.items()))
     trends.main()
     model.main()

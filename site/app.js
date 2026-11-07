@@ -40,10 +40,10 @@ const T = {
     cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / км²",
     missing: "Дутуу үзүүлэлт",
     snow_days: "Цастай өдөр", density: "Цасны хамгийн их нягт", unit_density: "кг/м³",
-    months: { oct: "10-р сар", nov: "11-р сар", dec: "12-р сар", jan: "1-р сар", feb: "2-р сар", mar: "3-р сар" },
+    months: { oct: "10-р сар", nov: "11-р сар", dec: "12-р сар", jan: "1-р сар", feb: "2-р сар", mar: "3-р сар", oct_seas5: "10-р сар + SEAS5" },
     outlook_opt: (m) => `төлөв (${m} хүртэл)`, not_observed: "ажиглагдаагүй",
     banner: "Өвөл үргэлжилж байна: энэ бол урьдчилсан төлөв, ажигласан өвөл биш. Хүйтэн ба цасны мэдээ сар бүр нэмэгдэнэ.",
-    stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)",
+    stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)", seas5_note: (o, f) => `10-р сарын 1-ний ECMWF SEAS5 улирлын таамгийг 10-р сарын шатанд нэмэхэд нарийвчлал буурсан: сум-өвөл ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, бүх аймаг-өвөл ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. Тиймээс төлөвт ашиглахгүй.`,
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
     level_soum: "Сум", level_aimag: "Аймаг", level_zone: "Бүс", zone_table: "Байгалийн бүсүүд (эрсдэлээр)",
     zone_risk: "Бүсийн сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", zone_mort: "Энэ өвлийн хорогдол",
@@ -99,10 +99,10 @@ const T = {
     cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km²",
     missing: "Missing indicators",
     snow_days: "Snow-cover days", density: "Densest monthly snow", unit_density: "kg/m³",
-    months: { oct: "Oct", nov: "Nov", dec: "Dec", jan: "Jan", feb: "Feb", mar: "Mar" },
+    months: { oct: "Oct", nov: "Nov", dec: "Dec", jan: "Jan", feb: "Feb", mar: "Mar", oct_seas5: "Oct + SEAS5" },
     outlook_opt: (m) => `outlook (data to ${m})`, not_observed: "not observed yet",
     banner: "Winter under way: an outlook, not an observed winter. Cold and snow are added month by month.",
-    stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)",
+    stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)", seas5_note: (o, f) => `Adding the 1 October ECMWF SEAS5 seasonal forecast to the October stage lowered its skill: soum-winter ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, every aimag-winter ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. The outlook does not use it.`,
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
     level_soum: "Soum", level_aimag: "Aimag", level_zone: "Zone", zone_table: "Natural zones (by risk)",
     zone_risk: "The zone's soum risk weighted by herd size", zone_mort: "Losses this winter",
@@ -338,7 +338,8 @@ function render() {
   $("validation_h").textContent = isOutlook() ? t.stage_validation : t.validation;
   if (asof) {
     $("stages").innerHTML = hbars(Object.entries(asof).map(([k, s]) => ({ label: t.months[k], values: [s.pooled.spearman],
-      hi: isOutlook() && outlook && k === outlook.stage })), ["#3b6fd8"], { aria: t.stages });
+      hi: isOutlook() && outlook && k === outlook.stage })), ["#3b6fd8"], { aria: t.stages }) +
+      (asof.oct_seas5?.pooled_aimag && asof.oct?.pooled_aimag ? `<div class="note">${esc(t.seas5_note(asof.oct, asof.oct_seas5))}</div>` : "");
   }
   if (isOutlook() && validation) {
     const rows = Object.entries(validation.winters).map(([w, v]) => [w.replace("-", "/"),

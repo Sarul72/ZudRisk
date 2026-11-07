@@ -18,8 +18,10 @@ uv run python -m pipeline.boundaries          # OCHA COD-AB soums -> data/derive
 uv run python -m pipeline.nso                 # NSO herds and losses -> data/derived/livestock.csv
 uv run python -m pipeline.era5                # ERA5-Land t2m, snow depth/density/cover, Nov-Mar, to the latest month (CDS)
 uv run python -m pipeline.gldas               # GLDAS-2.1 snow depth, for the snow comparison only (Earthdata)
-uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2001 to the latest summer (Earthdata)
-uv run python -m pipeline.hindcast            # 15 winters scored (2009/10, 2011/12-2024/25), the pre-registered
+uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2000 to the latest summer (Earthdata)
+uv run python -m pipeline.seasonal --fetch && uv run python -m pipeline.seasonal  # SEAS5 1 October forecasts (CDS),
+                                              # tested as the oct stage plus a forecast; not used by the outlook
+uv run python -m pipeline.hindcast            # 25 winters scored (2000/01-2024/25), the pre-registered
                                               # pooled test, snow comparison, as-of stages, greenness trend
                                               # (pipeline.trends) and the learned vulnerability model (pipeline.model)
 uv run python -m pipeline.zones              # natural zones from RESOLVE Ecoregions 2017 (downloads 149 MB once)
