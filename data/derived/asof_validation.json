@@ -7,47 +7,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.464
+        "spearman_aimag": 0.347
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.01,
-        "excess_spearman_soum": -0.033,
+        "spearman_soum": 0.052,
+        "excess_spearman_soum": -0.032,
         "n_aimag": 21,
-        "spearman_aimag": 0.013
+        "spearman_aimag": 0.022
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.107,
-        "excess_spearman_soum": 0.071,
+        "spearman_soum": 0.118,
+        "excess_spearman_soum": 0.08,
         "n_aimag": 21,
-        "spearman_aimag": -0.101
+        "spearman_aimag": -0.103
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.1,
-        "excess_spearman_soum": 0.091,
+        "spearman_soum": 0.104,
+        "excess_spearman_soum": 0.068,
         "n_aimag": 21,
-        "spearman_aimag": 0.244
+        "spearman_aimag": 0.281
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.315,
-        "excess_spearman_soum": 0.333,
+        "spearman_soum": 0.33,
+        "excess_spearman_soum": 0.344,
         "n_aimag": 21,
-        "spearman_aimag": 0.379
+        "spearman_aimag": 0.296
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.186,
-        "excess_spearman_soum": 0.186,
+        "spearman_soum": 0.219,
+        "excess_spearman_soum": 0.214,
         "n_aimag": 21,
-        "spearman_aimag": -0.125
+        "spearman_aimag": -0.19
       }
     },
     "pooled": {
@@ -59,9 +59,9 @@
         2022,
         2023
       ],
-      "spearman": 0.219,
+      "spearman": 0.221,
       "n_excess": 1649,
-      "spearman_excess": 0.205
+      "spearman_excess": 0.197
     }
   },
   "nov": {
@@ -72,47 +72,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.842
+        "spearman_aimag": 0.861
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.216,
-        "excess_spearman_soum": -0.06,
+        "spearman_soum": 0.234,
+        "excess_spearman_soum": -0.03,
         "n_aimag": 21,
-        "spearman_aimag": 0.271
+        "spearman_aimag": 0.318
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.311,
-        "excess_spearman_soum": 0.39,
+        "spearman_soum": 0.342,
+        "excess_spearman_soum": 0.414,
         "n_aimag": 21,
-        "spearman_aimag": 0.523
+        "spearman_aimag": 0.44
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": -0.024,
-        "excess_spearman_soum": 0.007,
+        "spearman_soum": -0.001,
+        "excess_spearman_soum": -0.009,
         "n_aimag": 21,
-        "spearman_aimag": -0.161
+        "spearman_aimag": -0.092
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.212,
-        "excess_spearman_soum": 0.203,
+        "spearman_soum": 0.237,
+        "excess_spearman_soum": 0.226,
         "n_aimag": 21,
-        "spearman_aimag": 0.145
+        "spearman_aimag": 0.131
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.679,
-        "excess_spearman_soum": 0.698,
+        "spearman_soum": 0.676,
+        "excess_spearman_soum": 0.693,
         "n_aimag": 21,
-        "spearman_aimag": 0.852
+        "spearman_aimag": 0.842
       }
     },
     "pooled": {
@@ -124,9 +124,9 @@
         2022,
         2023
       ],
-      "spearman": 0.483,
+      "spearman": 0.493,
       "n_excess": 1649,
-      "spearman_excess": 0.468
+      "spearman_excess": 0.475
     }
   },
   "dec": {
@@ -137,47 +137,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.796
+        "spearman_aimag": 0.717
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.198,
-        "excess_spearman_soum": -0.099,
+        "spearman_soum": 0.217,
+        "excess_spearman_soum": -0.07,
         "n_aimag": 21,
-        "spearman_aimag": 0.201
+        "spearman_aimag": 0.2
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.343,
-        "excess_spearman_soum": 0.431,
+        "spearman_soum": 0.379,
+        "excess_spearman_soum": 0.461,
         "n_aimag": 21,
-        "spearman_aimag": 0.609
+        "spearman_aimag": 0.612
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.115,
-        "excess_spearman_soum": 0.065,
+        "spearman_soum": 0.144,
+        "excess_spearman_soum": 0.056,
         "n_aimag": 21,
-        "spearman_aimag": 0.156
+        "spearman_aimag": 0.243
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.274,
-        "excess_spearman_soum": 0.261,
+        "spearman_soum": 0.283,
+        "excess_spearman_soum": 0.268,
         "n_aimag": 21,
-        "spearman_aimag": 0.26
+        "spearman_aimag": 0.226
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.68,
-        "excess_spearman_soum": 0.706,
+        "spearman_soum": 0.673,
+        "excess_spearman_soum": 0.696,
         "n_aimag": 21,
-        "spearman_aimag": 0.809
+        "spearman_aimag": 0.813
       }
     },
     "pooled": {
@@ -189,9 +189,9 @@
         2022,
         2023
       ],
-      "spearman": 0.627,
+      "spearman": 0.632,
       "n_excess": 1649,
-      "spearman_excess": 0.622
+      "spearman_excess": 0.625
     }
   },
   "jan": {
@@ -202,47 +202,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.703
+        "spearman_aimag": 0.675
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.204,
-        "excess_spearman_soum": -0.177,
+        "spearman_soum": 0.223,
+        "excess_spearman_soum": -0.143,
         "n_aimag": 21,
-        "spearman_aimag": 0.062
+        "spearman_aimag": 0.064
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.417,
-        "excess_spearman_soum": 0.494,
+        "spearman_soum": 0.453,
+        "excess_spearman_soum": 0.522,
         "n_aimag": 21,
         "spearman_aimag": 0.69
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.084,
-        "excess_spearman_soum": 0.077,
+        "spearman_soum": 0.111,
+        "excess_spearman_soum": 0.067,
         "n_aimag": 21,
-        "spearman_aimag": 0.077
+        "spearman_aimag": 0.274
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.338,
-        "excess_spearman_soum": 0.33,
+        "spearman_soum": 0.342,
+        "excess_spearman_soum": 0.333,
         "n_aimag": 21,
-        "spearman_aimag": 0.295
+        "spearman_aimag": 0.306
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.686,
-        "excess_spearman_soum": 0.713,
+        "spearman_soum": 0.675,
+        "excess_spearman_soum": 0.699,
         "n_aimag": 21,
-        "spearman_aimag": 0.786
+        "spearman_aimag": 0.758
       }
     },
     "pooled": {
@@ -254,9 +254,9 @@
         2022,
         2023
       ],
-      "spearman": 0.626,
+      "spearman": 0.629,
       "n_excess": 1649,
-      "spearman_excess": 0.617
+      "spearman_excess": 0.618
     }
   },
   "feb": {
@@ -267,47 +267,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.604
+        "spearman_aimag": 0.586
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.246,
-        "excess_spearman_soum": -0.136,
+        "spearman_soum": 0.261,
+        "excess_spearman_soum": -0.097,
         "n_aimag": 21,
         "spearman_aimag": 0.164
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.432,
-        "excess_spearman_soum": 0.503,
+        "spearman_soum": 0.465,
+        "excess_spearman_soum": 0.528,
         "n_aimag": 21,
-        "spearman_aimag": 0.742
+        "spearman_aimag": 0.674
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.041,
-        "excess_spearman_soum": 0.044,
+        "spearman_soum": 0.068,
+        "excess_spearman_soum": 0.032,
         "n_aimag": 21,
-        "spearman_aimag": 0.029
+        "spearman_aimag": 0.166
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.324,
-        "excess_spearman_soum": 0.32,
+        "spearman_soum": 0.321,
+        "excess_spearman_soum": 0.316,
         "n_aimag": 21,
-        "spearman_aimag": 0.355
+        "spearman_aimag": 0.344
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.677,
-        "excess_spearman_soum": 0.7,
+        "spearman_soum": 0.668,
+        "excess_spearman_soum": 0.689,
         "n_aimag": 21,
-        "spearman_aimag": 0.757
+        "spearman_aimag": 0.723
       }
     },
     "pooled": {
@@ -319,9 +319,9 @@
         2022,
         2023
       ],
-      "spearman": 0.593,
+      "spearman": 0.595,
       "n_excess": 1649,
-      "spearman_excess": 0.577
+      "spearman_excess": 0.579
     }
   },
   "mar": {
@@ -332,47 +332,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.587
+        "spearman_aimag": 0.573
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 329,
-        "spearman_soum": 0.24,
-        "excess_spearman_soum": -0.136,
+        "spearman_soum": 0.252,
+        "excess_spearman_soum": -0.1,
         "n_aimag": 21,
-        "spearman_aimag": 0.2
+        "spearman_aimag": 0.182
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.427,
-        "excess_spearman_soum": 0.496,
+        "spearman_soum": 0.459,
+        "excess_spearman_soum": 0.521,
         "n_aimag": 21,
-        "spearman_aimag": 0.731
+        "spearman_aimag": 0.671
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.037,
-        "excess_spearman_soum": 0.045,
+        "spearman_soum": 0.064,
+        "excess_spearman_soum": 0.032,
         "n_aimag": 21,
-        "spearman_aimag": 0.029
+        "spearman_aimag": 0.171
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.332,
-        "excess_spearman_soum": 0.331,
+        "spearman_soum": 0.327,
+        "excess_spearman_soum": 0.325,
         "n_aimag": 21,
-        "spearman_aimag": 0.317
+        "spearman_aimag": 0.338
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 330,
-        "spearman_soum": 0.671,
-        "excess_spearman_soum": 0.694,
+        "spearman_soum": 0.661,
+        "excess_spearman_soum": 0.682,
         "n_aimag": 21,
-        "spearman_aimag": 0.749
+        "spearman_aimag": 0.714
       }
     },
     "pooled": {
@@ -384,9 +384,9 @@
         2022,
         2023
       ],
-      "spearman": 0.591,
+      "spearman": 0.594,
       "n_excess": 1649,
-      "spearman_excess": 0.576
+      "spearman_excess": 0.577
     }
   }
 }

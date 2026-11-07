@@ -10,7 +10,7 @@ from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 
-from pipeline.boundaries import load_soums
+from pipeline.boundaries import is_aimag_centre, load_soums
 from pipeline.era5 import load_era5
 from pipeline.gldas import OUT as GLDAS_CSV, load_series
 from pipeline.ndvi import OUT as NDVI_CSV
@@ -106,6 +106,26 @@ def pressure_raw(stock_by_type: dict[str, float], area_km2: float) -> float | No
     return math.log(su * 1000 / area_km2)
 
 
+def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, float | None]:
+    """log sheep units per km2. An aimag centre is a town: the herds registered there graze the aimag, so it takes
+    the aimag's density rather than a town's 5,000-13,000 per km2, which clipped every centre at z = 3."""
+    su = {s["pcode"]: sheep_units(herds.get((s["pcode"], census, "stock"), {})) for s in soums}
+    aimag: dict[str, list[float]] = {}
+    for s in soums:
+        if su[s["pcode"]] is not None:
+            tot = aimag.setdefault(s["aimag_pcode"], [0.0, 0.0])
+            tot[0], tot[1] = tot[0] + su[s["pcode"]], tot[1] + s["area_km2"]
+    out = {}
+    for s in soums:
+        pc = s["pcode"]
+        if is_aimag_centre(s) and su[pc] is not None:
+            a_su, a_km2 = aimag[s["aimag_pcode"]]
+            out[pc] = math.log(a_su * 1000 / a_km2) if a_su > 0 else None
+        else:
+            out[pc] = pressure_raw(herds.get((pc, census, "stock"), {}), s["area_km2"])
+    return out
+
+
 def score_row(z: dict[str, float | None]) -> dict:
     r = risk(z)
     return {"n_indicators": sum(v is not None for v in z.values()), "risk": r,
@@ -136,6 +156,7 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
     """Every soum's indicators and score for winter year/year+1, from what was published by as_of."""
     soums, herds, era5, gldas_s, ndvi_s = _inputs()
     census = census_year(year, as_of)
+    pressure = pressure_by_soum(soums, herds, census)
     rows = {}
     for s in soums:
         pc = s["pcode"]
@@ -146,7 +167,7 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
         sn = snow(sde, year, as_of)
         dn = density(e5["rsn"], sde, year, as_of)
         nd = summer(ndvi_s.get(pc, {}), year)
-        p = pressure_raw(herds.get((pc, census, "stock"), {}), s["area_km2"])
+        p = pressure[pc]
         rows[pc] = {
             "pcode": pc, "cold_c": c, "snow_m": sn, "ndvi": nd,
             "z_cold": _neg(_anomaly(c, [cold(e5["t2m"], y, then[y]) for y in BASELINE])),
@@ -219,6 +240,12 @@ def check() -> None:
     assert census_year(2023, date(2024, 1, 31)) == 2022  # census 2023 is not out before 1 Feb 2024
     assert census_year(2023, date(2024, 2, 29)) == 2023
     assert census_year(2023, date(2023, 10, 31)) == 2022
+    town = {"pcode": "MN4601", "aimag_pcode": "MN46", "area_km2": 10.0, "is_ub": False}
+    rural = {"pcode": "MN4616", "aimag_pcode": "MN46", "area_km2": 990.0, "is_ub": False}
+    herds = {("MN4601", 2025, "stock"): {**full, "sheep": 0.1}, ("MN4616", 2025, "stock"): {**full, "sheep": 0.9}}
+    pr = pressure_by_soum([town, rural], herds, 2025)
+    assert pr["MN4601"] == 0.0, "an aimag centre's herd grazes the aimag: 1000 sheep on 1000 km2"
+    assert abs(pr["MN4616"] - math.log(900 / 990)) < 1e-12
     row = score_row({"cold": 1.0, "pressure": 0.0, "snow": None, "summer": None})
     assert row["n_indicators"] == 2 and abs(row["risk"] - 0.35 / 0.64) < 1e-12
     print("indicators check: ok")

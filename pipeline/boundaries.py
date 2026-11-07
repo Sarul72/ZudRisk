@@ -17,6 +17,11 @@ OUT = Path("data/derived/soums.geojson")
 UB_PCODE = "MN11"
 
 
+def is_aimag_centre(soum: dict) -> bool:
+    """NSO numbers each aimag's centre soum 01 (Dalanzadgad MN4601, Baruun-Urt MN2201, ...); Ulaanbaatar is apart."""
+    return not soum["is_ub"] and soum["pcode"].endswith("01")
+
+
 def trim(props: dict) -> dict:
     return {
         "pcode": props["adm2_pcode"],

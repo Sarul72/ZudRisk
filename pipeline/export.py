@@ -10,7 +10,7 @@ import numpy as np
 import shapely
 from shapely.geometry import Polygon, mapping
 
-from pipeline.boundaries import load_soums
+from pipeline.boundaries import is_aimag_centre, load_soums
 from pipeline.indicators import out_path
 from pipeline.validate import out_path_json
 
@@ -42,6 +42,7 @@ def write_index(years: list[int]) -> None:
 def props_for(soum: dict, row: dict) -> dict:
     """A soum's map properties from an indicator row whose missing values are None."""
     props = {k: soum[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
+    props["is_centre"] = is_aimag_centre(soum)  # its herd density is the aimag's (indicators.pressure_by_soum)
     props.update({k: None if row.get(k) is None else round(float(row[k]), 4) for k in NUMERIC})
     for k in ("risk_class", "n_indicators"):
         props[k] = None if row.get(k) is None else int(row[k])

@@ -17,8 +17,8 @@
       "median_era5_m": 0.049,
       "median_gldas_m": 0.05,
       "n": 329,
-      "rho_soum_era5": 0.24,
-      "rho_soum_gldas": 0.182
+      "rho_soum_era5": 0.252,
+      "rho_soum_gldas": 0.196
     },
     {
       "winter": "2015/16",
@@ -27,8 +27,8 @@
       "median_era5_m": 0.079,
       "median_gldas_m": 0.097,
       "n": 330,
-      "rho_soum_era5": 0.427,
-      "rho_soum_gldas": 0.279
+      "rho_soum_era5": 0.459,
+      "rho_soum_gldas": 0.298
     },
     {
       "winter": "2021/22",
@@ -37,8 +37,8 @@
       "median_era5_m": 0.039,
       "median_gldas_m": 0.23,
       "n": 330,
-      "rho_soum_era5": 0.037,
-      "rho_soum_gldas": 0.056
+      "rho_soum_era5": 0.064,
+      "rho_soum_gldas": 0.073
     },
     {
       "winter": "2022/23",
@@ -47,8 +47,8 @@
       "median_era5_m": 0.07,
       "median_gldas_m": 0.117,
       "n": 330,
-      "rho_soum_era5": 0.332,
-      "rho_soum_gldas": 0.32
+      "rho_soum_era5": 0.327,
+      "rho_soum_gldas": 0.328
     },
     {
       "winter": "2023/24",
@@ -57,13 +57,13 @@
       "median_era5_m": 0.151,
       "median_gldas_m": 0.145,
       "n": 330,
-      "rho_soum_era5": 0.671,
-      "rho_soum_gldas": 0.597
+      "rho_soum_era5": 0.661,
+      "rho_soum_gldas": 0.593
     }
   ],
   "pooled": {
     "n": 1649,
-    "rho_era5": 0.591,
-    "rho_gldas": 0.426
+    "rho_era5": 0.594,
+    "rho_gldas": 0.434
   }
 }
