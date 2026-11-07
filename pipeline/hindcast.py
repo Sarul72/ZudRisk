@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline import export, indicators, validate
+from pipeline import compare, export, indicators, validate
 from pipeline.nso import load_livestock, sheep_units
 from pipeline.validate import mortality, spearman
 
@@ -66,6 +66,8 @@ def main() -> None:
     (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2))
     export.write_index(winters)
     print(f"pooled: {res}")
+    snow = compare.main(winters)
+    print(f"snow comparison -> {compare.PAGE}: pooled {snow['pooled']}")
 
 
 def check() -> None:
