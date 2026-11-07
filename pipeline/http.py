@@ -94,6 +94,10 @@ def cds_config(text: str) -> tuple[str, str]:
         name, sep, value = line.partition(":")
         if sep:
             cfg[name.strip()] = value.strip()
+    missing = [k for k in ("url", "key") if not cfg.get(k)]
+    if missing:
+        raise RuntimeError(f"~/.cdsapirc needs {' and '.join(missing)}: lines (url: https://cds.climate.copernicus.eu/api, "
+                           "key: the API Token from your CDS profile)")
     return cfg["url"], cfg["key"]
 
 
@@ -128,6 +132,9 @@ def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, ti
         return _cds_call(u, key, body, opener)
 
     job = call(f"{url}/retrieve/v1/processes/{dataset}/execution", {"inputs": inputs})
+    if "jobID" not in job:
+        detail = job.get("detail") or job.get("title") or job.get("status") or job
+        raise RuntimeError(f"CDS refused the request for {dataset}: {detail}")
     job_id, deadline = job["jobID"], time.monotonic() + timeout_s
     while job["status"] != "successful":
         if job["status"] in ("failed", "rejected", "dismissed"):
@@ -192,6 +199,11 @@ def check() -> None:
 def _check_cds() -> None:
     assert cds_config("url: https://x/api\nkey: abc\n") == ("https://x/api", "abc")
     assert cds_config("key:abc\nurl:https://x/api") == ("https://x/api", "abc")
+    try:
+        cds_config("key: abc\n")
+        raise AssertionError("an rc without url must say so")
+    except RuntimeError as e:
+        assert "~/.cdsapirc" in str(e) and "url" in str(e), e
 
     class Resp:
         def __init__(self, body: dict | bytes):
@@ -238,6 +250,16 @@ def _check_cds() -> None:
         raise AssertionError("a failed job must raise")
     except RuntimeError as e:
         assert "J1" in str(e) and "failed" in str(e) and "bad area" in str(e), e
+    class NoJob(FakeCds):
+        def open(self, req, timeout=None):
+            if req.full_url.endswith("/execution"):
+                return Resp({"status": "failed", "title": "Request too large"})
+            return super().open(req, timeout)
+    try:
+        cds_retrieve("ds", {}, opener=NoJob([]), auth=auth, poll_s=0)
+        raise AssertionError("a submit answered without a job id must raise")
+    except RuntimeError as e:
+        assert "Request too large" in str(e), e
     fake = FakeCds(["running", "successful"])
     assert cds_retrieve("ds", {"a": 1}, opener=fake, auth=auth, poll_s=0) == b"\x89HDF"
     assert fake.seen[0] == ("https://x/api/retrieve/v1/processes/ds/execution", "K")

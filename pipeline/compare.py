@@ -59,7 +59,7 @@ def compare(winters: list[int]) -> dict:
 
 def render_md(result: dict) -> str:
     def f(v) -> str:
-        return "–" if v is None else str(v)
+        return "–" if v is None else f"{v:.3f}" if isinstance(v, float) else str(v)
     lines = [
         "# Snow: GLDAS-2.1 against ERA5-Land",
         "",
@@ -109,6 +109,7 @@ def check() -> None:
     rows = [l for l in md.splitlines() if l.startswith("| 20")]
     assert [r.split("|")[1].strip() for r in rows] == ["2009/10", "2023/24"], rows
     assert "fixed before this comparison" in md and "–" in rows[0], md
+    assert "| 0.120 |" in rows[0] and "| 0.500 |" in rows[1], rows  # one precision down every column
     before = indicators.read_risk(2023)
     compare([2023])
     assert indicators.read_risk(2023) == before, "the comparison changed the score"

@@ -186,8 +186,13 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
     return rows
 
 
+def winter_end(year: int) -> date:
+    """as_of of a whole-winter hindcast: everything through March is in."""
+    return date(year + 1, 3, 31)
+
+
 def main(year: int, as_of: date | None = None) -> None:
-    rows = compute(year, as_of or date(year + 1, 3, 31))
+    rows = compute(year, as_of or winter_end(year))
     missing = Counter(k for r in rows.values() for k in ("cold", "snow", "summer", "pressure") if r[f"z_{k}"] is None)
     hist = Counter(r["risk_class"] for r in rows.values())
     with out_path(year).open("w", newline="") as f:

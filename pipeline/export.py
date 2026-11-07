@@ -11,7 +11,8 @@ import shapely
 from shapely.geometry import Polygon, mapping
 
 from pipeline.boundaries import is_aimag_centre, load_soums
-from pipeline.indicators import out_path
+from pipeline.indicators import census_year, out_path, winter_end
+from pipeline.nso import load_livestock
 from pipeline.validate import out_path_json
 
 SIMPLIFY_DEG = 0.005
@@ -52,7 +53,10 @@ def props_for(soum: dict, row: dict) -> dict:
 def main(year: int) -> None:
     with out_path(year).open() as f:
         scores = {r["pcode"]: {k: v or None for k, v in r.items()} for r in csv.DictReader(f)}
-    feats = [feature(s["geom"], props_for(s, scores.get(s["pcode"], {}))) for s in load_soums()]
+    from pipeline import aimags  # aimags imports this module
+    props = {s["pcode"]: props_for(s, scores.get(s["pcode"], {})) for s in load_soums()}
+    feats = [feature(s["geom"], props[s["pcode"]]) for s in load_soums()]
+    aimags.write_scores(label(year), props, load_livestock(), census_year(year, winter_end(year)))
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,

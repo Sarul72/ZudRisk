@@ -28,8 +28,10 @@ const T = {
     banner: "Өвөл үргэлжилж байна: энэ бол урьдчилсан төлөв, ажигласан өвөл биш. Хүйтэн ба цасны мэдээ сар бүр нэмэгдэнэ.",
     stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)",
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
+    level_soum: "Сум", level_aimag: "Аймаг", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
+    aimag_risk: "Сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", soums_n: "сум", zoom_to: "Газрын зураг дээр харах",
     aimag_suffix: " (аймаг)", centre: " (аймгийн төв: аймгийн дундаж)",
-    proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж 2001–2024 онд хамгийн ихдээ 220 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
+    proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж (цасны зузаанаар жигнэсэн) 2001–2024 онд хамгийн ихдээ 240 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
   },
   en: {
     title: "Dzud risk", subtitle: "Per soum: hindcasts of past winters and the 2026/27 outlook", winter: "Winter",
@@ -55,13 +57,16 @@ const T = {
     banner: "Winter under way: an outlook, not an observed winter. Cold and snow are added month by month.",
     stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)",
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
+    level_soum: "Soum", level_aimag: "Aimag", level: "Map level", aimags: "Aimags (by risk)",
+    aimag_risk: "Soum risk weighted by herd size", soums_n: "soums", zoom_to: "Show on the map",
     aimag_suffix: " (aimag)", centre: " (aimag centre: the aimag's density)",
-    proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means peaked near 220 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
+    proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means (weighted by snow depth) peaked near 240 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
   },
 };
 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
-const isOutlook = () => sel.value === "outlook";
+let level = "soum", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
+const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
 
 const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
 L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -78,11 +83,29 @@ function style(f) {
   return { color: "#555", weight: 0.4, fillOpacity: 0.78, fillColor: c === null ? GREY : COLORS[c] };
 }
 
+function aimagStyle(f) {
+  const c = aimagScores[f.properties.pcode]?.risk_class ?? null;
+  return { color: "#333", weight: 1, fillOpacity: 0.78, fillColor: c === null ? GREY : COLORS[c] };
+}
+
+function aimagName(p) {
+  return lang === "mn" ? p.name_mn : p.name_en;
+}
+
+function aimagPopup(p) {
+  const t = T[lang], a = aimagScores[p.pcode];
+  if (!a || a.risk_class === null) return `<b>${esc(aimagName(p))}</b><br>${p.is_ub ? t.ub : t.nodata}`;
+  const counts = a.counts.map((n, i) => `<i class="chip" style="background:${COLORS[i]}"></i>${esc(t.classes[i])}: ${n}`)
+    .reverse().join("<br>");
+  return `<b>${esc(aimagName(p))}</b><br>${t.risk}: <b>${t.classes[a.risk_class]}</b> (${fmt(a.risk, 4)})<br>
+    <small>${t.aimag_risk}</small><br>${counts}<br><small>${a.n} ${t.soums_n}</small>`;
+}
+
 function popup(p) {
   const t = T[lang];
   const name = lang === "mn" ? `${p.name_mn}, ${p.aimag_mn}` : `${p.name_en}, ${p.aimag_en}`;
   if (p.risk_class === null) return `<b>${esc(name)}</b><br>${p.is_ub ? t.ub : t.nodata}`;
-  const unseen = (k) => p.stage && (k === "cold" || k === "snow") && p[`z_${k}`] === null; // outlook: months still ahead
+  const unseen = (k) => p.stage === "oct" && (k === "cold" || k === "snow"); // pre-winter: no winter month yet
   const z = KEYS.map((k) => `${t.ind[k]} z: ${unseen(k) ? t.not_observed : fmt(p[`z_${k}`])}`).join("<br>");
   const missing = KEYS.filter((k) => p[`z_${k}`] === null && !unseen(k)).map((k) => t.ind[k]);
   return `<b>${esc(name)}</b><br>${t.risk}: <b>${t.classes[p.risk_class]}</b> (${fmt(p.risk, 4)})<br>${z}<br>
@@ -112,7 +135,7 @@ function render() {
   document.getElementById("validation_h").textContent = isOutlook() ? t.stage_validation : t.validation;
   if (asof) {
     document.getElementById("stages").innerHTML = Object.entries(asof).map(([k, s]) => {
-      const row = `<td>${esc(t.months[k])}</td><td>${fmt(s.pooled.spearman)} (n=${s.pooled.n})</td>`;
+      const row = `<td>${esc(t.months[k])}</td><td>${fmt(s.pooled.spearman)} (n=${esc(s.pooled.n)})</td>`;
       return isOutlook() && outlook && k === outlook.stage ? `<tr style="font-weight:600">${row}</tr>` : `<tr>${row}</tr>`;
     }).join("");
   }
@@ -136,24 +159,70 @@ function render() {
       [t.pooled_rho, `${fmt(pooled.spearman)} (n=${pooled.n})`], [t.pooled_ex, `${fmt(pooled.spearman_excess)} (n=${pooled.n_excess})`],
     ]);
   }
-  if (layer) layer.eachLayer((l) => l.setPopupContent(popup(l.feature.properties)));
+  for (const b of document.querySelectorAll("[data-level]")) {
+    b.textContent = t[`level_${b.dataset.level}`];
+    b.setAttribute("aria-pressed", String(b.dataset.level === level));
+  }
+  document.getElementById("level").setAttribute("aria-label", t.level);
+  if (aimagGeo) {
+    const rank = (pc) => aimagScores[pc]?.risk ?? -Infinity;
+    document.getElementById("aimags").innerHTML = aimagGeo.features.map((f) => f.properties)
+      .sort((a, b) => rank(b.pcode) - rank(a.pcode))
+      .map((p) => {
+        const a = aimagScores[p.pcode], c = a?.risk_class ?? null;
+        return `<tr tabindex="0" role="button" data-aimag="${esc(p.pcode)}" title="${esc(t.zoom_to)}">` +
+          `<td><i class="chip" style="background:${c === null ? GREY : COLORS[c]}"></i>${esc(aimagName(p))}</td>` +
+          `<td>${c === null ? "–" : esc(t.classes[c])} ${a?.risk == null ? "" : fmt(a.risk)}</td></tr>`;
+      }).join("");
+  }
+  if (layer) layer.eachLayer((l) => l.setPopupContent(level === "aimag" ? aimagPopup(l.feature.properties) : popup(l.feature.properties)));
 }
 
-async function load(label) {
-  const [geo, v] = label === "outlook"
-    ? [await fetch(`data/outlook_${outlook.winter}.geojson`).then((r) => r.json()), asof[outlook.stage]]
-    : await Promise.all([
-      fetch(`data/risk_${label}.geojson`).then((r) => r.json()),
-      fetch(`data/validation_${label}.json`).then((r) => r.json()),
-    ]);
-  if (label !== sel.value) return; // a later choice won the race; drawing this one would mislabel the map
-  validation = v;
+function draw() {
   if (layer) map.removeLayer(layer);
-  layer = L.geoJSON(geo, { style, onEachFeature: (f, l) => l.bindPopup(popup(f.properties)) }).addTo(map);
+  if (borders) map.removeLayer(borders);
+  borders = null;
+  if (level === "aimag") {
+    layer = L.geoJSON(aimagGeo, { style: aimagStyle, onEachFeature: (f, l) => l.bindPopup(aimagPopup(f.properties)) }).addTo(map);
+  } else {
+    layer = L.geoJSON(soumGeo, { style, onEachFeature: (f, l) => l.bindPopup(popup(f.properties)) }).addTo(map);
+    borders = L.geoJSON(aimagGeo, { style: { color: "#222", weight: 1.6, fill: false }, interactive: false }).addTo(map);
+  }
   render();
 }
 
+function zoomToAimag(pcode) {
+  const f = aimagGeo.features.find((x) => x.properties.pcode === pcode);
+  if (!f) return;
+  map.fitBounds(L.geoJSON(f).getBounds());
+  if (level === "aimag" && layer) layer.eachLayer((l) => { if (l.feature.properties.pcode === pcode) l.openPopup(); });
+}
+
+async function load(label) {
+  const key = label === "outlook" ? outlook.winter : label;
+  const [geo, v, a] = await Promise.all([
+    fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
+    label === "outlook" ? asof[outlook.stage] : fetch(`data/validation_${key}.json`).then((r) => r.json()),
+    fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
+  ]);
+  if (label !== sel.value) return; // a later choice won the race; drawing this one would mislabel the map
+  shown = label;
+  validation = v;
+  soumGeo = geo;
+  aimagScores = a;
+  draw();
+}
+
 document.getElementById("lang").addEventListener("click", () => { lang = lang === "mn" ? "en" : "mn"; render(); });
+for (const b of document.querySelectorAll("[data-level]")) {
+  b.addEventListener("click", () => { if (level !== b.dataset.level) { level = b.dataset.level; if (soumGeo) draw(); else render(); } });
+}
+const aimagTable = document.getElementById("aimags");
+aimagTable.addEventListener("click", (e) => { const r = e.target.closest("[data-aimag]"); if (r) zoomToAimag(r.dataset.aimag); });
+aimagTable.addEventListener("keydown", (e) => {
+  const r = e.target.closest("[data-aimag]");
+  if (r && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); zoomToAimag(r.dataset.aimag); }
+});
 sel.addEventListener("change", () => load(sel.value).catch(fail));
 
 function fail(e) {
@@ -166,7 +235,9 @@ Promise.all([
   fetch("data/pooled.json").then((r) => r.json()),
   fetch("data/asof_validation.json").then((r) => r.json()),
   fetch("data/outlook.json").then((r) => (r.ok ? r.json() : null)),
-]).then(async ([w, p, a, o]) => {
+  fetch("data/aimags.geojson").then((r) => r.json()),
+]).then(async ([w, p, a, o, g]) => {
+  aimagGeo = g;
   winters = w;
   pooled = p;
   asof = a;

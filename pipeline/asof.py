@@ -59,4 +59,9 @@ def check() -> None:
 
 
 if __name__ == "__main__":
-    check() if "--check" in sys.argv else main()
+    if "--check" in sys.argv:
+        check()
+    else:
+        from pipeline.hindcast import DZUD, normal_winters  # hindcast imports asof; the reverse only here
+        normals = normal_winters(load_livestock())
+        main(sorted(DZUD + normals), normals)

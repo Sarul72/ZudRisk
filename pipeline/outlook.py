@@ -5,17 +5,21 @@ import sys
 from collections import Counter
 from datetime import date
 
-from pipeline import indicators
+from pipeline import aimags, indicators
 from pipeline.asof import STAGES, stage_date
 from pipeline.boundaries import load_soums
 from pipeline.export import SITE, feature, label, props_for
+from pipeline.nso import load_livestock
 
 STAGE_OF_MONTH = {m: stage for stage, (_, m, _) in STAGES.items()}
 
 
 def parse_through(through: str) -> tuple[int, str]:
     """'2026-10' -> (2026, 'oct'): the winter's first year and the stage named by its last data month."""
-    y, m = map(int, through.split("-"))
+    try:
+        y, m = map(int, through.split("-"))
+    except ValueError:
+        raise ValueError(f"{through}: expected YYYY-MM") from None
     if m not in STAGE_OF_MONTH:
         raise ValueError(f"{through}: an outlook stage ends in Oct-Mar")
     return (y if m >= 10 else y - 1), STAGE_OF_MONTH[m]
@@ -59,6 +63,7 @@ def main(through: str) -> None:
     feats = [feature(s["geom"], {**props_for(s, rows.get(s["pcode"], {})), **extra}) for s in load_soums()]
     (SITE / f"outlook_{label(year)}.geojson").write_text(
         json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
+    aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     (SITE / "outlook.json").write_text(json.dumps({"winter": label(year), "stage": stage, "data_through": through,
                                                    "as_of": as_of.isoformat(), "made": date.today().isoformat()}))
     hist = Counter(r["risk_class"] for r in rows.values())
@@ -73,6 +78,12 @@ def check() -> None:
     from pipeline import compare
     global SITE
     assert parse_through("2026-10") == (2026, "oct") and parse_through("2027-02") == (2026, "feb")
+    for bad in ("soon", "2026-05"):
+        try:
+            parse_through(bad)
+            raise AssertionError(f"{bad} must be refused")
+        except ValueError as e:
+            assert bad in str(e), e
     have = {"era5": {"202611"}, "ndvi": {"202607", "202608"}, "census": {2025}}
     assert missing_months(2026, "oct", have) == []
     assert missing_months(2026, "dec", have) == ["ERA5-Land 202612"]
@@ -97,7 +108,7 @@ def check() -> None:
                 assert "ERA5-Land 203011" in str(e), e
             assert not (SITE / "outlook_2030-31.geojson").exists() and not (SITE / "outlook.json").exists()
             main("2026-10")
-            assert (SITE / "outlook.json").exists() and (SITE / "winters.json").read_bytes() == index, \
+            assert (SITE / "aimag_2026-27.json").exists() and (SITE / "outlook.json").exists() and (SITE / "winters.json").read_bytes() == index, \
                 "the outlook entered the hindcast index"
         finally:
             SITE = live_site
@@ -109,5 +120,10 @@ def check() -> None:
 if __name__ == "__main__":
     if "--check" in sys.argv:
         check()
+    elif "--through" not in sys.argv or sys.argv.index("--through") + 1 >= len(sys.argv):
+        sys.exit("usage: python -m pipeline.outlook --through YYYY-MM   (Oct-Mar, e.g. 2026-11)")
     else:
-        main(sys.argv[sys.argv.index("--through") + 1])
+        try:
+            main(sys.argv[sys.argv.index("--through") + 1])
+        except ValueError as e:
+            sys.exit(f"--through {e}")

@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline import asof, compare, export, indicators, validate
+from pipeline import aimags, asof, compare, export, indicators, validate
 from pipeline.nso import load_livestock, sheep_units
 from pipeline.validate import pooled, pooled_rows, rounded
 
@@ -48,6 +48,7 @@ def main() -> None:
     POOLED.write_text(json.dumps(res, indent=2))
     (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2))
     export.write_index(winters)
+    aimags.write_shapes()
     print(f"pooled: {res}")
     snow = compare.main(winters)
     print(f"snow comparison -> {compare.PAGE}: pooled {snow['pooled']}")
