@@ -21,6 +21,8 @@ uv run python -m pipeline.gldas               # GLDAS-2.1 snow depth, for the sn
 uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2000 to the latest summer (Earthdata)
 uv run python -m pipeline.seasonal --fetch && uv run python -m pipeline.seasonal  # SEAS5 1 October forecasts (CDS),
                                               # tested as the oct stage plus a forecast; not used by the outlook
+uv run python -m pipeline.ice --fetch && uv run python -m pipeline.ice  # iron dzud candidates (mid-winter
+                                              # melt, rain on snow); tested, not used: see below
 uv run python -m pipeline.hindcast            # 25 winters scored (2000/01-2024/25), the pre-registered
                                               # pooled test, snow comparison, as-of stages, greenness trend
                                               # (pipeline.trends) and the learned vulnerability model (pipeline.model)
@@ -43,3 +45,13 @@ NASA POWER (`pipeline.power`) is no longer scored: it runs 5-6 weeks behind.
 
 Self-checks (no network): `uv run python -m pipeline.<step> --check` for every step except `score`,
 which runs its check with no flag.
+
+## Tested and not used
+
+- **Iron dzud (`pipeline.ice`)**: ERA5-Land Nov-Feb snowmelt and rain on snow, z against 2001-2020. Against losses,
+  soum-winters 2011/12-2024/25: melt rho 0.049, rain on snow 0.018 (n 4688); aimag-winters 2000/01-2024/25: 0.036
+  and 0.051 (n 525). Added to the model, held-out soum rho fell 0.372 -> 0.358 and AUC 0.745 -> 0.730 (aimag rho
+  rose 0.523 -> 0.542). The rule fixed before the run was to keep them only if both soum figures rose.
+  Monthly means may be too coarse: a crust is a one-day thaw, which a month's mean melt hides.
+- **SEAS5 seasonal forecast (`pipeline.seasonal`)**: shown on the site as the "Oct + SEAS5" stage; it lowers the
+  October stage's skill, so the outlook does not use it.
