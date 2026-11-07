@@ -15,7 +15,7 @@ const T = {
     view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)" },
     search: "Сум хайх", legend: "Тайлбар", validation: "Бодит хорогдолтой харьцуулалт",
     classes: ["Маш бага", "Бага", "Дунд", "Өндөр", "Маш өндөр"], none: "Тооцоогүй / мэдээлэл хүрэлцээгүй",
-    ub: "Улаанбаатар: бүртгэлтэй мал байхгүй тул тооцоогүй", ub_density: " (Улаанбаатарын дундаж)",
+    no_herd: "Тооллогоор мал бүртгэлгүй тул тооцоогүй", ub_density: " (Улаанбаатарын дундаж)",
     nodata: "Мэдээлэл хүрэлцээгүй",
     n: "Харьцуулсан сум", rho_soum: "Spearman ρ, сум", excess: "Spearman ρ, илүүдэл хорогдол",
     rho_aimag: "Spearman ρ, аймаг", top: "Эрсдэлийн дээд 20%-ийн хорогдлын дээд 20%-д орсон хувь",
@@ -45,7 +45,7 @@ const T = {
     hist_caption: "Хорогдол (багана, хамгийн ихийг дээр нь) ба эрсдэлийн ангилал (зурвас) өвөл бүрээр",
     vuln: "Эмзэг байдал", vuln_unit: "хорогдол ≥5% болох магадлал",
     vuln_legend: "Хорогдол ≥5% болох магадлал, 20 өвлийн дундаж", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
-    vuln_note: (m) => `Загвар нь ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")} оны ${m.train.length} өвлийн сум-өвөл бүрээс хорогдол 5%-иас давах эсэхийг сурсан (ridge логистик регресс). Эмзэг байдал = ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} оны 20 өвлийн цаг агаарыг ${m.census} оны малын тоо, бэлчээрийн одоогийн чиг хандлага дээр давтан тооцоход гарах дундаж магадлал. Урьдчилсан таамаг биш, судалгааны давхарга.`,
+    vuln_note: (m) => `Загвар нь ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")} оны ${m.train.length} өвлийн сум-өвөл бүрээс хорогдол 5%-иас давах эсэхийг сурсан (ridge логистик регресс). Эмзэг байдал = ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} оны 20 өвлийн цаг агаарыг ${m.census} оны малын тоо, бэлчээрийн одоогийн чиг хандлага дээр давтан тооцоход гарах дундаж магадлал. Цаг агаар нь сум бүрийн өөрийн хэвийн утгаас хазайлтаар ордог тул 20 өвлийн дунджаар 0 орчим болно: давхарга нь уур амьсгалын хатуу ширүүнийг бус, малын ачаалал, өмнөх хорогдол, малын өсөлт, ногоорлоос хамаарах мэдрэмтгий байдлыг голчлон харуулна. Урьдчилсан таамаг биш, судалгааны давхарга.`,
     green: "Ногоорлын чиг", per_decade: "/10 жил",
     green_legend: (g) => `NDVI-ийн өөрчлөлт 10 жилд, 7–8 сар, ${g.from}–${g.through}`,
     green_classes: ["Буурсан (< 0)", "Бараг өөрчлөгдөөгүй (0–0.01)", "Бага зэрэг ногоорсон (0.01–0.02)", "Ногоорсон (0.02–0.04)", "Их ногоорсон (≥ 0.04)"],
@@ -64,7 +64,7 @@ const T = {
     view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)" },
     search: "Find a soum", legend: "Legend", validation: "Against recorded losses",
     classes: ["Very low", "Low", "Medium", "High", "Very high"], none: "Not scored / insufficient data",
-    ub: "Ulaanbaatar: no registered herd, so not scored", ub_density: " (Ulaanbaatar's density)",
+    no_herd: "The census records no livestock here, so not scored", ub_density: " (Ulaanbaatar's density)",
     nodata: "Insufficient data",
     n: "Soums compared", rho_soum: "Spearman ρ, soum", excess: "Spearman ρ, excess mortality",
     rho_aimag: "Spearman ρ, aimag", top: "Top-20% risk soums in top-20% losses",
@@ -94,7 +94,7 @@ const T = {
     hist_caption: "Losses (bars, the largest marked above) and risk class (strip) by winter",
     vuln: "Vulnerability", vuln_unit: "chance of losing ≥5%",
     vuln_legend: "Chance of losing ≥5% of the herd, mean over 20 winters", vuln_classes: ["< 10%", "10–20%", "20–30%", "30–40%", "≥ 40%"],
-    vuln_note: (m) => `The model learned from ${m.train.length} winters, ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")}, which soum-winters lost 5% of the herd or more (ridge logistic regression). Vulnerability = the mean chance when the weather of the 20 winters ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} is replayed on the ${m.census} herds and today's pasture trend. A research layer, not a forecast.`,
+    vuln_note: (m) => `The model learned from ${m.train.length} winters, ${m.train[0].replace("-", "/")}–${m.train[m.train.length - 1].replace("-", "/")}, which soum-winters lost 5% of the herd or more (ridge logistic regression). Vulnerability = the mean chance when the weather of the 20 winters ${m.replay[0].replace("-", "/")}–${m.replay[1].replace("-", "/")} is replayed on the ${m.census} herds and today's pasture trend. Weather enters as each soum's own anomalies, which average near zero over 20 winters, so the layer mostly shows sensitivity (herd pressure, past losses, herd growth, greenness), not how harsh a soum's climate is. A research layer, not a forecast.`,
     green: "Greenness trend", per_decade: "/decade",
     green_legend: (g) => `Change in Jul–Aug NDVI per decade, ${g.from}–${g.through}`,
     green_classes: ["Browning (< 0)", "Little change (0–0.01)", "Slight greening (0.01–0.02)", "Greening (0.02–0.04)", "Strong greening (≥ 0.04)"],
@@ -215,7 +215,7 @@ function aimagPopup(p) {
 
 function popup(p) {
   const t = T[lang], chart = `<br>${histChart(hist?.soum[p.pcode])}`;
-  if (p.risk_class === null) return `<b>${esc(soumName(p))}</b><br>${p.is_ub ? t.ub : t.nodata}${extraLines(p)}${chart}`;
+  if (p.risk_class === null) return `<b>${esc(soumName(p))}</b><br>${p.no_herd ? t.no_herd : t.nodata}${extraLines(p)}${chart}`;
   const unseen = (k) => p.stage === "oct" && (k === "cold" || k === "snow"); // pre-winter: no winter month yet
   const z = KEYS.map((k) => `${t.ind[k]} z: ${unseen(k) ? t.not_observed : fmt(p[`z_${k}`])}`).join("<br>");
   const missing = KEYS.filter((k) => p[`z_${k}`] === null && !unseen(k)).map((k) => t.ind[k]);

@@ -50,9 +50,9 @@ def check() -> None:
     assert list(STAGES) == ["oct", "nov", "dec", "jan", "feb", "mar"]
     pre = indicators.compute(2023, stage_date(2023, "oct"))
     assert all(r["z_cold"] is None and r["z_snow"] is None for r in pre.values())
-    herd = [r for r in pre.values() if r["su_per_km2"] is not None]
+    herd = [r for r in pre.values() if not r["no_herd"]]
     assert {r["n_indicators"] for r in herd} == {2}, {r["n_indicators"] for r in herd}
-    assert all(r["risk"] is None for r in pre.values() if r["su_per_km2"] is None), "no herd, no risk"
+    assert all(r["risk"] is None for r in pre.values() if r["no_herd"]), "no herd, no risk"
     full = indicators.compute(2023, stage_date(2023, "mar"))
     hindcast = indicators.read_risk(2023)
     assert {pc: round(r["risk"], 4) for pc, r in full.items() if r["risk"] is not None} == hindcast, \

@@ -10,13 +10,13 @@
     2013,
     2021
   ],
-  "n_unscored": 2,
+  "n_unscored": 1,
   "validation_unit": "soum+aimag",
   "n": 319,
-  "n_soum_losses": 334,
-  "n_dropped": 18,
+  "n_soum_losses": 335,
+  "n_dropped": 19,
   "dropped_reasons": {
-    "no mortality": 18
+    "no mortality": 19
   },
   "spearman_soum": 0.291,
   "excess_spearman_soum": 0.299,

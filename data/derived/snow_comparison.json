@@ -2,18 +2,18 @@
   "winters": [
     {
       "winter": "2009/10",
-      "n_soums": 328,
-      "rho_depth": 0.753,
+      "n_soums": 339,
+      "rho_depth": 0.749,
       "median_era5_m": 0.101,
-      "median_gldas_m": 0.44,
+      "median_gldas_m": 0.431,
       "n": 0,
       "rho_soum_era5": null,
       "rho_soum_gldas": null
     },
     {
       "winter": "2013/14",
-      "n_soums": 337,
-      "rho_depth": 0.858,
+      "n_soums": 338,
+      "rho_depth": 0.855,
       "median_era5_m": 0.05,
       "median_gldas_m": 0.05,
       "n": 337,

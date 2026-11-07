@@ -19,7 +19,7 @@ from pipeline.score import risk, risk_class, zscore
 
 BASELINE = range(2001, 2021)  # winters 2001/02 .. 2020/21, summers 2001 .. 2020
 COLUMNS = ["pcode", "cold_c", "z_cold", "snow_m", "z_snow", "ndvi", "z_summer", "su_per_km2", "z_pressure",
-           "n_indicators", "risk", "risk_class", "z_snow_gldas", "snow_days", "density_kgm3", "z_density"]
+           "n_indicators", "risk", "risk_class", "z_snow_gldas", "snow_days", "density_kgm3", "z_density", "no_herd"]
 
 
 def out_path(year: int) -> Path:
@@ -126,6 +126,11 @@ def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, f
     return out
 
 
+def no_herd(herds: dict, pcode: str, census: int) -> bool:
+    """The census counts this soum and finds no livestock. A missing row is missing data, scored on the rest."""
+    return sheep_units(herds.get((pcode, census, "stock"), {})) == 0
+
+
 def score_row(z: dict[str, float | None], has_herd: bool = True) -> dict:
     r = risk(z) if has_herd else None  # no herd, no dzud risk: a district with no registered stock is not scored
     return {"n_indicators": sum(v is not None for v in z.values()), "risk": r,
@@ -175,13 +180,13 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
             "snow_days": snow_days(e5["snowc"], year, as_of), "density_kgm3": dn,
             "z_density": _anomaly(dn, [density(e5["rsn"], sde, y, then[y]) for y in BASELINE]),
             "z_summer": _neg(_anomaly(nd, [summer(ndvi_s.get(pc, {}), y) for y in BASELINE])),
-            "su_per_km2": None if p is None else math.exp(p), "p": p,
+            "su_per_km2": None if p is None else math.exp(p), "p": p, "no_herd": int(no_herd(herds, pc, census)),
         }
     ps = [r["p"] for r in rows.values() if r["p"] is not None]
     for r in rows.values():
         p = r.pop("p")
         r["z_pressure"] = None if p is None else zscore(p, ps)
-        r.update(score_row({k: r[f"z_{k}"] for k in ("cold", "snow", "summer", "pressure")}, r["su_per_km2"] is not None))
+        r.update(score_row({k: r[f"z_{k}"] for k in ("cold", "snow", "summer", "pressure")}, not r["no_herd"]))
     return rows
 
 
@@ -201,7 +206,7 @@ def main(year: int, as_of: date | None = None) -> None:
             w.writerow({k: ("" if r[k] is None else round(r[k], 4) if isinstance(r[k], float) else r[k]) for k in COLUMNS})
     scored = sum(r["risk"] is not None for r in rows.values())
     n4 = sum(r["n_indicators"] == 4 for r in rows.values())
-    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), {len(rows) - scored} with no herd; "
+    print(f"{year}/{(year + 1) % 100:02d}: {scored} scored ({n4} on all four), {sum(r["no_herd"] for r in rows.values())} with no herd; "
           f"missing {dict(missing)}; classes {dict(sorted(hist.items(), key=str))}")
 
 
@@ -258,6 +263,9 @@ def check() -> None:
     empty = pressure_by_soum([ub_rural, ub_city], {("MN1101", 2025, "stock"): {**full, "sheep": 0.9},
                                                     ("MN1107", 2025, "stock"): full}, 2025)
     assert empty["MN1107"] is None, empty
+    assert no_herd({("A", 2025, "stock"): full}, "A", 2025), "a census row of zeros is no herd"
+    assert not no_herd({}, "A", 2025), "a missing census row is missing data, not no herd: score it on the rest"
+    assert not no_herd({("A", 2025, "stock"): {**full, "sheep": 0.1}}, "A", 2025)
     assert score_row({"cold": 1.0, "pressure": None, "snow": 1.0, "summer": 1.0}, has_herd=False)["risk"] is None, \
         "no herd, no dzud risk"
     row = score_row({"cold": 1.0, "pressure": 0.0, "snow": None, "summer": None})

@@ -7,7 +7,7 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.339
+        "spearman_aimag": 0.347
       },
       "2013-14": {
         "validation_unit": "soum+aimag",

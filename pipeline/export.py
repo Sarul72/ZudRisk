@@ -45,7 +45,7 @@ def props_for(soum: dict, row: dict) -> dict:
     props = {k: soum[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
     props["is_centre"] = is_aimag_centre(soum)  # its herd density is the aimag's (indicators.pressure_by_soum)
     props.update({k: None if row.get(k) is None else round(float(row[k]), 4) for k in NUMERIC})
-    for k in ("risk_class", "n_indicators"):
+    for k in ("risk_class", "n_indicators", "no_herd"):
         props[k] = None if row.get(k) is None else int(row[k])
     return props
 
