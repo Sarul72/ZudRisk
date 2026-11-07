@@ -5,6 +5,8 @@ import math
 import sys
 from pathlib import Path
 
+import numpy as np
+import shapely
 from shapely.geometry import Point, box
 
 from pipeline.boundaries import load_soums
@@ -21,14 +23,19 @@ T2M = Path("data/derived/t2m_monthly.csv")
 CELLS = Path("data/derived/soum_cells.json")
 
 
-def cells_for(geom, points: list[tuple[float, float]]) -> list[tuple[float, float]]:
-    """Grid points inside the soum; a soum too small to hold one takes the nearest point."""
-    inside = [p for p in points if geom.contains(Point(p))]
-    if inside:
+def cells_for_xy(geom, xs: np.ndarray, ys: np.ndarray) -> np.ndarray:
+    """Indices of grid points inside the soum; a soum too small to hold one takes the nearest point."""
+    inside = np.nonzero(shapely.contains_xy(geom, xs, ys))[0]
+    if inside.size:
         return inside
     c = geom.representative_point()
     k = math.cos(math.radians(c.y))  # a degree of longitude shrinks with latitude
-    return [min(points, key=lambda p: ((p[0] - c.x) * k) ** 2 + (p[1] - c.y) ** 2)]
+    return np.array([int(np.argmin(((xs - c.x) * k) ** 2 + (ys - c.y) ** 2))])
+
+
+def cells_for(geom, points: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    xs, ys = (np.array(a, dtype=float) for a in zip(*points))
+    return [points[i] for i in cells_for_xy(geom, xs, ys)]
 
 
 def merge(boxes: list[list[dict]]) -> dict[tuple[float, float], dict[str, float]]:
@@ -57,8 +64,7 @@ def main() -> None:
     points = list(grid)
     cells, fallback = {}, 0
     for s in load_soums():
-        inside = [p for p in points if s["geom"].contains(Point(p))]
-        fallback += not inside
+        fallback += not shapely.contains_xy(s["geom"], *map(np.array, zip(*points))).any()
         cells[s["pcode"]] = [list(p) for p in cells_for(s["geom"], points)]
     CELLS.write_text(json.dumps(cells))
     print(f"{len(points)} unique points; {len(cells)} soums mapped, {fallback} by nearest point")
@@ -75,6 +81,8 @@ def check() -> None:
                              "properties": {"parameter": {"T2M": {"202301": v, "202313": 0, "202302": FILL}}}}
     merged = merge([[f(1, 2, -10.0)], [f(1, 2, -10.0), f(3, 4, -5.0)]])
     assert merged == {(1, 2): {"202301": -10.0}, (3, 4): {"202301": -5.0}}, merged
+    import numpy as np
+    assert cells_for_xy(box(0, 0, 1, 1), np.array([0.5, 2.0]), np.array([0.5, 2.0])).tolist() == [0]
     print("power check: ok")
 
 

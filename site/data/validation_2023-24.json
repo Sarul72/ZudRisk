@@ -2,17 +2,26 @@
   "winter": "2023/24",
   "indicators_used": [
     "cold",
-    "pressure"
+    "pressure",
+    "snow",
+    "summer"
   ],
+  "normal_winters": [
+    2013,
+    2021
+  ],
+  "n_unscored": 0,
+  "validation_unit": "soum+aimag",
   "n": 330,
+  "n_soum_losses": 330,
   "n_dropped": 0,
   "dropped_reasons": {
-    "unscored": 0,
     "no mortality": 0
   },
-  "spearman_soum": 0.42,
+  "spearman_soum": 0.494,
+  "excess_spearman_soum": 0.503,
+  "top_quintile_hit": 0.5,
   "n_aimag": 21,
-  "spearman_aimag": 0.409,
-  "top_quintile_hit": 0.47,
-  "mortality_pct_validated": 13.83
+  "spearman_aimag": 0.373,
+  "mortality_pct": 13.83
 }

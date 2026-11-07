@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
-from pipeline.boundaries import load_soums
+from pipeline.boundaries import UB_PCODE, load_soums
 from pipeline.http import get_json, post_json
 
 BASE = "https://data.1212.mn/api/v1/en/NSO/Industry,%20service/Livestock/"
@@ -16,6 +16,7 @@ SHEEP_UNITS = {"camel": 5, "horse": 7, "cattle": 6, "sheep": 1, "goat": 0.9}
 YEARS = range(2000, 2026)
 BATCH = 60
 OUT = Path("data/derived/livestock.csv")
+OUT_AIMAG = Path("data/derived/livestock_aimag.csv")
 
 
 def norm(name: str) -> str:
@@ -44,7 +45,17 @@ def crosswalk(nso_regions: dict[str, str], soums: list[dict]) -> tuple[dict[str,
             xwalk[code] = by_name[key]
         else:
             unmatched.append(code)
+    taken = [p for p in xwalk.values()]
+    if len(taken) != len(set(taken)):
+        dup = sorted({p for p in taken if taken.count(p) > 1})
+        raise ValueError(f"several NSO soums map to {dup}: their herds would overwrite each other")
     return xwalk, sorted(unmatched)
+
+
+def aimag_crosswalk(nso_regions: dict[str, str], soums: list[dict]) -> dict[str, str]:
+    """NSO 3-digit aimag codes to COD aimag pcodes by name; Ulaanbaatar is left out like everywhere else."""
+    by_name = {norm(s["aimag_mn"]): s["aimag_pcode"] for s in soums if s["aimag_pcode"] != UB_PCODE}
+    return {c: by_name[norm(t)] for c, t in nso_regions.items() if len(c) == 3 and norm(t) in by_name}
 
 
 def parse(resp: dict, years: dict[str, str], xwalk: dict[str, str], kind: str) -> list[tuple]:
@@ -65,6 +76,17 @@ def main() -> None:
     regions = dict(zip(var["Бүс"]["values"], var["Бүс"]["valueTexts"]))
     xwalk, unmatched = crosswalk(regions, load_soums())
     print(f"matched {len(set(xwalk.values()))}, unmatched NSO {unmatched}")
+    rows = fetch(xwalk)
+    write(OUT, "pcode", rows)
+    print(f"{len(rows)} rows -> {OUT}; {fill_camel(_read(OUT))[1]} soum-years read camel '..' as 0")
+    axwalk = aimag_crosswalk(regions, load_soums())
+    print(f"aimags matched {len(axwalk)}")
+    arows = fetch(axwalk)
+    write(OUT_AIMAG, "aimag_pcode", arows)
+    print(f"{len(arows)} rows -> {OUT_AIMAG}")
+
+
+def fetch(xwalk: dict[str, str]) -> list[tuple]:
     codes = sorted(xwalk)
     rows = []
     for kind, table in TABLES.items():
@@ -78,12 +100,15 @@ def main() -> None:
                 {"code": "Он", "selection": {"filter": "item", "values": list(years)}},
             ], "response": {"format": "json"}}
             rows += parse(post_json(BASE + table, body), years, xwalk, kind)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with OUT.open("w", newline="") as f:
+    return rows
+
+
+def write(path: Path, key: str, rows: list[tuple]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as f:
         w = csv.writer(f)
-        w.writerow(["pcode", "year", "kind", "type", "thousand_head"])
+        w.writerow([key, "year", "kind", "type", "thousand_head"])
         w.writerows(sorted(rows))
-    print(f"{len(rows)} rows -> {OUT}; {fill_camel(_read())[1]} soum-years read camel '..' as 0")
 
 
 def fill_camel(herds: dict[tuple, dict[str, float]]) -> tuple[dict, int]:
@@ -97,16 +122,22 @@ def fill_camel(herds: dict[tuple, dict[str, float]]) -> tuple[dict, int]:
     return herds, n
 
 
-def _read() -> dict[tuple, dict[str, float]]:
+def _read(path: Path) -> dict[tuple, dict[str, float]]:
     out: dict[tuple, dict[str, float]] = defaultdict(dict)
-    with OUT.open() as f:
-        for r in csv.DictReader(f):
-            out[(r["pcode"], int(r["year"]), r["kind"])][r["type"]] = float(r["thousand_head"])
+    with path.open() as f:
+        for r in csv.reader(f):
+            if r[1] != "year":
+                out[(r[0], int(r[1]), r[2])][r[3]] = float(r[4])
     return dict(out)
 
 
 def load_livestock() -> dict[tuple, dict[str, float]]:
-    return fill_camel(_read())[0]
+    return fill_camel(_read(OUT))[0]
+
+
+def load_livestock_aimag() -> dict[tuple, dict[str, float]]:
+    """Keyed (aimag_pcode, year, kind); NSO's own aimag totals, the only losses it gives for 2010."""
+    return fill_camel(_read(OUT_AIMAG))[0]
 
 
 def check() -> None:
@@ -130,6 +161,13 @@ def check() -> None:
     filled, n = fill_camel({("A", 2009, "stock"): dict(four), ("B", 2009, "stock"): {"sheep": 1.0}})
     assert filled[("A", 2009, "stock")]["camel"] == 0.0 and n == 1
     assert "camel" not in filled[("B", 2009, "stock")]
+    soums = [{"pcode": "MN8301", "aimag_pcode": "MN83", "aimag_mn": "Баян-Өлгий", "name_mn": "Өлгий"}]
+    try:
+        crosswalk({"183": "Баян-Өлгий", "18301": "Өлгий", "18399": "Өлгий сум"}, soums)
+        raise AssertionError("two NSO codes on one soum must raise")
+    except ValueError:
+        pass
+    assert aimag_crosswalk({"183": "Баян-Өлгий", "511": "Улаанбаатар", "18301": "Өлгий"}, soums) == {"183": "MN83"}
     print("nso check: ok")
 
 

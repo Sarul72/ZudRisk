@@ -17,7 +17,7 @@ from pipeline.validate import out_path_json
 SIMPLIFY_DEG = 0.005
 MAX_BYTES = 2_000_000
 SITE = Path("site/data")
-NUMERIC = ["cold_c", "z_cold", "su_per_km2", "z_pressure", "risk"]
+NUMERIC = ["cold_c", "z_cold", "snow_m", "z_snow", "ndvi", "z_summer", "su_per_km2", "z_pressure", "risk"]
 
 
 def feature(geom, props: dict) -> dict:
@@ -30,6 +30,14 @@ def label(year: int) -> str:
     return f"{year}-{(year + 1) % 100:02d}"
 
 
+def winters_index(years: list[int]) -> list[str]:
+    return [label(y) for y in sorted(years)]
+
+
+def write_index(years: list[int]) -> None:
+    (SITE / "winters.json").write_text(json.dumps(winters_index(years)))
+
+
 def main(year: int) -> None:
     with out_path(year).open() as f:
         scores = {r["pcode"]: r for r in csv.DictReader(f)}
@@ -38,7 +46,8 @@ def main(year: int) -> None:
         r = scores.get(s["pcode"], {})
         props = {k: s[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
         props.update({k: float(r[k]) if r.get(k) else None for k in NUMERIC})
-        props["risk_class"] = int(r["risk_class"]) if r.get("risk_class") else None
+        for k in ("risk_class", "n_indicators"):
+            props[k] = int(r[k]) if r.get(k) else None
         feats.append(feature(s["geom"], props))
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
@@ -58,6 +67,7 @@ def check() -> None:
     assert len(f["geometry"]["coordinates"][0]) < 1000
     assert f["properties"] == {"pcode": "X", "risk": None}
     assert all(c == round(c, 4) for xy in f["geometry"]["coordinates"][0] for c in xy)
+    assert winters_index([2023, 2009]) == ["2009-10", "2023-24"]
     print("export check: ok")
 
 

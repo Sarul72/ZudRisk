@@ -8,7 +8,7 @@ import numpy as np
 
 from pipeline.boundaries import load_soums
 from pipeline.indicators import out_path
-from pipeline.nso import load_livestock, sheep_units
+from pipeline.nso import load_livestock, load_livestock_aimag, sheep_units
 
 
 TOP_SHARE = 0.2
@@ -51,51 +51,64 @@ def _r(v: float | None, d: int) -> float | None:
     return None if v is None else round(v, d)
 
 
-def summarize(pairs: list[tuple], by_aimag: dict[str, list], dropped: dict[str, int]) -> dict:
-    """The numbers the site shows; null wherever too few soums survive to compute one."""
-    risk_s = [r for r, _ in pairs]
-    mort_s = [m for _, m in pairs]
-    a_risk = [sum(r * st for r, st, _ in v) / sum(st for _, st, _ in v) for v in by_aimag.values()]
-    a_mort = [sum(l for _, _, l in v) / sum(st for _, st, _ in v) for v in by_aimag.values()]
-    tot_stock = sum(st for v in by_aimag.values() for _, st, _ in v)
-    tot_loss = sum(l for v in by_aimag.values() for _, _, l in v)
-    return {
-        "n": len(pairs),
-        "n_dropped": sum(dropped.values()),
-        "dropped_reasons": dropped,
-        "spearman_soum": _r(spearman(risk_s, mort_s), 3),
-        "n_aimag": len(by_aimag),
-        "spearman_aimag": _r(spearman(a_risk, a_mort), 3),
-        "top_quintile_hit": _r(top_quintile_hit(risk_s, mort_s), 3) if pairs else None,
-        # over the validated soums only, Ulaanbaatar excluded
-        "mortality_pct_validated": _r(100 * tot_loss / tot_stock, 2) if tot_stock else None,
-    }
-
-
 def out_path_json(year: int) -> Path:
     return Path(f"data/derived/validation_{year}.json")
 
 
-def main(year: int) -> None:
-    herds = load_livestock()
-    soums = {s["pcode"]: s for s in load_soums() if not s["is_ub"]}
-    with out_path(year).open() as f:
-        scores = {r["pcode"]: float(r["risk"]) for r in csv.DictReader(f) if r["risk"]}
-    pairs, dropped = [], {"unscored": len(soums) - len(scores), "no mortality": 0}
-    by_aimag: dict[str, list] = {}
-    for pcode, r in scores.items():
+def evaluate(year: int, scores: dict[str, tuple[float, str]], herds: dict, aherds: dict,
+             normals: list[int]) -> dict:
+    """Score against losses at soum level where NSO has soum losses, and always at aimag level from NSO's aimag rows."""
+    pairs, excess_pairs, dropped, n_losses = [], [], {"no mortality": 0}, 0
+    by_aimag: dict[str, list[tuple[float, float]]] = {}
+    for pcode, (r, aimag) in scores.items():
+        n_losses += (pcode, year + 1, "loss") in herds
+        stock = sheep_units(herds.get((pcode, year, "stock"), {}))
+        if stock:
+            by_aimag.setdefault(aimag, []).append((r, stock))
         m = mortality(herds, pcode, year)
         if m is None:
             dropped["no mortality"] += 1
             continue
         pairs.append((r, m))
-        stock = sheep_units(herds[(pcode, year, "stock")])
-        loss = sheep_units(herds[(pcode, year + 1, "loss")])
-        by_aimag.setdefault(soums[pcode]["aimag_pcode"], []).append((r, stock, loss))
-    result = {"winter": f"{year}/{(year + 1) % 100:02d}", "indicators_used": ["cold", "pressure"],
-              **summarize(pairs, by_aimag, dropped)}
+        normal = [x for x in (mortality(herds, pcode, n) for n in normals) if x is not None]
+        if normal:
+            excess_pairs.append((r, m - sum(normal) / len(normal)))
+    a_risk, a_mort = [], []
+    for aimag, v in sorted(by_aimag.items()):
+        am = mortality(aherds, aimag, year)
+        if am is not None:
+            a_risk.append(sum(r * st for r, st in v) / sum(st for _, st in v))
+            a_mort.append(am)
+    a_loss = sum(sheep_units(aherds.get((a, year + 1, "loss"), {})) or 0 for a in by_aimag)
+    a_stock = sum(sheep_units(aherds.get((a, year, "stock"), {})) or 0 for a in by_aimag)
+    risk_s, mort_s = [r for r, _ in pairs], [m for _, m in pairs]
+    return {
+        "validation_unit": "soum+aimag" if pairs else "aimag",
+        "n": len(pairs),
+        "n_soum_losses": n_losses,
+        "n_dropped": sum(dropped.values()),
+        "dropped_reasons": dropped,
+        "spearman_soum": _r(spearman(risk_s, mort_s), 3),
+        "excess_spearman_soum": _r(spearman(*map(list, zip(*excess_pairs))), 3) if excess_pairs else None,
+        "top_quintile_hit": _r(top_quintile_hit(risk_s, mort_s), 3) if pairs else None,
+        "n_aimag": len(a_risk),
+        "spearman_aimag": _r(spearman(a_risk, a_mort), 3),
+        # NSO aimag totals, Ulaanbaatar excluded
+        "mortality_pct": _r(100 * a_loss / a_stock, 2) if a_stock else None,
+    }
+
+
+def main(year: int, normals: list[int] = ()) -> dict:
+    herds, aherds = load_livestock(), load_livestock_aimag()
+    soums = {s["pcode"]: s for s in load_soums() if not s["is_ub"]}
+    with out_path(year).open() as f:
+        rows = list(csv.DictReader(f))
+    scores = {r["pcode"]: (float(r["risk"]), soums[r["pcode"]]["aimag_pcode"]) for r in rows if r["risk"]}
+    used = sorted({k for r in rows for k in ("cold", "snow", "summer", "pressure") if r[f"z_{k}"]})
+    result = {"winter": f"{year}/{(year + 1) % 100:02d}", "indicators_used": used, "normal_winters": list(normals),
+              "n_unscored": len(soums) - len(scores), **evaluate(year, scores, herds, aherds, list(normals))}
     out_path_json(year).write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    return result
 
 
 def check() -> None:
@@ -112,9 +125,15 @@ def check() -> None:
     assert top_quintile_hit([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], [10, 9, 8, 7, 6, 5, 4, 3, 2, 1]) == 0.0
     assert spearman([1, 2, 3], [5, 5, 5]) is None  # constant series has no rank correlation
     assert spearman([1, 2], [1, 2]) is None
-    empty = summarize([], {}, {"unscored": 3, "no mortality": 0})
-    assert empty["n"] == 0 and empty["spearman_soum"] is None and empty["n_dropped"] == 3
-    json.dumps(empty, allow_nan=False)
+    st = {**full, "sheep": 100.0}
+    herds09 = {(p, 2009, "stock"): st for p in "ABC"}  # 2009 census, no 2010 soum losses
+    aherds = {}
+    for a, lost in (("X", 1.0), ("Y", 5.0), ("Z", 9.0)):
+        aherds[(a, 2009, "stock")], aherds[(a, 2010, "loss")] = st, {**full, "sheep": lost}
+    res = evaluate(2009, {"A": (0.1, "X"), "B": (0.5, "Y"), "C": (0.9, "Z")}, herds09, aherds, [])
+    assert res["spearman_soum"] is None and res["validation_unit"] == "aimag" and res["n_soum_losses"] == 0, res
+    assert res["spearman_aimag"] == 1.0 and res["n_aimag"] == 3 and res["mortality_pct"] == 5.0, res
+    json.dumps(res, allow_nan=False)
     print("validate check: ok")
 
 
@@ -123,4 +142,4 @@ if __name__ == "__main__":
     ap.add_argument("--check", action="store_true")
     ap.add_argument("--winter", type=int, default=2023)
     a = ap.parse_args()
-    check() if a.check else main(a.winter)
+    check() if a.check else print(json.dumps(main(a.winter), indent=2, ensure_ascii=False))

@@ -1,0 +1,27 @@
+{
+  "winter": "2021/22",
+  "indicators_used": [
+    "cold",
+    "pressure",
+    "snow",
+    "summer"
+  ],
+  "normal_winters": [
+    2013,
+    2021
+  ],
+  "n_unscored": 0,
+  "validation_unit": "soum+aimag",
+  "n": 330,
+  "n_soum_losses": 330,
+  "n_dropped": 0,
+  "dropped_reasons": {
+    "no mortality": 0
+  },
+  "spearman_soum": 0.071,
+  "excess_spearman_soum": -0.143,
+  "top_quintile_hit": 0.197,
+  "n_aimag": 21,
+  "spearman_aimag": 0.143,
+  "mortality_pct": 0.96
+}

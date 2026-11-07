@@ -1,0 +1,27 @@
+{
+  "winter": "2009/10",
+  "indicators_used": [
+    "cold",
+    "pressure",
+    "snow",
+    "summer"
+  ],
+  "normal_winters": [
+    2013,
+    2021
+  ],
+  "n_unscored": 0,
+  "validation_unit": "aimag",
+  "n": 0,
+  "n_soum_losses": 0,
+  "n_dropped": 330,
+  "dropped_reasons": {
+    "no mortality": 330
+  },
+  "spearman_soum": null,
+  "excess_spearman_soum": null,
+  "top_quintile_hit": null,
+  "n_aimag": 21,
+  "spearman_aimag": 0.456,
+  "mortality_pct": 21.7
+}
