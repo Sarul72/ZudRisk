@@ -97,24 +97,35 @@ def cds_config(text: str) -> tuple[str, str]:
     return cfg["url"], cfg["key"]
 
 
+def _cds_call(u: str, key: str, body: dict | None = None, opener=None) -> dict:
+    data = None if body is None else json.dumps(body).encode()
+    headers = {"User-Agent": USER_AGENT, **({"Content-Type": "application/json"} if data else {})}
+    req = urllib.request.Request(u, data=data, headers=headers)
+    req.add_unredirected_header("PRIVATE-TOKEN", key)  # urllib copies plain headers onto a redirect to any host
+    try:
+        return json.loads(_open(req, opener))
+    except urllib.error.HTTPError as e:
+        if e.code in (401, 403):
+            raise RuntimeError(f"CDS login failed (HTTP {e.code}): ~/.cdsapirc key must be the API Token "
+                               "from your CDS profile, and the dataset licence must be accepted") from e
+        raise
+
+
+def cds_months(dataset: str, year: int, variable: str, auth: tuple[str, str] | None = None, opener=None) -> list[str]:
+    """Months of a year the dataset has published, so a request never asks for one that does not exist yet."""
+    url, key = auth or cds_config(CDS_RC.read_text())
+    inputs = {"product_type": ["monthly_averaged_reanalysis"], "year": [str(year)], "variable": [variable]}
+    return sorted(_cds_call(f"{url}/retrieve/v1/processes/{dataset}/constraints", key, {"inputs": inputs}, opener).get("month", []))
+
+
 def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, timeout_s: float = 3600,
                  auth: tuple[str, str] | None = None) -> bytes:
     """Submit a Copernicus CDS job, wait for it, and return the file it made. The token goes to the API only,
     never to the object store the result is served from."""
     url, key = auth or cds_config(CDS_RC.read_text())
-    headers = {"User-Agent": USER_AGENT}
 
     def call(u: str, body: dict | None = None) -> dict:
-        data = None if body is None else json.dumps(body).encode()
-        req = urllib.request.Request(u, data=data, headers={**headers, **({"Content-Type": "application/json"} if data else {})})
-        req.add_unredirected_header("PRIVATE-TOKEN", key)  # urllib copies plain headers onto a redirect to any host
-        try:
-            return json.loads(_open(req, opener))
-        except urllib.error.HTTPError as e:
-            if e.code in (401, 403):
-                raise RuntimeError(f"CDS login failed (HTTP {e.code}): ~/.cdsapirc key must be the API Token "
-                                   "from your CDS profile, and the dataset licence must be accepted") from e
-            raise
+        return _cds_call(u, key, body, opener)
 
     job = call(f"{url}/retrieve/v1/processes/{dataset}/execution", {"inputs": inputs})
     job_id, deadline = job["jobID"], time.monotonic() + timeout_s
@@ -232,6 +243,13 @@ def _check_cds() -> None:
     assert fake.seen[0] == ("https://x/api/retrieve/v1/processes/ds/execution", "K")
     assert fake.seen[-1] == ("https://store/f.nc", None), "the object store href is fetched without the token"
     assert fake.redirected == [None, None], "a redirect off the CDS API must not carry the token"
+
+    class Constraints:
+        def open(self, req, timeout=None):
+            assert req.full_url == "https://x/api/retrieve/v1/processes/ds/constraints", req.full_url
+            assert json.loads(req.data)["inputs"]["year"] == ["2026"], req.data
+            return Resp({"month": ["01", "10"], "year": ["2026"]})
+    assert cds_months("ds", 2026, "snow_depth", auth=auth, opener=Constraints()) == ["01", "10"]
 
 
 if __name__ == "__main__":

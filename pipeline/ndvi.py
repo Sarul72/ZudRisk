@@ -1,6 +1,7 @@
 """MODIS MOD13C2 monthly NDVI (0.05 deg CMG, OPeNDAP subset, Earthdata login) for July and August, as a mean per soum."""
 import csv
 import sys
+from datetime import date
 from pathlib import Path
 
 import netCDF4
@@ -39,6 +40,15 @@ def granule_url(y: int, m: int) -> str:
     return base + CE
 
 
+def has_august(y: int) -> bool:
+    return bool(get_json(CMR.format(y=y, m="08"))["feed"]["entry"])
+
+
+def last_summer(this_year: int, has_august=has_august) -> int:
+    """The latest summer whose August composite is published: this year's from late September, else last year's."""
+    return this_year if has_august(this_year) else this_year - 1
+
+
 def read(path: Path) -> np.ma.MaskedArray:
     with netCDF4.Dataset("mem", memory=path.read_bytes()) as d:
         v = d[VAR.lstrip("/")]
@@ -48,7 +58,7 @@ def read(path: Path) -> np.ma.MaskedArray:
 
 def main() -> None:
     RAW.mkdir(parents=True, exist_ok=True)
-    months = [(y, m) for y in range(2001, 2024) for m in (7, 8)]
+    months = [(y, m) for y in range(2001, last_summer(date.today().year) + 1) for m in (7, 8)]
     for y, m in months:
         cached(RAW / f"{y}{m:02d}.nc4", lambda y=y, m=m: get_bytes_auth(granule_url(y, m)))
     lats, lons = grid_centres()
@@ -70,6 +80,8 @@ def main() -> None:
 
 
 def check() -> None:
+    assert last_summer(2026, has_august=lambda y: y <= 2026) == 2026
+    assert last_summer(2026, has_august=lambda y: y <= 2025) == 2025  # August not published yet
     v = to_ndvi(np.array([3861, -3000, 10000]))
     assert v.mask.tolist() == [False, True, False]
     assert abs(v[0] - 0.3861) < 1e-12 and v[2] == 1.0
