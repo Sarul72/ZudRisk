@@ -2,10 +2,15 @@
 outlook stage whose data has landed. Out of season, or with that stage already published, it does nothing.
 
 A month's ERA5-Land lands about five days after it ends, so the stage named by last month is tried first, and the
-one before it if last month has not landed yet."""
+one before it if last month has not landed yet.
+
+After it publishes a stage it commits site/data and pushes it, so GitHub Pages serves the new stage. --no-push
+skips that. A folder that is not a git checkout, or has no remote, is left alone."""
 import json
+import subprocess
 import sys
 from datetime import date
+from pathlib import Path
 
 from pipeline.export import SITE
 from pipeline.outlook import STAGE_OF_MONTH
@@ -30,7 +35,31 @@ def published() -> str | None:
     return json.loads(path.read_text())["data_through"] if path.exists() else None
 
 
-def main(today: date | None = None) -> None:
+def git(*args: str, cwd: Path = Path(".")) -> subprocess.CompletedProcess:
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+
+
+def push_site(message: str, cwd: Path = Path("."), push: bool = True) -> str:
+    """Commit only site/data and push it. Returns what happened, in a few words."""
+    if git("rev-parse", "--is-inside-work-tree", cwd=cwd).returncode != 0:
+        return "not a git checkout; nothing committed"
+    git("add", "--", "site/data", cwd=cwd)
+    if git("diff", "--cached", "--quiet", "--", "site/data", cwd=cwd).returncode == 0:
+        return "site/data unchanged; nothing committed"
+    done = git("commit", "-m", message, "--", "site/data", cwd=cwd)
+    if done.returncode != 0:
+        raise RuntimeError(f"git commit failed: {done.stderr.strip()}")
+    if not push:
+        return "committed; not pushed (--no-push)"
+    if not git("remote", cwd=cwd).stdout.strip():
+        return "committed; no remote to push to"
+    sent = git("push", cwd=cwd)
+    if sent.returncode != 0:
+        raise RuntimeError(f"git push failed: {sent.stderr.strip()}")
+    return "committed and pushed"
+
+
+def main(today: date | None = None, push: bool = True) -> None:
     today = today or date.today()
     todo = candidates(today, published())
     if not todo:
@@ -47,6 +76,7 @@ def main(today: date | None = None) -> None:
             continue
         outlook.main(through)
         print(f"{today}: published the outlook through {through}")
+        print(f"{today}: {push_site(f'Outlook through {through}', push=push)}")
         return
 
 
@@ -61,8 +91,35 @@ def check() -> None:
     assert candidates(date(2027, 5, 6), "2027-03") == [], "April ends no stage"
     assert candidates(date(2026, 10, 3), "2026-03") == [], "September ends no stage"
     assert candidates(date(2026, 11, 2), None) == ["2026-10"]
+    check_push()
     print("update check: ok")
 
 
+def check_push() -> None:
+    """push_site in a throwaway repository with a bare remote: only site/data is committed, and it reaches the remote."""
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as tmp:
+        root, remote = Path(tmp) / "work", Path(tmp) / "remote.git"
+        assert push_site("x", cwd=Path(tmp)) == "not a git checkout; nothing committed"
+        git("init", "-q", "--bare", str(remote), cwd=Path(tmp))
+        git("init", "-q", "-b", "main", str(root), cwd=Path(tmp))
+        for k, v in (("user.name", "check"), ("user.email", "check@example.invalid")):
+            git("config", k, v, cwd=root)
+        (root / "site/data").mkdir(parents=True)
+        (root / "site/data/outlook.json").write_text("{}")
+        (root / "other.txt").write_text("not mine to commit")
+        assert push_site("first", cwd=root, push=False) == "committed; not pushed (--no-push)"
+        assert git("ls-files", cwd=root).stdout.split() == ["site/data/outlook.json"], "only site/data is committed"
+        assert push_site("again", cwd=root) == "site/data unchanged; nothing committed"
+        (root / "site/data/outlook.json").write_text('{"data_through": "2026-11"}')
+        assert push_site("second", cwd=root) == "committed; no remote to push to"
+        git("remote", "add", "origin", str(remote), cwd=root)
+        git("push", "-q", "-u", "origin", "main", cwd=root)
+        (root / "site/data/outlook.json").write_text('{"data_through": "2026-12"}')
+        assert push_site("third", cwd=root) == "committed and pushed"
+        assert git("log", "-1", "--format=%s", "main", cwd=remote).stdout.strip() == "third", "the remote has it"
+
+
 if __name__ == "__main__":
-    check() if "--check" in sys.argv else main()
+    check() if "--check" in sys.argv else main(push="--no-push" not in sys.argv)
