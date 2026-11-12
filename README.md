@@ -70,6 +70,7 @@ uv run python -m pipeline.pasture             # EIC pasture map -> each soum's p
 uv run python -m pipeline.era5                # ERA5-Land t2m, snow depth/density/cover, Nov-Mar, to the latest month (CDS)
 uv run python -m pipeline.gldas               # GLDAS-2.1 snow depth, for the snow comparison only (Earthdata)
 uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2000 to the latest summer (Earthdata)
+uv run python -m pipeline.summer              # ERA5-Land May-Aug precipitation and temperature (CDS)
 uv run python -m pipeline.seasonal --fetch && uv run python -m pipeline.seasonal  # SEAS5 1 October forecasts (CDS);
                                               # before hindcast, which tests them as the "Oct + SEAS5" stage
 uv run python -m pipeline.hindcast            # natural zones, 25 winters scored, the pooled tests, snow comparison,
