@@ -16,7 +16,7 @@ from pipeline.gldas import map_cells, soum_means
 from pipeline.http import cached, cds_retrieve
 
 FIRST = 2000
-# ERA5-Land monthly means come about two months late: August is in by November
+# the summer is taken once its year's outlook starts (November); August has landed well before
 LAST = date.today().year if date.today().month >= 11 else date.today().year - 1
 DATASET = era5.DATASET
 INPUTS = {**era5.INPUTS, "variable": ["total_precipitation", "2m_temperature"], "month": ["05", "06", "07", "08"],
