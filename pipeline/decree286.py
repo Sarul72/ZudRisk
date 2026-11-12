@@ -72,19 +72,22 @@ def month_flags(depth_cm: float | None, t_anom: float | None, t_sd: float | None
 
 
 def winter_status(months: dict[str, set[str] | None]) -> tuple[str, list[str]]:
-    """The most severe type met in any month and the months it was met in; "none" if every assessed month met
-    nothing; UNASSESSED if no month was assessed."""
+    """The most severe type met in any month and the months it was met in; "none" only if every month was assessed
+    and met nothing; UNASSESSED if no month was, or a month is missing and the rest met nothing."""
     assessed = {m: f for m, f in months.items() if f is not None}
-    if not assessed:
-        return UNASSESSED, []
     for t in ORDER:
         hit = sorted(m for m, f in assessed.items() if t in f)
         if hit:
             return t, hit
-    return "none", []
+    return ("none" if assessed and len(assessed) == len(months) else UNASSESSED), []
 
 
-BASE_YEARS = range(2001, 2021)  # calendar years of the long-term mean, every month: 2001-2020, ZudRisk's baseline
+BASE_YEARS = range(2001, 2021)  # ZudRisk's baseline (indicators.BASELINE): winters 2001/02-2020/21, summers 2001-2020
+
+
+def base_years(month: str) -> range:
+    """The calendar years of a month's long-term mean: Nov-Dec of 2001-2020, Jan-Mar of 2002-2021."""
+    return BASE_YEARS if month >= "04" else range(BASE_YEARS.start + 1, BASE_YEARS.stop + 1)
 SUMMER = ("05", "06", "07", "08")
 DERIVED = Path("data/derived")
 
@@ -94,8 +97,9 @@ def _mean_sd(xs: list[float]) -> tuple[float, float]:
     return m, (sum((x - m) ** 2 for x in xs) / len(xs)) ** 0.5
 
 
-def anomaly(series: dict[str, float], month: str, year: int, years=BASE_YEARS) -> tuple[float | None, float | None]:
-    """A month's value less that calendar month's 2001-2020 mean, and the baseline's population σ."""
+def anomaly(series: dict[str, float], month: str, year: int, years=None) -> tuple[float | None, float | None]:
+    """A month's value less that calendar month's baseline mean (base_years), and the baseline's population σ."""
+    years = years or base_years(month)
     v = series.get(f"{year}{month}")
     base = [series[f"{y}{month}"] for y in years if f"{y}{month}" in series]
     if v is None or len(base) < len(years) // 2:
@@ -122,6 +126,22 @@ def summer_share(series_tp: dict[str, float], series_t: dict[str, float], year: 
     return share, round(now[1] - t_mean, 3), round(t_sd, 3)
 
 
+def summer_record(s: dict[str, dict[str, float]] | None, year: int) -> tuple[str | None, dict | None]:
+    """The summer class before winter year/year+1 and its inputs, from a soum's load_summer() entry."""
+    if s is None:
+        return UNASSESSED, None
+    share, t_anom, t_sd = summer_share(s["tp_mm"], s["t2m_c"], year)
+    return summer_drought(share, t_anom, t_sd), {"p_share": share, "t_anom": t_anom, "t_sd": t_sd}
+
+
+def month_record(depth_m: float | None, t_anom: float | None, t_sd: float | None, zone: str,
+                 summer: str | None) -> tuple[set[str] | None, dict]:
+    """A month's flags, tested on the unrounded depth, and its inputs as published (depth to 0.1 cm)."""
+    depth_cm = None if depth_m is None else depth_m * 100
+    flags = month_flags(depth_cm, t_anom, t_sd, zone, summer)
+    return flags, {"depth_cm": None if depth_cm is None else round(depth_cm, 1), "t_anom": t_anom, "t_sd": t_sd}
+
+
 def main(year: int, as_of: date | None = None, site: Path | None = None, derived: Path | None = None) -> dict[str, dict]:
     """Every soum's status for winter year/year+1 from the months over by as_of; writes the CSV (to derived) and the
     site file (to site). Both default to the live folders."""
@@ -133,17 +153,16 @@ def main(year: int, as_of: date | None = None, site: Path | None = None, derived
     out = {}
     for pcode in sorted(zone_of):
         z, e, s = zone_of[pcode], e5.get(pcode), sm.get(pcode)
-        summer_cls = summer_drought(*summer_share(s["tp_mm"], s["t2m_c"], year)) if s else UNASSESSED
+        summer_cls, summer_in = summer_record(s, year)
         by_month, inputs = {}, {}
         for ym in months:
             depth = e["sde"].get(ym) if e else None
             t_anom, t_sd = anomaly(e["t2m"], ym[4:], int(ym[:4])) if e else (None, None)
-            depth_cm = None if depth is None else round(depth * 100, 1)
-            f = month_flags(depth_cm, t_anom, t_sd, z, summer_cls)
+            f, inputs[ym] = month_record(depth, t_anom, t_sd, z, summer_cls)
             by_month[ym] = None if f is None else sorted(f, key=ORDER.index)
-            inputs[ym] = {"depth_cm": depth_cm, "t_anom": t_anom, "t_sd": t_sd}
         status, hit = winter_status({m: (None if f is None else set(f)) for m, f in by_month.items()})
-        out[pcode] = {"status": status, "months": hit, "summer": summer_cls, "by_month": by_month, "inputs": inputs, "zone": z}
+        out[pcode] = {"status": status, "months": hit, "summer": summer_cls, "summer_inputs": summer_in,
+                      "by_month": by_month, "inputs": inputs, "zone": z}
     derived.mkdir(parents=True, exist_ok=True)
     with (derived / f"decree286_{year}.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
@@ -231,7 +250,6 @@ def check() -> None:
     assert month_flags(None, -4.0, 1.0, "steppe", None) is None
     assert winter_status({}) == (UNASSESSED, [])
     assert winter_status({"202512": {"white_moderate"}, "202601": {"black", "white_moderate"}}) == ("black", ["202601"])
-    assert winter_status({"202512": set(), "202601": None}) == ("none", [])
     assert winter_status({"202512": None}) == (UNASSESSED, [])
     s = {f"{y}12": -20.0 for y in range(2001, 2021)}
     s["202512"] = -24.0
@@ -243,6 +261,19 @@ def check() -> None:
     t.update({f"2025{m}": 17.5 for m in ("05", "06", "07", "08")})
     share, ta, sd = summer_share(tp, t, 2025)
     assert share == 0.4 and ta == 2.5 and summer_drought(share, ta, sd) == "drought"
+    assert zone_thresholds("steppe") == (22.0, 11.0) and zone_thresholds("mountain") == zone_thresholds("forest_steppe") == (25.0, 16.0)
+    assert summer_drought(0.51, 2.0, 5.0) == "near"            # 51 % is no longer drought
+    assert winter_status({"202512": set(), "202601": None}) == (UNASSESSED, [])  # a missing month is never "none"
+    assert winter_status({"202512": {"white_moderate"}, "202601": None}) == ("white_moderate", ["202512"])
+    assert base_years("12") == range(2001, 2021) and base_years("01") == range(2002, 2022)  # winters 2001/02-2020/21
+    j = {f"{y}01": -20.0 for y in range(2002, 2022)}
+    j.update({"200101": -40.0, "202601": -24.0})               # Jan 2001 is outside winter 2001/02's baseline
+    assert anomaly(j, "01", 2026) == (-4.0, 0.0)
+    flags, inputs = month_record(0.2504, -3.5, 1.0, "mountain", None)
+    assert "white" in flags and inputs == {"depth_cm": 25.0, "t_anom": -3.5, "t_sd": 1.0}  # tested before rounding
+    assert month_record(None, -3.5, 1.0, "mountain", None) == (None, {"depth_cm": None, "t_anom": -3.5, "t_sd": 1.0})
+    assert summer_record({"tp_mm": tp, "t2m_c": t}, 2025) == ("drought", {"p_share": 0.4, "t_anom": 2.5, "t_sd": 0.0})
+    assert summer_record(None, 2025) == (UNASSESSED, None)
     print("decree286 check: ok")
 
 

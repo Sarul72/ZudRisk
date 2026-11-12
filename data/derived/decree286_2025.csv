@@ -74,7 +74,7 @@ MN4152,steppe,near,white_moderate,202511 202512 202601 202602,white_moderate,whi
 MN4155,steppe,,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-
 MN4158,taiga,,white_moderate,202512 202601 202602 202603,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN4161,steppe,,white_moderate,202512 202601,-,white_moderate,white_moderate,-,-
-MN4164,steppe,near,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-
+MN4164,steppe,near,white,202601,-,white_moderate,white white_moderate,white_moderate,-
 MN4167,steppe,,white_moderate,202512 202601,-,white_moderate,white_moderate,-,-
 MN4170,steppe,near,black_moderate,202511,black_moderate,white_moderate,white_moderate,white_moderate,-
 MN4173,steppe,near,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-
@@ -182,7 +182,7 @@ MN6328,steppe,,white_moderate,202512 202601,-,white_moderate,white_moderate,-,-
 MN6331,forest_steppe,,none,,-,-,-,-,-
 MN6334,forest_steppe,,none,,-,-,-,-,-
 MN6337,taiga,,none,,-,-,-,-,-
-MN6340,forest_steppe,,none,,-,-,-,-,-
+MN6340,forest_steppe,,white_moderate,202601,-,-,white_moderate,-,-
 MN6343,forest_steppe,,none,,-,-,-,-,-
 MN6346,forest_steppe,,none,,-,-,-,-,-
 MN6401,steppe,,none,,-,-,-,-,-
@@ -314,7 +314,7 @@ MN8425,desert,near,white_moderate,202512 202601 202602,-,white_moderate,white_mo
 MN8428,mountain,near,white_moderate,202601 202602 202603,-,-,white_moderate,white_moderate,white_moderate
 MN8431,mountain,near,none,,-,-,-,-,-
 MN8434,steppe,near,none,,-,-,-,-,-
-MN8437,desert,near,white_moderate,202512 202601 202602 202603,-,white_moderate,white_moderate,white_moderate,white_moderate
+MN8437,desert,near,white_moderate,202511 202512 202601 202602 202603,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
 MN8440,steppe,near,none,,-,-,-,-,-
 MN8443,mountain,near,none,,-,-,-,-,-
 MN8446,desert,near,none,,-,-,-,-,-
@@ -331,7 +331,7 @@ MN8525,steppe,near,none,,-,-,-,-,-
 MN8528,steppe,near,none,,-,-,-,-,-
 MN8531,steppe,near,none,,-,-,-,-,-
 MN8534,steppe,,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-
-MN8537,steppe,,white_moderate,202601 202602,-,-,white_moderate,white_moderate,-
+MN8537,steppe,,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-
 MN8540,mountain,,white_moderate,202512 202601 202602 202603,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8543,mountain,near,white_moderate,202601 202602,-,-,white_moderate,white_moderate,-
 MN8546,steppe,near,white_moderate,202512 202601 202602,-,white_moderate,white_moderate,white_moderate,-

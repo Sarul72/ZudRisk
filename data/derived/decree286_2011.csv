@@ -298,7 +298,7 @@ MN8316,mountain,,white_moderate,201112 201201 201202 201203,-,white_moderate,whi
 MN8319,mountain,,none,,-,-,-,-,-
 MN8322,mountain,,white_moderate,201112 201201 201202 201203,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8325,mountain,,none,,-,-,-,-,-
-MN8328,mountain,,white_moderate,201111 201112 201201 201202 201203,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
+MN8328,mountain,,white,201201,white_moderate,white_moderate,white white_moderate,white_moderate,white_moderate
 MN8331,mountain,,none,,-,-,-,-,-
 MN8334,mountain,,white_moderate,201112 201201 201202 201203,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8340,mountain,,white_moderate,201111 201112 201201 201202 201203,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
@@ -321,7 +321,7 @@ MN8446,desert,,none,,-,-,-,-,-
 MN8449,steppe,,none,,-,-,-,-,-
 MN8501,desert,,white_moderate,201112 201201 201202,-,white_moderate,white_moderate,white_moderate,-
 MN8504,steppe,,none,,-,-,-,-,-
-MN8507,mountain,,white_moderate,201202,-,-,-,white_moderate,-
+MN8507,mountain,,white_moderate,201201 201202,-,-,white_moderate,white_moderate,-
 MN8510,desert,,none,,-,-,-,-,-
 MN8513,desert,,none,,-,-,-,-,-
 MN8516,steppe,,none,,-,-,-,-,-

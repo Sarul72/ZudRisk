@@ -2,7 +2,7 @@ pcode,zone,summer,status,months,201711,201712,201801,201802,201803
 MN1101,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN1104,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN1107,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
-MN1110,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
+MN1110,forest_steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN1113,forest_steppe,,none,,-,-,-,-,-
 MN1116,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
 MN1119,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
@@ -22,7 +22,7 @@ MN2131,steppe,,none,,-,-,-,-,-
 MN2134,steppe,,none,,-,-,-,-,-
 MN2137,steppe,,none,,-,-,-,-,-
 MN2140,steppe,,none,,-,-,-,-,-
-MN2201,steppe,near,black_moderate,201711,black_moderate,-,-,-,-
+MN2201,steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
 MN2204,steppe,,none,,-,-,-,-,-
 MN2207,steppe,,none,,-,-,-,-,-
 MN2210,steppe,,none,,-,-,-,-,-
@@ -46,7 +46,7 @@ MN2322,forest_steppe,,none,,-,-,-,-,-
 MN2325,steppe,,none,,-,-,-,-,-
 MN2328,forest_steppe,,none,,-,-,-,-,-
 MN2331,steppe,,none,,-,-,-,-,-
-MN2334,steppe,near,black_moderate,201711,black_moderate,-,-,-,-
+MN2334,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN2337,steppe,,none,,-,-,-,-,-
 MN2340,steppe,,none,,-,-,-,-,-
 MN2343,forest_steppe,,none,,-,-,-,-,-
@@ -58,7 +58,7 @@ MN4104,steppe,near,black_moderate,201711,black_moderate,-,white_moderate,-,-
 MN4107,steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
 MN4110,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN4113,forest_steppe,near,black_moderate,201711,black_moderate,-,white_moderate,white_moderate,-
-MN4116,steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
+MN4116,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN4119,steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN4122,steppe,near,black_moderate,201711,black_moderate,-,-,-,-
 MN4125,steppe,,none,,-,-,-,-,-
@@ -66,7 +66,7 @@ MN4128,steppe,near,black_moderate,201711,black_moderate,-,white_moderate,-,-
 MN4131,steppe,,none,,-,-,-,-,-
 MN4134,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
 MN4137,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
-MN4140,forest_steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
+MN4140,forest_steppe,near,black_moderate,201711 201801 201802,black_moderate,-,black_moderate,black_moderate,-
 MN4143,steppe,near,black_moderate,201711 201801,black_moderate,-,black_moderate,-,-
 MN4146,steppe,,none,,-,-,-,-,-
 MN4149,forest_steppe,near,black_moderate,201801,-,-,black_moderate,-,-
@@ -161,7 +161,7 @@ MN6222,desert,near,black_moderate,201801,-,-,black_moderate,-,-
 MN6225,steppe,,white_moderate,201712 201801 201802,-,white_moderate,white_moderate,white_moderate,-
 MN6228,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN6231,steppe,near,none,,-,-,-,-,-
-MN6234,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
+MN6234,steppe,near,black_moderate,201801 201802,-,-,black_moderate,black_moderate,-
 MN6237,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN6240,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN6243,desert,near,black_moderate,201801,-,-,black_moderate,-,-
@@ -261,11 +261,11 @@ MN8131,mountain,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8134,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8137,forest_steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8140,forest_steppe,near,white_moderate,201801 201802 201803,-,-,white_moderate,white_moderate,white_moderate
-MN8143,forest_steppe,near,black_moderate,201801,-,-,black_moderate,-,-
+MN8143,forest_steppe,near,black_moderate,201801,-,-,black_moderate,white_moderate,-
 MN8146,forest_steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8149,steppe,,white_moderate,201801 201802,-,-,white_moderate,white_moderate,-
 MN8152,desert,near,black_moderate,201801,-,-,black_moderate,-,-
-MN8155,forest_steppe,near,none,,-,-,-,-,-
+MN8155,forest_steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8158,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8161,steppe,near,white_moderate,201801 201802,-,-,white_moderate,white_moderate,-
 MN8164,steppe,near,none,,-,-,-,-,-
@@ -283,7 +283,7 @@ MN8225,steppe,near,black_moderate,201801,-,-,black_moderate,-,-
 MN8228,desert,near,white_moderate,201801 201802,-,-,white_moderate,white_moderate,-
 MN8231,desert,near,white_moderate,201801,-,-,white_moderate,-,-
 MN8234,desert,near,white_moderate,201801,-,-,white_moderate,-,-
-MN8237,desert,near,black_moderate,201801,-,-,black_moderate,-,-
+MN8237,desert,near,black_moderate,201801 201802,-,-,black_moderate,black_moderate,-
 MN8240,desert,,none,,-,-,-,-,-
 MN8243,desert,near,white_moderate,201801,-,-,white_moderate,-,-
 MN8246,desert,,none,,-,-,-,-,-

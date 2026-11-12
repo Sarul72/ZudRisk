@@ -27,14 +27,14 @@ MN2204,steppe,near,black_moderate,201012,-,black_moderate,white_moderate,-,-
 MN2207,steppe,,none,,-,-,-,-,-
 MN2210,steppe,near,black_moderate,201103,-,white_moderate,white_moderate,white_moderate,black_moderate
 MN2213,steppe,,none,,-,-,-,-,-
-MN2216,steppe,near,black_moderate,201012 201101,-,black_moderate,black_moderate,-,-
+MN2216,steppe,near,black_moderate,201012 201101 201103,-,black_moderate,black_moderate,-,black_moderate
 MN2219,steppe,,none,,-,-,-,-,-
 MN2222,steppe,,none,,-,-,-,-,-
 MN2225,steppe,,none,,-,-,-,-,-
 MN2228,steppe,,none,,-,-,-,-,-
 MN2231,steppe,,none,,-,-,-,-,-
 MN2234,steppe,,none,,-,-,-,-,-
-MN2237,steppe,near,white_moderate,201012 201101 201102,-,white_moderate,white_moderate,white_moderate,-
+MN2237,steppe,near,black_moderate,201103,-,white_moderate,white_moderate,white_moderate,black_moderate
 MN2301,steppe,,none,,-,-,-,-,-
 MN2304,forest_steppe,,none,,-,-,-,-,-
 MN2307,forest_steppe,,none,,-,-,-,-,-
@@ -95,7 +95,7 @@ MN4325,steppe,,none,,-,-,-,-,-
 MN4328,steppe,,none,,-,-,-,-,-
 MN4331,steppe,,none,,-,-,-,-,-
 MN4334,forest_steppe,,none,,-,-,-,-,-
-MN4337,forest_steppe,,none,,-,-,-,-,-
+MN4337,forest_steppe,,white_moderate,201102,-,-,-,white_moderate,-
 MN4340,forest_steppe,,white_moderate,201012 201101 201102 201103,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN4343,forest_steppe,,none,,-,-,-,-,-
 MN4346,forest_steppe,,none,,-,-,-,-,-
@@ -119,7 +119,7 @@ MN4504,steppe,,white_moderate,201012 201101 201102,-,white_moderate,white_modera
 MN4507,forest_steppe,,none,,-,-,-,-,-
 MN4510,forest_steppe,,none,,-,-,-,-,-
 MN4601,desert,,none,,-,-,-,-,-
-MN4604,desert,near,white_moderate,201101,-,-,white_moderate,-,-
+MN4604,desert,near,black,201103,-,-,white_moderate,-,black
 MN4607,desert,,none,,-,-,-,-,-
 MN4610,desert,near,black,201103,-,-,black_moderate,-,black
 MN4613,desert,near,black,201103,-,-,black_moderate,-,black
@@ -127,11 +127,11 @@ MN4616,desert,near,black,201103,-,-,black_moderate,-,black
 MN4619,desert,,none,,-,-,-,-,-
 MN4622,desert,near,black,201103,-,-,black_moderate,-,black
 MN4625,desert,,none,,-,-,-,-,-
-MN4628,desert,near,white_moderate,201101,-,-,white_moderate,-,-
+MN4628,desert,near,black,201103,-,-,white_moderate,-,black
 MN4631,desert,,none,,-,-,-,-,-
 MN4634,desert,,none,,-,-,-,-,-
 MN4637,desert,,none,,-,-,-,-,-
-MN4640,desert,near,black_moderate,201101,-,-,black_moderate,-,-
+MN4640,desert,near,black,201103,-,-,black_moderate,-,black
 MN4643,desert,,none,,-,-,-,-,-
 MN4801,steppe,,none,,-,-,-,-,-
 MN4804,steppe,,none,,-,-,-,-,-
@@ -151,7 +151,7 @@ MN4843,steppe,near,black_moderate,201101 201103,-,-,black_moderate,-,black_moder
 MN6101,forest_steppe,,none,,-,-,-,-,-
 MN6104,forest_steppe,,none,,-,-,-,-,-
 MN6201,steppe,,none,,-,-,-,-,-
-MN6204,desert,,none,,-,-,-,-,-
+MN6204,desert,,white_moderate,201101,-,-,white_moderate,-,-
 MN6207,forest_steppe,,white,201103,-,-,white_moderate,white_moderate,white white_moderate
 MN6210,steppe,near,black_moderate,201101 201103,-,-,black_moderate,-,black_moderate
 MN6213,steppe,,none,,-,-,-,-,-
@@ -203,7 +203,7 @@ MN6443,desert,,none,,-,-,-,-,-
 MN6446,steppe,,none,,-,-,-,-,-
 MN6449,steppe,,none,,-,-,-,-,-
 MN6452,steppe,,none,,-,-,-,-,-
-MN6455,desert,near,black_moderate,201101,-,-,black_moderate,-,-
+MN6455,desert,near,black,201103,-,-,black_moderate,-,black
 MN6458,mountain,,none,,-,-,-,-,-
 MN6501,forest_steppe,,none,,-,-,-,-,-
 MN6504,forest_steppe,,none,,-,-,-,-,-
@@ -265,7 +265,7 @@ MN8143,forest_steppe,,white,201103,-,white_moderate,white_moderate,white_moderat
 MN8146,forest_steppe,,white,201103,-,white_moderate,white_moderate,white_moderate,white white_moderate
 MN8149,steppe,,white,201101 201103,-,white_moderate,white white_moderate,white_moderate,white white_moderate
 MN8152,desert,,white_moderate,201101,-,-,white_moderate,-,-
-MN8155,forest_steppe,,white_moderate,201101 201102 201103,-,-,white_moderate,white_moderate,white_moderate
+MN8155,forest_steppe,,white,201103,-,-,white_moderate,white_moderate,white white_moderate
 MN8158,steppe,,white_moderate,201101 201103,-,-,white_moderate,-,white_moderate
 MN8161,steppe,,white_moderate,201012 201101 201102 201103,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8164,steppe,,none,,-,-,-,-,-
@@ -282,7 +282,7 @@ MN8222,steppe,,none,,-,-,-,-,-
 MN8225,steppe,,none,,-,-,-,-,-
 MN8228,desert,,white,201101 201103,-,white_moderate,white white_moderate,white_moderate,white white_moderate
 MN8231,desert,,white_moderate,201101 201102,-,-,white_moderate,white_moderate,-
-MN8234,desert,,white_moderate,201101,-,-,white_moderate,-,-
+MN8234,desert,,white_moderate,201101 201102,-,-,white_moderate,white_moderate,-
 MN8237,desert,,none,,-,-,-,-,-
 MN8240,desert,,none,,-,-,-,-,-
 MN8243,desert,,white_moderate,201101,-,-,white_moderate,-,-
@@ -296,12 +296,12 @@ MN8310,steppe,,white_moderate,201101,-,-,white_moderate,-,-
 MN8313,mountain,,none,,-,-,-,-,-
 MN8316,mountain,,white,201101 201103,white_moderate,white_moderate,white white_moderate,white_moderate,white white_moderate
 MN8319,mountain,,white_moderate,201101 201102,-,-,white_moderate,white_moderate,-
-MN8322,mountain,,white,201101 201103,-,white_moderate,white white_moderate,white_moderate,white white_moderate
+MN8322,mountain,,white,201101,-,white_moderate,white white_moderate,white_moderate,white_moderate
 MN8325,mountain,,none,,-,-,-,-,-
 MN8328,mountain,,white,201101,-,white_moderate,white white_moderate,white_moderate,white_moderate
 MN8331,mountain,,white_moderate,201101 201102 201103,-,-,white_moderate,white_moderate,white_moderate
 MN8334,mountain,,white,201101,-,white_moderate,white white_moderate,white_moderate,white_moderate
-MN8340,mountain,,white,201101 201103,white_moderate,white_moderate,white white_moderate,white_moderate,white white_moderate
+MN8340,mountain,,white,201101,white_moderate,white_moderate,white white_moderate,white_moderate,white_moderate
 MN8401,steppe,,none,,-,-,-,-,-
 MN8404,desert,,white,201101,-,white_moderate,white white_moderate,white_moderate,white_moderate
 MN8407,desert,,white,201101,-,white_moderate,white white_moderate,white_moderate,white_moderate

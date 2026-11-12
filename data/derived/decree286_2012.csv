@@ -17,7 +17,7 @@ MN2116,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN2119,forest_steppe,,none,,-,-,-,-,-
 MN2122,steppe,,white,201302,-,white_moderate,white_moderate,white white_moderate,white_moderate
 MN2125,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
-MN2128,steppe,,white,201212 201302 201303,-,white white_moderate,white_moderate,white white_moderate,white white_moderate
+MN2128,steppe,,white,201212 201301 201302 201303,-,white white_moderate,white white_moderate,white white_moderate,white white_moderate
 MN2131,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN2134,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN2137,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
@@ -214,7 +214,7 @@ MN6516,steppe,,white_moderate,201301,-,-,white_moderate,-,-
 MN6519,steppe,,white_moderate,201301,-,-,white_moderate,-,-
 MN6522,forest_steppe,,none,,-,-,-,-,-
 MN6525,forest_steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
-MN6528,forest_steppe,,white_moderate,201301,-,-,white_moderate,-,-
+MN6528,forest_steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN6531,forest_steppe,,none,,-,-,-,-,-
 MN6534,forest_steppe,,white_moderate,201302,-,-,-,white_moderate,-
 MN6537,steppe,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-
@@ -242,7 +242,7 @@ MN6743,taiga,,white,201212,white_moderate,white white_moderate,white_moderate,wh
 MN6746,taiga,,white_moderate,201301 201302 201303,-,-,white_moderate,white_moderate,white_moderate
 MN6749,mountain,,white,201211 201212,white white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
 MN6752,forest_steppe,,white_moderate,201302,-,-,-,white_moderate,-
-MN6755,taiga,,white,201212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN6755,taiga,,white,201212 201302,white_moderate,white white_moderate,white_moderate,white white_moderate,white_moderate
 MN6758,forest_steppe,,white_moderate,201212 201301 201302 201303,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN6761,taiga,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-
 MN6764,forest_steppe,,none,,-,-,-,-,-
@@ -333,7 +333,7 @@ MN8531,steppe,,none,,-,-,-,-,-
 MN8534,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN8537,steppe,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-
 MN8540,mountain,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-
-MN8543,mountain,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
+MN8543,mountain,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-
 MN8546,steppe,,white_moderate,201301 201302,-,-,white_moderate,white_moderate,-
 MN8549,mountain,,none,,-,-,-,-,-
 MN8552,steppe,,white_moderate,201212 201301 201302,-,white_moderate,white_moderate,white_moderate,-

@@ -32,11 +32,19 @@ def monthly_total_mm(rate_m: float, yyyymm: str) -> float:
     return round(rate_m * days * 1000, 1)
 
 
+def times_of(valid_time) -> list[str]:
+    """yyyymm of each step, refusing a time axis that is not in seconds since 1970 (as era5.read_fields does)."""
+    units = getattr(valid_time, "units", "")
+    if not units.startswith("seconds since 1970-01-01"):
+        raise ValueError(f"valid_time is in '{units}', read as seconds since 1970")
+    return [era5.yyyymm(t) for t in valid_time[:]]
+
+
 def main() -> None:
     RAW.parent.mkdir(parents=True, exist_ok=True)
     cached(RAW, lambda: cds_retrieve(DATASET, INPUTS))
     with netCDF4.Dataset(RAW) as d:
-        times = [era5.yyyymm(t) for t in d["valid_time"][:]]
+        times = times_of(d["valid_time"])
         grids = {v: d[v][:] for v in COLS}
         lats, lons = d["latitude"][:].data, d["longitude"][:].data
     cells = map_cells(grids["t2m"][0], lats, lons)
@@ -71,6 +79,15 @@ def check() -> None:
     assert INPUTS["month"] == ["05", "06", "07", "08"]
     assert INPUTS["variable"] == ["total_precipitation", "2m_temperature"]
     assert INPUTS["year"][0] == "2000" and INPUTS["area"] == era5.INPUTS["area"]
+    class Var(list):
+        units = "days since 1970-01-01"
+    try:
+        times_of(Var([0.0]))
+        raise AssertionError("days read as seconds")
+    except ValueError as e:
+        assert "days since" in str(e)
+    Var.units = "seconds since 1970-01-01"
+    assert times_of(Var([1719792000.0])) == ["202407"]
     print("summer check: ok")
 
 

@@ -8,24 +8,24 @@
   "loss5": 0.0
  },
  "black_moderate": {
-  "n": 154,
-  "loss5": 0.351
+  "n": 155,
+  "loss5": 0.348
  },
  "none": {
-  "n": 3520,
-  "loss5": 0.109
+  "n": 3518,
+  "loss5": 0.108
  },
  "risk_class_4": {
   "n": 235,
   "loss5": 0.583
  },
  "white": {
-  "n": 104,
-  "loss5": 0.356
+  "n": 110,
+  "loss5": 0.373
  },
  "white_moderate": {
-  "n": 908,
-  "loss5": 0.244
+  "n": 903,
+  "loss5": 0.243
  },
  "official": [
   {
@@ -33,11 +33,11 @@
    "as_of": "2016-12-26",
    "category": "dzud_any",
    "named": 116,
-   "flagged": 120,
-   "both": 79,
-   "both_any": 79,
-   "recall": 0.681,
-   "precision": 0.658
+   "flagged": 121,
+   "both": 80,
+   "both_any": 80,
+   "recall": 0.69,
+   "precision": 0.661
   },
   {
    "winter": "2019-20",
@@ -46,7 +46,7 @@
    "named": 41,
    "flagged": 0,
    "both": 0,
-   "both_any": 16,
+   "both_any": 17,
    "recall": 0.0,
    "precision": null
   },
@@ -55,11 +55,11 @@
    "as_of": "2020-01-12",
    "category": "white_moderate",
    "named": 50,
-   "flagged": 60,
+   "flagged": 61,
    "both": 14,
    "both_any": 14,
    "recall": 0.28,
-   "precision": 0.233
+   "precision": 0.23
   },
   {
    "winter": "2022-23",
@@ -77,11 +77,11 @@
    "as_of": "2023-01-26",
    "category": "white_moderate",
    "named": 45,
-   "flagged": 49,
+   "flagged": 50,
    "both": 16,
    "both_any": 16,
    "recall": 0.356,
-   "precision": 0.327
+   "precision": 0.32
   },
   {
    "winter": "2022-23",
@@ -143,11 +143,11 @@
    "as_of": "2024-02-20",
    "category": "white",
    "named": 139,
-   "flagged": 27,
-   "both": 11,
+   "flagged": 35,
+   "both": 13,
    "both_any": 90,
-   "recall": 0.079,
-   "precision": 0.407
+   "recall": 0.094,
+   "precision": 0.371
   },
   {
    "winter": "2023-24",
@@ -165,22 +165,22 @@
    "as_of": "2026-01-27",
    "category": "white",
    "named": 52,
-   "flagged": 0,
+   "flagged": 1,
    "both": 0,
-   "both_any": 40,
+   "both_any": 41,
    "recall": 0.0,
-   "precision": null
+   "precision": 0.0
   },
   {
    "winter": "2025-26",
    "as_of": "2026-01-27",
    "category": "white_moderate",
    "named": 61,
-   "flagged": 118,
+   "flagged": 119,
    "both": 28,
    "both_any": 28,
    "recall": 0.459,
-   "precision": 0.237
+   "precision": 0.235
   }
  ]
 }

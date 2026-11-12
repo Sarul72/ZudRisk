@@ -311,7 +311,7 @@ MN8416,desert,,none,,-,-,-,-,-
 MN8419,mountain,near,none,,-,-,-,-,-
 MN8422,mountain,near,none,,-,-,-,-,-
 MN8425,desert,near,none,,-,-,-,-,-
-MN8428,mountain,near,white_moderate,202302,-,-,-,white_moderate,-
+MN8428,mountain,near,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
 MN8431,mountain,near,none,,-,-,-,-,-
 MN8434,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
 MN8437,desert,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate

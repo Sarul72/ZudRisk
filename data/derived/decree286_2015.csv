@@ -238,7 +238,7 @@ MN6731,taiga,,none,,-,-,-,-,-
 MN6734,forest_steppe,,none,,-,-,-,-,-
 MN6737,forest_steppe,,none,,-,-,-,-,-
 MN6740,taiga,,none,,-,-,-,-,-
-MN6743,taiga,,white_moderate,201511 201512 201601 201602 201603,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
+MN6743,taiga,,white,201601,white_moderate,white_moderate,white white_moderate,white_moderate,white_moderate
 MN6746,taiga,,white_moderate,201512 201601 201602 201603,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN6749,mountain,,white_moderate,201511 201512 201601 201602 201603,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
 MN6752,forest_steppe,,none,,-,-,-,-,-

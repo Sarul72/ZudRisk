@@ -244,7 +244,7 @@ MN6749,mountain,,white,201812,white_moderate,white white_moderate,white_moderate
 MN6752,forest_steppe,,none,,-,-,-,-,-
 MN6755,taiga,,none,,-,-,-,-,-
 MN6758,forest_steppe,,white_moderate,201901 201902,-,-,white_moderate,white_moderate,-
-MN6761,taiga,,white_moderate,201812 201901,-,white_moderate,white_moderate,-,-
+MN6761,taiga,,white_moderate,201811 201812 201901,white_moderate,white_moderate,white_moderate,-,-
 MN6764,forest_steppe,,none,,-,-,-,-,-
 MN6767,taiga,,none,,-,-,-,-,-
 MN8101,forest_steppe,,white_moderate,201902,-,-,-,white_moderate,-

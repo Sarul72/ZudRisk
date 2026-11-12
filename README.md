@@ -27,9 +27,9 @@ Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "
   gobi snow thresholds; the map has it in the steppe zone, and the site says so.
 - **Resolution 286** (main criteria): which of the official procedure's dzud types each soum met in a winter month,
   from ERA5-Land depth, temperature and the summer before. Density, the auxiliary criteria and the dekad step are not
-  assessed, and the site says so; it is not an official assessment. Losses >= 5 % followed in 36 % of the soum-winters
+  assessed, and the site says so; it is not an official assessment. Losses >= 5 % followed in 37 % of the soum-winters
   flagged white and 11 % of those flagged nothing. Of the soums NAMEM named in white dzud, 4 % are flagged white here
-  and 63 % white or moderate (`pipeline.decree286`, `pipeline.official`).
+  and 64 % white or moderate (`pipeline.decree286`, `pipeline.official`).
 - **Validation** beside every map: how each winter and each outlook stage ranked the losses that followed.
 
 ## How well it works (2026-11-13)
@@ -131,7 +131,7 @@ repository on GitHub: Settings -> Pages -> Build and deployment -> Source: **Git
 Each step has one, run from local files:
 
 ```bash
-for m in boundaries http era5 ndvi gldas nso indicators validate export aimags compare asof hindcast outlook trends model power zones seasonal ice calibrate update herdmix thaw; do uv run python -m pipeline.$m --check; done; uv run python -m pipeline.score
+for m in boundaries http era5 ndvi gldas nso indicators validate export aimags compare asof hindcast outlook trends model power zones seasonal ice calibrate update herdmix thaw summer decree286 official pasture; do uv run python -m pipeline.$m --check; done; uv run python -m pipeline.score
 ```
 
 ## Tested and not used

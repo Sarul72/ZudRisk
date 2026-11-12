@@ -67,7 +67,7 @@ const T = {
     decree_legend: "Засгийн газрын 2015 оны 286-р тогтоол, 5-р хавсралт: өвлийн аль нэг сард биелсэн хамгийн хүнд төрөл",
     decree_status: { black: "Хар зуд", white: "Цагаан зуд (нягтгүйгээр)", black_moderate: "Хараар зудархуу", white_moderate: "Цагаанаар зудархуу (нягтгүйгээр)", none: "Шалгуур биелээгүй", unassessed: "Үнэлэх өгөгдөлгүй" },
     decree_summer: { drought: "гантай", near: "гандуу", unassessed: "мэдээгүй" }, decree_summer_none: "ган биш",
-    decree_prev_summer: "Өмнөх зун", decree_depth: "цас", decree_threshold: "босго", decree_anom: "температурын хазайлт", decree_months: "Биелсэн сар",
+    decree_prev_summer: "Өмнөх зун", decree_depth: "цас", decree_threshold: "босго", decree_anom: "температурын хазайлт", decree_months: "Биелсэн сар", decree_p_share: "5–8-р сарын хур тунадас олон жилийн дунджийн",
     decree_loss: (v) => `Хорогдол ≥5% болсон сум-өвлийн хувь (2011/12-оос): цагаан зуд ${pct(v.white)}, хараар зудархуу ${pct(v.black_moderate)}, цагаанаар зудархуу ${pct(v.white_moderate)}, шалгуур биелээгүй ${pct(v.none)}; харьцуулахад ZudRisk-ийн «маш өндөр» анги ${pct(v.risk_class_4)}.`,
     decree_official: (r) => `ЦУОШГ-ын албан жагсаалттай (${r.n} агшин зураг): албан ёсоор «цагаан зуд» гэж нэрлэгдсэн сумдын ${r.white}%-ийг энд цагаан зуд, ${r.any}%-ийг цагаан зуд эсвэл зудархуу гэж тэмдэглэв. Албан жагсаалт нь бэлчээр дээр хэмжсэн цас ашигладаг, «−3°C» нөхцөлийг шаарддаггүй бололтой. Жагсаалтад ороогүй сум «зудгүй» гэсэн үг биш.`,
     zone_level_note: "Сум бүр талбайн ихэнхийг нь эзэлсэн бүсэд тоологдоно; бүсийн хил нь эдгээр сумдын хил. * Цөлжүү хээрийг цөл, говийн бүсэд оруулсан нь бидний сонголт (эх зурагт хээрийн бүсэд), 286-р тогтоолын говь цөлийн цасны босгыг хэрэглэхийн тулд.", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
@@ -144,7 +144,7 @@ const T = {
     decree_legend: "Government Resolution 286 (2015), annex 5: the most severe type met in any winter month",
     decree_status: { black: "Black dzud", white: "White dzud (density not assessed)", black_moderate: "Black, moderate", white_moderate: "White, moderate (density not assessed)", none: "No main criterion met", unassessed: "Not assessed" },
     decree_summer: { drought: "drought", near: "near-drought", unassessed: "no data" }, decree_summer_none: "no drought",
-    decree_prev_summer: "Previous summer", decree_depth: "snow", decree_threshold: "threshold", decree_anom: "temperature anomaly", decree_months: "Months met",
+    decree_prev_summer: "Previous summer", decree_depth: "snow", decree_threshold: "threshold", decree_anom: "temperature anomaly", decree_months: "Months met", decree_p_share: "May–Aug precipitation, share of normal",
     decree_loss: (v) => `Share of soum-winters with adult losses ≥5% (2011/12 on): white ${pct(v.white)}, black moderate ${pct(v.black_moderate)}, white moderate ${pct(v.white_moderate)}, no criterion met ${pct(v.none)}; for comparison, ZudRisk's very-high class ${pct(v.risk_class_4)}.`,
     decree_official: (r) => `Against NAMEM's official lists (${r.n} snapshots): of the soums named in white dzud, ${r.white}% are flagged white here and ${r.any}% white or moderate. The official lists use snow measured on pasture and seem not to require the −3 °C condition. A soum missing from a list is not an official "no".`,
     zone_level_note: "Each soum counts in the zone covering most of it; a zone's border here is its soums' borders. * Desert steppe is counted in the desert and gobi zone by our choice (the source map has it in the steppe zone), to use Resolution 286's gobi snow thresholds.", level: "Map level", aimags: "Aimags (by risk)",
@@ -348,12 +348,14 @@ function decreePopup(p) {
   const months = Object.keys(r.by_month).map((m) => {
     const i = r.inputs[m], f = r.by_month[m];
     const types = f == null ? t.decree_status.unassessed : f.length ? f.map((x) => t.decree_status[x]).join(", ") : t.decree_status.none;
-    return `${ymLabel(m)}: <b>${esc(types)}</b> <small>(${t.decree_depth} ${fmt(i.depth_cm, 0)} cm, ${t.decree_threshold} ${th[0]}/${th[1]}; ${t.decree_anom} ${fmt(i.t_anom, 1)} °C)</small>`;
+    return `${esc(ymLabel(m))}: <b>${esc(types)}</b> <small>(${t.decree_depth} ${fmt(i.depth_cm, 1)} cm, ${t.decree_threshold} ${th[0]}/${th[1]}; ${t.decree_anom} ${fmt(i.t_anom, 1)} °C, σ ${fmt(i.t_sd, 1)})</small>`;
   });
   const summer = r.summer == null ? t.decree_summer_none : t.decree_summer[r.summer];
+  const si = r.summer_inputs;
+  const summerIn = si && si.p_share != null ? ` <small>(${t.decree_p_share} ${Math.round(100 * si.p_share)}%; ${t.decree_anom} ${fmt(si.t_anom, 1)} °C, σ ${fmt(si.t_sd, 1)})</small>` : "";
   return `<b>${esc(soumName(p))}</b><br>${esc(t.decree_view)}: <b>${esc(t.decree_status[r.status])}</b>` +
-    (r.months.length ? `<br>${t.decree_months}: ${r.months.map(ymLabel).join(", ")}` : "") +
-    `<br>${t.decree_prev_summer}: ${esc(summer)}<br>${months.join("<br>")}<br><small><i>${esc(t.decree_caveat)}</i></small>`;
+    (r.months.length ? `<br>${t.decree_months}: ${esc(r.months.map(ymLabel).join(", "))}` : "") +
+    `<br>${t.decree_prev_summer}: ${esc(summer)}${summerIn}<br>${months.join("<br>")}<br><small><i>${esc(t.decree_caveat)}</i></small>`;
 }
 
 function popup(p) {
@@ -565,13 +567,12 @@ function findSoum() {
 
 async function load(label) {
   const key = label === "outlook" ? outlook.winter : label;
-  const [geo, v, a, z, d] = await Promise.all([
+  const [geo, v, a, z] = await Promise.all([
     fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
     // a winter whose losses NSO has not published yet is scored but has no validation file
     label === "outlook" ? asof[outlook.stage] : pending.has(key) ? null : fetch(`data/validation_${key}.json`).then((r) => (r.ok ? r.json() : null)),
     fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
     fetch(`data/zone_${key}.json`).then((r) => (r.ok ? r.json() : {})),
-    fetch(`data/decree286_${key}.json`).then((r) => (r.ok ? r.json() : null)),
   ]);
   if (label !== sel.value) return; // a later choice won the race; drawing this one would mislabel the map
   shown = label;
@@ -579,8 +580,19 @@ async function load(label) {
   soumGeo = geo;
   aimagScores = a;
   zoneScores = z;
-  decree = d;
+  decree = null;
+  if (view === "decree") {
+    await loadDecree();
+    if (label !== sel.value) return;
+  }
   draw();
+}
+
+const decreeFiles = {}; // winter -> its Resolution 286 file, fetched the first time the decree view needs it
+async function loadDecree() {
+  const key = shown === "outlook" ? outlook.winter : shown;
+  if (!(key in decreeFiles)) decreeFiles[key] = await fetch(`data/decree286_${key}.json`).then((r) => (r.ok ? r.json() : null));
+  if ((shown === "outlook" ? outlook.winter : shown) === key) decree = decreeFiles[key];
 }
 
 $("lang").addEventListener("click", () => { lang = lang === "mn" ? "en" : "mn"; render(); });
@@ -590,7 +602,12 @@ for (const b of document.querySelectorAll("[data-level]")) {
 for (const b of document.querySelectorAll("[data-scale]")) {
   b.addEventListener("click", () => { if (scale !== b.dataset.scale) { scale = b.dataset.scale; if (soumGeo) draw(); else render(); } });
 }
-$("view").addEventListener("change", (e) => { view = e.target.value; if (soumGeo) draw(); else render(); });
+$("view").addEventListener("change", (e) => {
+  view = e.target.value;
+  if (!soumGeo) render();
+  else if (view === "decree") loadDecree().then(draw).catch(fail);
+  else draw();
+});
 $("search").addEventListener("change", findSoum);
 $("aimags").addEventListener("click", (e) => { const b = e.target.closest("[data-aimag]"); if (b) zoomTo(aimagGeo, "aimag", b.dataset.aimag); });
 $("zones").addEventListener("click", (e) => { const b = e.target.closest("[data-zone]"); if (b) zoomTo(zoneGeo, "zone", b.dataset.zone); });

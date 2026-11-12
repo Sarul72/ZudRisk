@@ -87,7 +87,7 @@ MN4301,forest_steppe,,none,,-,-,-,-,-
 MN4304,forest_steppe,,none,,-,-,-,-,-
 MN4307,forest_steppe,,none,,-,-,-,-,-
 MN4310,forest_steppe,,none,,-,-,-,-,-
-MN4313,taiga,,white_moderate,201003,-,-,-,-,white_moderate
+MN4313,taiga,,white_moderate,201002 201003,-,-,-,white_moderate,white_moderate
 MN4316,forest_steppe,,none,,-,-,-,-,-
 MN4319,forest_steppe,,none,,-,-,-,-,-
 MN4322,taiga,,white_moderate,201003,-,-,-,-,white_moderate
@@ -230,7 +230,7 @@ MN6707,mountain,,none,,-,-,-,-,-
 MN6710,taiga,,white,201002 201003,white_moderate,white_moderate,white_moderate,white white_moderate,white white_moderate
 MN6713,forest_steppe,,none,,-,-,-,-,-
 MN6716,forest_steppe,,white_moderate,201001 201002 201003,-,-,white_moderate,white_moderate,white_moderate
-MN6719,forest_steppe,,white,201002 201003,white_moderate,white_moderate,white_moderate,white white_moderate,white white_moderate
+MN6719,forest_steppe,,white,201001 201002 201003,white_moderate,white_moderate,white white_moderate,white white_moderate,white white_moderate
 MN6722,forest_steppe,,none,,-,-,-,-,-
 MN6725,forest_steppe,,none,,-,-,-,-,-
 MN6728,taiga,,white,201001 201002 201003,white_moderate,white_moderate,white white_moderate,white white_moderate,white white_moderate
@@ -331,7 +331,7 @@ MN8525,steppe,,white_moderate,201002,-,-,-,white_moderate,-
 MN8528,steppe,,white_moderate,201001 201002,-,-,white_moderate,white_moderate,-
 MN8531,steppe,,white,201002,white_moderate,white_moderate,white_moderate,white white_moderate,white_moderate
 MN8534,steppe,,white_moderate,200912 201001 201002 201003,-,white_moderate,white_moderate,white_moderate,white_moderate
-MN8537,steppe,,white,201002 201003,white_moderate,white_moderate,white_moderate,white white_moderate,white white_moderate
+MN8537,steppe,,white,201001 201002 201003,white_moderate,white_moderate,white white_moderate,white white_moderate,white white_moderate
 MN8540,mountain,,white,201002 201003,-,white_moderate,white_moderate,white white_moderate,white white_moderate
 MN8543,mountain,,white,201002 201003,white_moderate,white_moderate,white_moderate,white white_moderate,white white_moderate
 MN8546,steppe,,white_moderate,200912 201001 201002 201003,-,white_moderate,white_moderate,white_moderate,white_moderate

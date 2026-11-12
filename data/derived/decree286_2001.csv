@@ -21,7 +21,7 @@ MN2128,steppe,near,none,,-,-,-,-,-
 MN2131,steppe,,none,,-,-,-,-,-
 MN2134,steppe,near,black_moderate,200112,-,black_moderate,-,-,-
 MN2137,steppe,near,none,,-,-,-,-,-
-MN2140,steppe,near,none,,-,-,-,-,-
+MN2140,steppe,near,white_moderate,200202,-,-,-,white_moderate,-
 MN2201,steppe,,none,,-,-,-,-,-
 MN2204,steppe,,none,,-,-,-,-,-
 MN2207,steppe,,none,,-,-,-,-,-
@@ -204,7 +204,7 @@ MN6446,steppe,,none,,-,-,-,-,-
 MN6449,steppe,,none,,-,-,-,-,-
 MN6452,steppe,,none,,-,-,-,-,-
 MN6455,desert,,none,,-,-,-,-,-
-MN6458,mountain,,white_moderate,200201 200202,-,-,white_moderate,white_moderate,-
+MN6458,mountain,,white_moderate,200112 200201 200202,-,white_moderate,white_moderate,white_moderate,-
 MN6501,forest_steppe,,none,,-,-,-,-,-
 MN6504,forest_steppe,,none,,-,-,-,-,-
 MN6507,forest_steppe,,white_moderate,200112 200201 200202 200203,-,white_moderate,white_moderate,white_moderate,white_moderate
@@ -276,7 +276,7 @@ MN8204,desert,,white_moderate,200203,-,-,-,-,white_moderate
 MN8207,desert,near,black_moderate,200112,-,black_moderate,-,-,-
 MN8210,desert,,white,200203,-,-,white_moderate,white_moderate,white white_moderate
 MN8213,desert,,white_moderate,200203,-,-,-,-,white_moderate
-MN8216,desert,near,black_moderate,200112,-,black_moderate,-,-,white_moderate
+MN8216,desert,near,black_moderate,200112,-,black_moderate,white_moderate,-,white_moderate
 MN8219,steppe,,none,,-,-,-,-,-
 MN8222,steppe,,none,,-,-,-,-,-
 MN8225,steppe,,none,,-,-,-,-,-
@@ -310,13 +310,13 @@ MN8413,desert,near,black_moderate,200112,-,black_moderate,white_moderate,-,-
 MN8416,desert,near,white_moderate,200112 200201,-,white_moderate,white_moderate,-,-
 MN8419,mountain,near,none,,-,-,-,-,-
 MN8422,mountain,near,black_moderate,200111 200112,black_moderate,black_moderate,-,-,-
-MN8425,desert,,white_moderate,200112 200201,-,white_moderate,white_moderate,-,-
+MN8425,desert,,white_moderate,200112 200201 200202,-,white_moderate,white_moderate,white_moderate,-
 MN8428,mountain,,none,,-,-,-,-,-
 MN8431,mountain,near,black_moderate,200112 200203,-,black_moderate,-,-,black_moderate
 MN8434,steppe,,none,,-,-,-,-,-
 MN8437,desert,,white_moderate,200112 200201 200202 200203,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8440,steppe,,none,,-,-,-,-,-
-MN8443,mountain,near,black_moderate,200112,-,black_moderate,-,-,-
+MN8443,mountain,near,black_moderate,200112 200203,-,black_moderate,-,-,black_moderate
 MN8446,desert,near,black_moderate,200112,-,black_moderate,white_moderate,-,-
 MN8449,steppe,,white_moderate,200112 200201 200202,-,white_moderate,white_moderate,white_moderate,-
 MN8501,desert,,white_moderate,200112 200201 200202,-,white_moderate,white_moderate,white_moderate,-

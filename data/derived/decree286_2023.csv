@@ -5,7 +5,7 @@ MN1107,forest_steppe,,white_moderate,202401 202402,-,-,white_moderate,white_mode
 MN1110,forest_steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
 MN1113,forest_steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
 MN1116,forest_steppe,,white,202402,-,white_moderate,white_moderate,white white_moderate,white_moderate
-MN1119,forest_steppe,,white_moderate,202312 202401 202402 202403,-,white_moderate,white_moderate,white_moderate,white_moderate
+MN1119,forest_steppe,,white,202402,-,white_moderate,white_moderate,white white_moderate,white_moderate
 MN1122,forest_steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
 MN1125,forest_steppe,,white,202402,-,white_moderate,white_moderate,white white_moderate,white_moderate
 MN2101,steppe,,white_moderate,202401,-,-,white_moderate,-,-
@@ -23,25 +23,25 @@ MN2134,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_modera
 MN2137,steppe,,white_moderate,202401,-,-,white_moderate,-,-
 MN2140,steppe,,none,,-,-,-,-,-
 MN2201,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
-MN2204,steppe,,white_moderate,202311 202312 202401 202402,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN2204,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
 MN2207,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_moderate,white_moderate,-
 MN2210,steppe,,white_moderate,202312 202401 202402 202403,-,white_moderate,white_moderate,white_moderate,white_moderate
-MN2213,steppe,,white,202312,white_moderate,white white_moderate,white_moderate,white_moderate,-
+MN2213,steppe,,white,202312 202402,white_moderate,white white_moderate,white_moderate,white white_moderate,-
 MN2216,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_moderate,white_moderate,-
 MN2219,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_moderate,white_moderate,-
-MN2222,steppe,,white_moderate,202311 202312 202401 202402,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN2222,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
 MN2225,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
 MN2228,steppe,,white_moderate,202311 202312 202401 202402,white_moderate,white_moderate,white_moderate,white_moderate,-
 MN2231,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
 MN2234,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
-MN2237,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_moderate,white_moderate,-
+MN2237,steppe,,white,202402,-,white_moderate,white_moderate,white white_moderate,-
 MN2301,steppe,,white_moderate,202311 202312 202401 202402,white_moderate,white_moderate,white_moderate,white_moderate,-
 MN2304,forest_steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
 MN2307,forest_steppe,,none,,-,-,-,-,-
 MN2310,forest_steppe,,none,,-,-,-,-,-
 MN2313,steppe,,white,202312 202402,white_moderate,white white_moderate,white_moderate,white white_moderate,-
 MN2316,steppe,,white_moderate,202311 202312 202401 202402,white_moderate,white_moderate,white_moderate,white_moderate,-
-MN2319,steppe,,white,202312,white_moderate,white white_moderate,white_moderate,white_moderate,-
+MN2319,steppe,,white,202312 202402,white_moderate,white white_moderate,white_moderate,white white_moderate,-
 MN2322,forest_steppe,,none,,-,-,-,-,-
 MN2325,steppe,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,-
 MN2328,forest_steppe,,none,,-,-,-,-,-
@@ -319,14 +319,14 @@ MN8440,steppe,,white_moderate,202402,-,-,-,white_moderate,-
 MN8443,mountain,,white_moderate,202402 202403,-,-,-,white_moderate,white_moderate
 MN8446,desert,,none,,-,-,-,-,-
 MN8449,steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
-MN8501,desert,,white,202312,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8501,desert,,white,202312 202402,white_moderate,white white_moderate,white_moderate,white white_moderate,white_moderate
 MN8504,steppe,,white_moderate,202311 202312 202401 202402 202403,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
 MN8507,mountain,,white_moderate,202312 202401 202402 202403,-,white_moderate,white_moderate,white_moderate,white_moderate
 MN8510,desert,,white_moderate,202311 202312 202401 202402 202403,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
 MN8513,desert,,none,,-,-,-,-,-
 MN8516,steppe,,white_moderate,202312 202401 202402,-,white_moderate,white_moderate,white_moderate,-
 MN8519,steppe,,white_moderate,202311 202312 202401 202402 202403,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
-MN8522,desert,,white_moderate,202311 202312 202401 202402 202403,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
+MN8522,desert,,white,202402,white_moderate,white_moderate,white_moderate,white white_moderate,white_moderate
 MN8525,steppe,,white_moderate,202401 202402,-,-,white_moderate,white_moderate,-
 MN8528,steppe,,none,,-,-,-,-,-
 MN8531,steppe,,none,,-,-,-,-,-
