@@ -12,6 +12,7 @@ from pipeline.export import SITE, feature, label, props_for, soum_shapes
 from pipeline.nso import load_livestock
 
 STAGE_OF_MONTH = {m: stage for stage, (_, m, _) in STAGES.items()}
+DERIVED = decree286.DERIVED
 
 
 def parse_through(through: str) -> tuple[int, str]:
@@ -67,7 +68,7 @@ def main(through: str) -> None:
         json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     zones.write_scores(label(year), year, rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
-    decree286.main(year, as_of)  # Resolution 286 flags for the months over so far
+    decree286.main(year, as_of, site=SITE, derived=DERIVED)  # Resolution 286 flags for the months over so far
     (SITE / "outlook.json").write_text(json.dumps({"winter": label(year), "stage": stage, "data_through": through,
                                                    "as_of": as_of.isoformat(), "made": date.today().isoformat()}), encoding="utf-8")
     hist = Counter(r["risk_class"] for r in rows.values())
@@ -80,7 +81,7 @@ def check() -> None:
     import tempfile
     from pathlib import Path
     from pipeline import compare
-    global SITE
+    global SITE, DERIVED
     assert parse_through("2026-10") == (2026, "oct") and parse_through("2027-02") == (2026, "feb")
     for bad in ("soon", "2026-05"):
         try:
@@ -98,11 +99,11 @@ def check() -> None:
     rows["D"] = {"n_indicators": 1, "no_herd": 1}  # a UB district with no herd is not scored, so not short
     assert short_soums(rows, "oct") == ["B"]
     assert short_soums(rows, "nov") == ["A", "B"]
-    live_site = SITE
-    live = live_site / "outlook.json"
-    live_mtime = live.stat().st_mtime_ns if live.exists() else None
+    live_site, live_derived = SITE, DERIVED
+    live = [live_site / "outlook.json", live_site / "decree286_2026-27.json", live_derived / "decree286_2026.csv"]
+    live_mtime = [f.stat().st_mtime_ns if f.exists() else None for f in live]
     with tempfile.TemporaryDirectory() as d:
-        SITE = Path(d)  # the self-check writes a scratch site, never the published outlook
+        SITE = DERIVED = Path(d)  # the self-check writes a scratch site, never the published outlook
         try:
             shutil.copy(live_site / "winters.json", SITE / "winters.json")
             index = (SITE / "winters.json").read_bytes()
@@ -115,10 +116,11 @@ def check() -> None:
             main("2026-10")
             assert (SITE / "aimag_2026-27.json").exists() and (SITE / "outlook.json").exists() and (SITE / "winters.json").read_bytes() == index, \
                 "the outlook entered the hindcast index"
+            assert (SITE / "decree286_2026-27.json").exists() and (SITE / "decree286_2026.csv").exists(), "decree flags left the scratch site"
         finally:
-            SITE = live_site
+            SITE, DERIVED = live_site, live_derived
     compare.compare([2023])
-    assert (live.stat().st_mtime_ns if live.exists() else None) == live_mtime, "the self-check overwrote the live outlook"
+    assert [f.stat().st_mtime_ns if f.exists() else None for f in live] == live_mtime, "the self-check overwrote the live outlook"
     print("outlook check: ok")
 
 

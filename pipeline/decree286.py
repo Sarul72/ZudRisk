@@ -122,9 +122,11 @@ def summer_share(series_tp: dict[str, float], series_t: dict[str, float], year: 
     return share, round(now[1] - t_mean, 3), round(t_sd, 3)
 
 
-def main(year: int, as_of: date | None = None) -> dict[str, dict]:
-    """Every soum's status for winter year/year+1 from the months over by as_of; writes the CSV and the site file."""
+def main(year: int, as_of: date | None = None, site: Path | None = None, derived: Path | None = None) -> dict[str, dict]:
+    """Every soum's status for winter year/year+1 from the months over by as_of; writes the CSV (to derived) and the
+    site file (to site). Both default to the live folders."""
     from pipeline import era5, export, indicators, summer, zones
+    site, derived = site or export.SITE, derived or DERIVED
     as_of = as_of or indicators.winter_end(year)
     months = indicators.snow_months(year, as_of)
     e5, sm, zone_of = era5.load_era5(), summer.load_summer(), zones.soum_zone()
@@ -142,14 +144,14 @@ def main(year: int, as_of: date | None = None) -> dict[str, dict]:
             inputs[ym] = {"depth_cm": depth_cm, "t_anom": t_anom, "t_sd": t_sd}
         status, hit = winter_status({m: (None if f is None else set(f)) for m, f in by_month.items()})
         out[pcode] = {"status": status, "months": hit, "summer": summer_cls, "by_month": by_month, "inputs": inputs, "zone": z}
-    DERIVED.mkdir(parents=True, exist_ok=True)
-    with (DERIVED / f"decree286_{year}.csv").open("w", newline="", encoding="utf-8") as f:
+    derived.mkdir(parents=True, exist_ok=True)
+    with (derived / f"decree286_{year}.csv").open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "zone", "summer", "status", "months", *months])
         for pc, r in out.items():
             w.writerow([pc, r["zone"], r["summer"] or "", r["status"], " ".join(r["months"]),
                         *("" if r["by_month"][m] is None else " ".join(r["by_month"][m]) or "-" for m in months)])
-    (export.SITE / f"decree286_{export.label(year)}.json").write_text(
+    (site / f"decree286_{export.label(year)}.json").write_text(
         json.dumps({"as_of": as_of.isoformat(), "months": months, "soums": out}, separators=(",", ":")), encoding="utf-8")
     counts = Counter(r["status"] for r in out.values())
     print(f"{export.label(year)} (to {as_of}): " + ", ".join(f"{k} {counts[k]}" for k in [*ORDER, "none", UNASSESSED] if counts[k]))
