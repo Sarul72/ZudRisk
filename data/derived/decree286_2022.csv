@@ -1,0 +1,340 @@
+pcode,zone,summer,status,months,202211,202212,202301,202302,202303
+MN1101,steppe,,white_moderate,202211 202212 202301 202302,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN1104,steppe,,white_moderate,202301,-,-,white_moderate,-,-
+MN1107,forest_steppe,,none,,-,-,-,-,-
+MN1110,forest_steppe,,none,,-,-,-,-,-
+MN1113,forest_steppe,,none,,-,-,-,-,-
+MN1116,forest_steppe,,none,,-,-,-,-,-
+MN1119,forest_steppe,,none,,-,-,-,-,-
+MN1122,forest_steppe,,none,,-,-,-,-,-
+MN1125,forest_steppe,,none,,-,-,-,-,-
+MN2101,steppe,,none,,-,-,-,-,-
+MN2104,forest_steppe,,none,,-,-,-,-,-
+MN2107,steppe,,none,,-,-,-,-,-
+MN2110,forest_steppe,,none,,-,-,-,-,-
+MN2113,steppe,,none,,-,-,-,-,-
+MN2116,steppe,,none,,-,-,-,-,-
+MN2119,forest_steppe,,none,,-,-,-,-,-
+MN2122,steppe,,none,,-,-,-,-,-
+MN2125,steppe,,none,,-,-,-,-,-
+MN2128,steppe,,none,,-,-,-,-,-
+MN2131,steppe,,none,,-,-,-,-,-
+MN2134,steppe,,none,,-,-,-,-,-
+MN2137,steppe,,none,,-,-,-,-,-
+MN2140,steppe,,none,,-,-,-,-,-
+MN2201,steppe,,none,,-,-,-,-,-
+MN2204,steppe,,none,,-,-,-,-,-
+MN2207,steppe,,none,,-,-,-,-,-
+MN2210,steppe,,none,,-,-,-,-,-
+MN2213,steppe,,none,,-,-,-,-,-
+MN2216,steppe,,none,,-,-,-,-,-
+MN2219,steppe,,none,,-,-,-,-,-
+MN2222,steppe,,none,,-,-,-,-,-
+MN2225,steppe,,none,,-,-,-,-,-
+MN2228,steppe,,none,,-,-,-,-,-
+MN2231,steppe,,none,,-,-,-,-,-
+MN2234,steppe,,none,,-,-,-,-,-
+MN2237,steppe,,none,,-,-,-,-,-
+MN2301,steppe,,none,,-,-,-,-,-
+MN2304,forest_steppe,,none,,-,-,-,-,-
+MN2307,forest_steppe,,white_moderate,202301,-,-,white_moderate,-,-
+MN2310,forest_steppe,,none,,-,-,-,-,-
+MN2313,steppe,,none,,-,-,-,-,-
+MN2316,steppe,,none,,-,-,-,-,-
+MN2319,steppe,,none,,-,-,-,-,-
+MN2322,forest_steppe,,none,,-,-,-,-,-
+MN2325,steppe,,none,,-,-,-,-,-
+MN2328,forest_steppe,,none,,-,-,-,-,-
+MN2331,steppe,,none,,-,-,-,-,-
+MN2334,steppe,,white_moderate,202212 202301,-,white_moderate,white_moderate,-,-
+MN2337,steppe,,white_moderate,202212 202301,-,white_moderate,white_moderate,-,-
+MN2340,steppe,,none,,-,-,-,-,-
+MN2343,forest_steppe,,none,,-,-,-,-,-
+MN2346,forest_steppe,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN2349,forest_steppe,,white_moderate,202211 202212 202301 202302,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN2352,steppe,,none,,-,-,-,-,-
+MN4101,forest_steppe,,none,,-,-,-,-,-
+MN4104,steppe,,none,,-,-,-,-,-
+MN4107,steppe,,none,,-,-,-,-,-
+MN4110,steppe,,white_moderate,202211 202212 202301 202302,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN4113,forest_steppe,,white_moderate,202301,-,-,white_moderate,-,-
+MN4116,steppe,,none,,-,-,-,-,-
+MN4119,steppe,,white_moderate,202211 202212 202301 202302,white_moderate,white_moderate,white_moderate,white_moderate,-
+MN4122,steppe,,white_moderate,202212 202301,-,white_moderate,white_moderate,-,-
+MN4125,steppe,,none,,-,-,-,-,-
+MN4128,steppe,,none,,-,-,-,-,-
+MN4131,steppe,,none,,-,-,-,-,-
+MN4134,forest_steppe,,none,,-,-,-,-,-
+MN4137,forest_steppe,,none,,-,-,-,-,-
+MN4140,forest_steppe,,none,,-,-,-,-,-
+MN4143,steppe,,none,,-,-,-,-,-
+MN4146,steppe,,none,,-,-,-,-,-
+MN4149,forest_steppe,,none,,-,-,-,-,-
+MN4152,steppe,,none,,-,-,-,-,-
+MN4155,steppe,,none,,-,-,-,-,-
+MN4158,taiga,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN4161,steppe,,none,,-,-,-,-,-
+MN4164,steppe,,white_moderate,202301,-,-,white_moderate,-,-
+MN4167,steppe,,none,,-,-,-,-,-
+MN4170,steppe,,none,,-,-,-,-,-
+MN4173,steppe,,none,,-,-,-,-,-
+MN4176,taiga,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN4179,steppe,,none,,-,-,-,-,-
+MN4201,steppe,,none,,-,-,-,-,-
+MN4204,steppe,,none,,-,-,-,-,-
+MN4207,steppe,,none,,-,-,-,-,-
+MN4301,forest_steppe,,none,,-,-,-,-,-
+MN4304,forest_steppe,,none,,-,-,-,-,-
+MN4307,forest_steppe,,none,,-,-,-,-,-
+MN4310,forest_steppe,,none,,-,-,-,-,-
+MN4313,taiga,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN4316,forest_steppe,,none,,-,-,-,-,-
+MN4319,forest_steppe,,none,,-,-,-,-,-
+MN4322,taiga,,white_moderate,202301,-,-,white_moderate,-,-
+MN4325,steppe,,none,,-,-,-,-,-
+MN4328,steppe,,none,,-,-,-,-,-
+MN4331,steppe,,white_moderate,202301,-,-,white_moderate,-,-
+MN4334,forest_steppe,,none,,-,-,-,-,-
+MN4337,forest_steppe,,none,,-,-,-,-,-
+MN4340,forest_steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN4343,forest_steppe,,none,,-,-,-,-,-
+MN4346,forest_steppe,,none,,-,-,-,-,-
+MN4349,forest_steppe,,none,,-,-,-,-,-
+MN4401,desert,,none,,-,-,-,-,-
+MN4404,steppe,,none,,-,-,-,-,-
+MN4407,desert,,none,,-,-,-,-,-
+MN4410,steppe,,none,,-,-,-,-,-
+MN4413,steppe,,none,,-,-,-,-,-
+MN4416,desert,,none,,-,-,-,-,-
+MN4419,steppe,,none,,-,-,-,-,-
+MN4422,desert,,none,,-,-,-,-,-
+MN4425,desert,,none,,-,-,-,-,-
+MN4428,desert,,none,,-,-,-,-,-
+MN4431,desert,,none,,-,-,-,-,-
+MN4434,desert,,none,,-,-,-,-,-
+MN4437,desert,,none,,-,-,-,-,-
+MN4440,desert,,none,,-,-,-,-,-
+MN4501,steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN4504,steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN4507,forest_steppe,,none,,-,-,-,-,-
+MN4510,forest_steppe,,none,,-,-,-,-,-
+MN4601,desert,near,none,,-,-,-,-,-
+MN4604,desert,near,none,,-,-,-,-,-
+MN4607,desert,,none,,-,-,-,-,-
+MN4610,desert,near,none,,-,-,-,-,-
+MN4613,desert,near,none,,-,-,-,-,-
+MN4616,desert,near,none,,-,-,-,-,-
+MN4619,desert,,none,,-,-,-,-,-
+MN4622,desert,near,none,,-,-,-,-,-
+MN4625,desert,,none,,-,-,-,-,-
+MN4628,desert,near,none,,-,-,-,-,-
+MN4631,desert,,none,,-,-,-,-,-
+MN4634,desert,near,none,,-,-,-,-,-
+MN4637,desert,near,none,,-,-,-,-,-
+MN4640,desert,,none,,-,-,-,-,-
+MN4643,desert,,none,,-,-,-,-,-
+MN4801,steppe,,none,,-,-,-,-,-
+MN4804,steppe,,none,,-,-,-,-,-
+MN4807,steppe,,none,,-,-,-,-,-
+MN4810,steppe,,none,,-,-,-,-,-
+MN4813,steppe,,none,,-,-,-,-,-
+MN4816,desert,,none,,-,-,-,-,-
+MN4819,steppe,,none,,-,-,-,-,-
+MN4822,steppe,,none,,-,-,-,-,-
+MN4825,steppe,,none,,-,-,-,-,-
+MN4828,desert,,none,,-,-,-,-,-
+MN4831,desert,,none,,-,-,-,-,-
+MN4834,steppe,,none,,-,-,-,-,-
+MN4837,desert,,none,,-,-,-,-,-
+MN4840,steppe,,none,,-,-,-,-,-
+MN4843,steppe,,none,,-,-,-,-,-
+MN6101,forest_steppe,,none,,-,-,-,-,-
+MN6104,forest_steppe,,none,,-,-,-,-,-
+MN6201,steppe,,none,,-,-,-,-,-
+MN6204,desert,near,none,,-,-,-,-,-
+MN6207,forest_steppe,,none,,-,-,-,-,-
+MN6210,steppe,,none,,-,-,-,-,-
+MN6213,steppe,,none,,-,-,-,-,-
+MN6216,desert,near,none,,-,-,-,-,-
+MN6219,steppe,,none,,-,-,-,-,-
+MN6222,desert,near,none,,-,-,-,-,-
+MN6225,steppe,,none,,-,-,-,-,-
+MN6228,steppe,,none,,-,-,-,-,-
+MN6231,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6234,steppe,,none,,-,-,-,-,-
+MN6237,steppe,,none,,-,-,-,-,-
+MN6240,steppe,,none,,-,-,-,-,-
+MN6243,desert,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6246,forest_steppe,,none,,-,-,-,-,-
+MN6249,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6252,forest_steppe,,none,,-,-,-,-,-
+MN6255,forest_steppe,,none,,-,-,-,-,-
+MN6301,forest_steppe,,none,,-,-,-,-,-
+MN6304,forest_steppe,,none,,-,-,-,-,-
+MN6307,steppe,,none,,-,-,-,-,-
+MN6310,forest_steppe,,none,,-,-,-,-,-
+MN6313,steppe,,none,,-,-,-,-,-
+MN6316,steppe,,none,,-,-,-,-,-
+MN6319,steppe,,none,,-,-,-,-,-
+MN6322,forest_steppe,,none,,-,-,-,-,-
+MN6325,forest_steppe,,none,,-,-,-,-,-
+MN6328,steppe,,none,,-,-,-,-,-
+MN6331,forest_steppe,,none,,-,-,-,-,-
+MN6334,forest_steppe,,none,,-,-,-,-,-
+MN6337,taiga,,none,,-,-,-,-,-
+MN6340,forest_steppe,,none,,-,-,-,-,-
+MN6343,forest_steppe,,none,,-,-,-,-,-
+MN6346,forest_steppe,,none,,-,-,-,-,-
+MN6401,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6404,desert,near,none,,-,-,-,-,-
+MN6407,forest_steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6410,desert,near,none,,-,-,-,-,-
+MN6413,desert,near,none,,-,-,-,-,-
+MN6416,steppe,near,none,,-,-,-,-,-
+MN6419,desert,near,none,,-,-,-,-,-
+MN6422,desert,near,none,,-,-,-,-,-
+MN6425,desert,near,none,,-,-,-,-,-
+MN6428,steppe,near,none,,-,-,-,-,-
+MN6431,steppe,near,none,,-,-,-,-,-
+MN6434,mountain,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6437,forest_steppe,,none,,-,-,-,-,-
+MN6440,mountain,,none,,-,-,-,-,-
+MN6443,desert,near,none,,-,-,-,-,-
+MN6446,steppe,,none,,-,-,-,-,-
+MN6449,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6452,steppe,near,none,,-,-,-,-,-
+MN6455,desert,near,none,,-,-,-,-,-
+MN6458,mountain,near,black_moderate,202212,-,black_moderate,-,-,-
+MN6501,forest_steppe,,none,,-,-,-,-,-
+MN6504,forest_steppe,,none,,-,-,-,-,-
+MN6507,forest_steppe,,none,,-,-,-,-,-
+MN6510,forest_steppe,,none,,-,-,-,-,-
+MN6513,forest_steppe,,none,,-,-,-,-,-
+MN6516,steppe,,none,,-,-,-,-,-
+MN6519,steppe,,none,,-,-,-,-,-
+MN6522,forest_steppe,,none,,-,-,-,-,-
+MN6525,forest_steppe,,none,,-,-,-,-,-
+MN6528,forest_steppe,,none,,-,-,-,-,-
+MN6531,forest_steppe,,none,,-,-,-,-,-
+MN6534,forest_steppe,,none,,-,-,-,-,-
+MN6537,steppe,,none,,-,-,-,-,-
+MN6540,forest_steppe,,none,,-,-,-,-,-
+MN6543,mountain,,white_moderate,202301 202302 202303,-,-,white_moderate,white_moderate,white_moderate
+MN6546,forest_steppe,,none,,-,-,-,-,-
+MN6549,forest_steppe,,none,,-,-,-,-,-
+MN6552,forest_steppe,,none,,-,-,-,-,-
+MN6555,forest_steppe,,none,,-,-,-,-,-
+MN6701,forest_steppe,,none,,-,-,-,-,-
+MN6704,taiga,,none,,-,-,-,-,-
+MN6707,mountain,,none,,-,-,-,-,-
+MN6710,taiga,,none,,-,-,-,-,-
+MN6713,forest_steppe,,none,,-,-,-,-,-
+MN6716,forest_steppe,,none,,-,-,-,-,-
+MN6719,forest_steppe,,none,,-,-,-,-,-
+MN6722,forest_steppe,,none,,-,-,-,-,-
+MN6725,forest_steppe,,none,,-,-,-,-,-
+MN6728,taiga,,white_moderate,202301 202302 202303,-,-,white_moderate,white_moderate,white_moderate
+MN6731,taiga,,none,,-,-,-,-,-
+MN6734,forest_steppe,,none,,-,-,-,-,-
+MN6737,forest_steppe,,none,,-,-,-,-,-
+MN6740,taiga,,none,,-,-,-,-,-
+MN6743,taiga,,white_moderate,202212 202301 202302 202303,-,white_moderate,white_moderate,white_moderate,white_moderate
+MN6746,taiga,,none,,-,-,-,-,-
+MN6749,mountain,,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN6752,forest_steppe,,none,,-,-,-,-,-
+MN6755,taiga,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN6758,forest_steppe,,none,,-,-,-,-,-
+MN6761,taiga,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN6764,forest_steppe,,none,,-,-,-,-,-
+MN6767,taiga,,none,,-,-,-,-,-
+MN8101,forest_steppe,near,black_moderate,202212,-,black_moderate,white_moderate,white_moderate,-
+MN8104,forest_steppe,near,black_moderate,202212,-,black_moderate,-,white_moderate,-
+MN8107,forest_steppe,,white_moderate,202302,-,-,-,white_moderate,-
+MN8110,forest_steppe,,white_moderate,202302,-,-,-,white_moderate,-
+MN8113,forest_steppe,,none,,-,-,-,-,-
+MN8116,desert,,none,,-,-,-,-,-
+MN8119,steppe,,none,,-,-,-,-,-
+MN8122,forest_steppe,,white_moderate,202301 202302 202303,-,-,white_moderate,white_moderate,white_moderate
+MN8125,forest_steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN8128,forest_steppe,,none,,-,-,-,-,-
+MN8131,mountain,near,black_moderate,202212,-,black_moderate,white_moderate,white_moderate,-
+MN8134,steppe,,none,,-,-,-,-,-
+MN8137,forest_steppe,,none,,-,-,-,-,-
+MN8140,forest_steppe,,white_moderate,202301 202302 202303,-,-,white_moderate,white_moderate,white_moderate
+MN8143,forest_steppe,,none,,-,-,-,-,-
+MN8146,forest_steppe,,white_moderate,202302,-,-,-,white_moderate,-
+MN8149,steppe,,white_moderate,202302,-,-,-,white_moderate,-
+MN8152,desert,,none,,-,-,-,-,-
+MN8155,forest_steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8158,steppe,near,black_moderate,202212,-,black_moderate,white_moderate,-,-
+MN8161,steppe,,none,,-,-,-,-,-
+MN8164,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8167,steppe,,none,,-,-,-,-,-
+MN8170,forest_steppe,,none,,-,-,-,-,-
+MN8201,mountain,near,none,,-,-,-,-,-
+MN8204,desert,drought,none,,-,-,-,-,-
+MN8207,desert,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8210,desert,near,none,,-,-,-,-,-
+MN8213,desert,near,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN8216,desert,near,none,,-,-,-,-,-
+MN8219,steppe,near,none,,-,-,-,-,-
+MN8222,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8225,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8228,desert,near,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN8231,desert,near,none,,-,-,-,-,-
+MN8234,desert,near,none,,-,-,-,-,-
+MN8237,desert,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8240,desert,near,none,,-,-,-,-,-
+MN8243,desert,near,none,,-,-,-,-,-
+MN8246,desert,near,none,,-,-,-,-,-
+MN8249,desert,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8252,desert,near,none,,-,-,-,-,-
+MN8301,steppe,near,none,,-,-,-,-,-
+MN8304,mountain,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8307,steppe,near,none,,-,-,-,-,-
+MN8310,steppe,,none,,-,-,-,-,-
+MN8313,mountain,near,none,,-,-,-,-,-
+MN8316,mountain,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8319,mountain,near,none,,-,-,-,-,-
+MN8322,mountain,near,white_moderate,202212 202301 202302 202303,-,white_moderate,white_moderate,white_moderate,white_moderate
+MN8325,mountain,,none,,-,-,-,-,-
+MN8328,mountain,near,white_moderate,202211 202212 202301 202302 202303,white_moderate,white_moderate,white_moderate,white_moderate,white_moderate
+MN8331,mountain,near,none,,-,-,-,-,-
+MN8334,mountain,,white_moderate,202212 202301 202302 202303,-,white_moderate,white_moderate,white_moderate,white_moderate
+MN8340,mountain,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8401,steppe,near,none,,-,-,-,-,-
+MN8404,desert,near,white,202212,-,white white_moderate,white_moderate,white_moderate,-
+MN8407,desert,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8410,desert,near,none,,-,-,-,-,-
+MN8413,desert,near,white_moderate,202301,-,-,white_moderate,-,-
+MN8416,desert,,none,,-,-,-,-,-
+MN8419,mountain,near,none,,-,-,-,-,-
+MN8422,mountain,near,none,,-,-,-,-,-
+MN8425,desert,near,none,,-,-,-,-,-
+MN8428,mountain,near,white_moderate,202302,-,-,-,white_moderate,-
+MN8431,mountain,near,none,,-,-,-,-,-
+MN8434,steppe,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8437,desert,near,white,202212,white_moderate,white white_moderate,white_moderate,white_moderate,white_moderate
+MN8440,steppe,near,none,,-,-,-,-,-
+MN8443,mountain,near,none,,-,-,-,-,-
+MN8446,desert,near,black_moderate,202212,-,black_moderate,-,-,-
+MN8449,steppe,near,none,,-,-,-,-,-
+MN8501,desert,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN8504,steppe,,none,,-,-,-,-,-
+MN8507,mountain,,none,,-,-,-,-,-
+MN8510,desert,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN8513,desert,,none,,-,-,-,-,-
+MN8516,steppe,,none,,-,-,-,-,-
+MN8519,steppe,,none,,-,-,-,-,-
+MN8522,desert,,white_moderate,202212 202301 202302,-,white_moderate,white_moderate,white_moderate,-
+MN8525,steppe,,none,,-,-,-,-,-
+MN8528,steppe,,none,,-,-,-,-,-
+MN8531,steppe,near,none,,-,-,-,-,-
+MN8534,steppe,,none,,-,-,-,-,-
+MN8537,steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN8540,mountain,,none,,-,-,-,-,-
+MN8543,mountain,,none,,-,-,-,-,-
+MN8546,steppe,,white_moderate,202301 202302,-,-,white_moderate,white_moderate,-
+MN8549,mountain,near,none,,-,-,-,-,-
+MN8552,steppe,,none,,-,-,-,-,-
+MN8555,steppe,,none,,-,-,-,-,-

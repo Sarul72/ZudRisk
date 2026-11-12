@@ -3,7 +3,7 @@ import json
 import sys
 from pathlib import Path
 
-from pipeline import aimags, asof, calibrate, compare, export, indicators, model, trends, validate, zones
+from pipeline import aimags, asof, calibrate, compare, decree286, export, indicators, model, trends, validate, zones
 from pipeline.boundaries import load_soums
 from pipeline.nso import load_livestock, load_livestock_aimag, sheep_units
 from pipeline.validate import aimag_pairs, pooled, pooled_aimag, pooled_rows, rounded
@@ -26,6 +26,8 @@ def score_pending() -> None:
     for y in PENDING:
         indicators.main(y)
         export.main(y)
+        decree286.main(y)
+    decree286.validate(WINTERS)  # after every shown winter has its file
     export.write_index(shown())
     export.write_pending(PENDING)
     export.write_history(shown())
@@ -62,6 +64,7 @@ def main() -> None:
         indicators.main(y)
         v = validate.main(y, normals)
         export.main(y)
+        decree286.main(y)
         print(f"  {v['winter']}: unit {v['validation_unit']}, n {v['n']}, rho soum {v['spearman_soum']}, "
               f"excess {v['excess_spearman_soum']}, rho aimag {v['spearman_aimag']} (n={v['n_aimag']}), "
               f"mortality {v['mortality_pct']}%")

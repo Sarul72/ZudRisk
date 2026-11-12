@@ -5,7 +5,7 @@ import sys
 from collections import Counter
 from datetime import date
 
-from pipeline import aimags, indicators, zones
+from pipeline import aimags, decree286, indicators, zones
 from pipeline.asof import STAGES, stage_date
 from pipeline.boundaries import load_soums
 from pipeline.export import SITE, feature, label, props_for, soum_shapes
@@ -67,6 +67,7 @@ def main(through: str) -> None:
         json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     zones.write_scores(label(year), year, rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
+    decree286.main(year, as_of)  # Resolution 286 flags for the months over so far
     (SITE / "outlook.json").write_text(json.dumps({"winter": label(year), "stage": stage, "data_through": through,
                                                    "as_of": as_of.isoformat(), "made": date.today().isoformat()}), encoding="utf-8")
     hist = Counter(r["risk_class"] for r in rows.values())
