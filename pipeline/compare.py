@@ -29,7 +29,7 @@ def compare(winters: list[int]) -> dict:
     out, pool_e, pool_g, pool_m = [], [], [], []
     for y in winters:
         as_of = date(y + 1, 3, 31)
-        with indicators.out_path(y).open() as f:
+        with indicators.out_path(y).open(encoding="utf-8") as f:
             rows = [r for r in csv.DictReader(f) if r["risk"]]
         depth = [(indicators.snow(era5.get(r["pcode"], {}).get("sde", {}), y, as_of),
                   indicators.snow(gldas.get(r["pcode"], {}), y, as_of)) for r in rows]
@@ -88,10 +88,10 @@ def render_md(result: dict) -> str:
 
 def main(winters: list[int] | None = None) -> dict:
     if winters is None:
-        winters = [int(label[:4]) for label in json.loads((SITE / "winters.json").read_text())]
+        winters = [int(label[:4]) for label in json.loads((SITE / "winters.json").read_text(encoding="utf-8"))]
     result = compare(winters)
-    OUT.write_text(json.dumps(result, indent=2, allow_nan=False))
-    PAGE.write_text(render_md(result))
+    OUT.write_text(json.dumps(result, indent=2, allow_nan=False), encoding="utf-8")
+    PAGE.write_text(render_md(result), encoding="utf-8")
     return result
 
 

@@ -53,8 +53,8 @@ def main() -> None:
         every += r
         rows += r if y in winters else []
     res = {**rounded(pooled(rows)), "every_winter": rounded(pooled(every)), "every_winter_aimag": rounded(pooled_aimag(by_aimag))}
-    POOLED.write_text(json.dumps(res, indent=2))
-    (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2))
+    POOLED.write_text(json.dumps(res, indent=2), encoding="utf-8")
+    (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2), encoding="utf-8")
     export.write_index(WINTERS)
     export.write_history(WINTERS)
     aimags.write_shapes()

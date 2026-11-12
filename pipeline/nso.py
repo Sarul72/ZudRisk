@@ -89,14 +89,14 @@ def main_hay(regions: dict[str, str]) -> None:
             "response": {"format": "json"}}
     rows = parse_hay(post_json(HAY, body), years, xwalk)
     OUT_HAY.parent.mkdir(parents=True, exist_ok=True)
-    with OUT_HAY.open("w", newline="") as f:
+    with OUT_HAY.open("w", newline="", encoding="utf-8") as f:
         csv.writer(f).writerows([("aimag_pcode", "year", "thousand_tonnes"), *rows])
     print(f"hay: {len(xwalk)} aimags, {len(rows)} rows -> {OUT_HAY}")
 
 
 def load_hay() -> dict[tuple[str, int], float]:
     """(aimag_pcode, year) -> hay laid in, thousand tonnes."""
-    with OUT_HAY.open() as f:
+    with OUT_HAY.open(encoding="utf-8") as f:
         return {(a, int(y)): float(v) for a, y, v in list(csv.reader(f))[1:]}
 
 
@@ -148,7 +148,7 @@ def fetch(xwalk: dict[str, str]) -> list[tuple]:
 
 def write(path: Path, key: str, rows: list[tuple]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", newline="") as f:
+    with path.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow([key, "year", "kind", "type", "thousand_head"])
         w.writerows(sorted(rows))
@@ -167,7 +167,7 @@ def fill_camel(herds: dict[tuple, dict[str, float]]) -> tuple[dict, int]:
 
 def _read(path: Path) -> dict[tuple, dict[str, float]]:
     out: dict[tuple, dict[str, float]] = defaultdict(dict)
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for r in csv.reader(f):
             if r[1] != "year":
                 out[(r[0], int(r[1]), r[2])][r[3]] = float(r[4])

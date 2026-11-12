@@ -32,11 +32,11 @@ def candidates(today: date, published: str | None) -> list[str]:
 
 def published() -> str | None:
     path = SITE / "outlook.json"
-    return json.loads(path.read_text())["data_through"] if path.exists() else None
+    return json.loads(path.read_text(encoding="utf-8"))["data_through"] if path.exists() else None
 
 
 def git(*args: str, cwd: Path = Path(".")) -> subprocess.CompletedProcess:
-    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True)
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True, encoding="utf-8")
 
 
 def push_site(message: str, cwd: Path = Path("."), push: bool = True) -> str:
@@ -107,16 +107,16 @@ def check_push() -> None:
         for k, v in (("user.name", "check"), ("user.email", "check@example.invalid")):
             git("config", k, v, cwd=root)
         (root / "site/data").mkdir(parents=True)
-        (root / "site/data/outlook.json").write_text("{}")
-        (root / "other.txt").write_text("not mine to commit")
+        (root / "site/data/outlook.json").write_text("{}", encoding="utf-8")
+        (root / "other.txt").write_text("not mine to commit", encoding="utf-8")
         assert push_site("first", cwd=root, push=False) == "committed; not pushed (--no-push)"
         assert git("ls-files", cwd=root).stdout.split() == ["site/data/outlook.json"], "only site/data is committed"
         assert push_site("again", cwd=root) == "site/data unchanged; nothing committed"
-        (root / "site/data/outlook.json").write_text('{"data_through": "2026-11"}')
+        (root / "site/data/outlook.json").write_text('{"data_through": "2026-11"}', encoding="utf-8")
         assert push_site("second", cwd=root) == "committed; no remote to push to"
         git("remote", "add", "origin", str(remote), cwd=root)
         git("push", "-q", "-u", "origin", "main", cwd=root)
-        (root / "site/data/outlook.json").write_text('{"data_through": "2026-12"}')
+        (root / "site/data/outlook.json").write_text('{"data_through": "2026-12"}', encoding="utf-8")
         assert push_site("third", cwd=root) == "committed and pushed"
         assert git("log", "-1", "--format=%s", "main", cwd=remote).stdout.strip() == "third", "the remote has it"
 

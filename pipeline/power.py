@@ -53,10 +53,10 @@ def main() -> None:
     if not RAW.exists():
         boxes = [get_json(URL.format(s=s, n=n, w=w, e=e))["features"] for s, n in LATS for w, e in LONS]
         RAW.parent.mkdir(parents=True, exist_ok=True)
-        RAW.write_text(json.dumps(boxes))
-    grid = merge(json.loads(RAW.read_text()))
+        RAW.write_text(json.dumps(boxes), encoding="utf-8")
+    grid = merge(json.loads(RAW.read_text(encoding="utf-8")))
     T2M.parent.mkdir(parents=True, exist_ok=True)
-    with T2M.open("w", newline="") as f:
+    with T2M.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["lon", "lat", "yyyymm", "t2m"])
         for (lon, lat), series in sorted(grid.items()):
@@ -66,7 +66,7 @@ def main() -> None:
     for s in load_soums():
         fallback += not shapely.contains_xy(s["geom"], *map(np.array, zip(*points))).any()
         cells[s["pcode"]] = [list(p) for p in cells_for(s["geom"], points)]
-    CELLS.write_text(json.dumps(cells))
+    CELLS.write_text(json.dumps(cells), encoding="utf-8")
     print(f"{len(points)} unique points; {len(cells)} soums mapped, {fallback} by nearest point")
 
 

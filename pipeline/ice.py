@@ -65,7 +65,7 @@ def main() -> None:
         for y, (melt, ros) in tot.items():
             z = [None if x is None else zscore(x, b) for x, b in zip((melt, ros), base)]
             rows.append((pc, y, *("" if v is None else round(v, 4) for v in (melt, ros, *z))))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "winter", "melt_mm", "ros_mm", "z_melt", "z_ros"])
         w.writerows(rows)
@@ -74,7 +74,7 @@ def main() -> None:
 
 def load(path: Path = OUT) -> dict[tuple[str, int], dict[str, float | None]]:
     """(pcode, winter) -> {"z_melt", "z_ros"}."""
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         return {(r["pcode"], int(r["winter"])): {k: float(r[k]) if r[k] else None for k in ("z_melt", "z_ros")}
                 for r in csv.DictReader(f)}
 

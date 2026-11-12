@@ -72,7 +72,7 @@ def main() -> None:
         for pcode, v in soum_means(read(RAW / f"{y}{m:02d}.nc4"), cells).items():
             if v is not None:
                 rows.append((pcode, f"{y}{m:02d}", round(v, 4)))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "yyyymm", "ndvi"])
         w.writerows(rows)

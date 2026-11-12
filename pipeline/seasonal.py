@@ -34,7 +34,7 @@ def raw_path(year: int) -> Path:
 
 
 def published_years() -> list[int]:
-    url, key = cds_config(CDS_RC.read_text())
+    url, key = cds_config(CDS_RC.read_text(encoding="utf-8"))
     c = _cds_call(f"{url}/retrieve/v1/processes/{DATASET}/constraints", key,
                   {"inputs": {k: INPUTS[k] for k in ("originating_centre", "system", "month", "product_type")}}, timeout=60)
     return sorted(y for y in map(int, c.get("year", [])) if y >= FIRST)
@@ -107,7 +107,7 @@ def main() -> None:
         for y in years:
             c = None if y not in zc else -zc[y]  # colder is riskier, as indicators.z_cold
             rows.append((pc, y, "" if c is None else round(c, 4), round(zs[y], 4) if y in zs else "", members[y]))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "year", "z_cold_fc", "z_snow_fc", "members"])
         w.writerows(rows)
@@ -118,7 +118,7 @@ def main() -> None:
 def load(path: Path = OUT) -> dict[int, dict[str, tuple[float | None, float | None]]]:
     """winter -> pcode -> (z_cold, z_snow) from that winter's 1 October forecast."""
     out: dict[int, dict[str, tuple]] = {}
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for r in csv.DictReader(f):
             out.setdefault(int(r["year"]), {})[r["pcode"]] = tuple(float(r[k]) if r[k] else None
                                                                    for k in ("z_cold_fc", "z_snow_fc"))

@@ -199,7 +199,7 @@ def main(year: int, as_of: date | None = None) -> None:
     rows = compute(year, as_of or winter_end(year))
     missing = Counter(k for r in rows.values() for k in ("cold", "snow", "summer", "pressure") if r[f"z_{k}"] is None)
     hist = Counter(r["risk_class"] for r in rows.values())
-    with out_path(year).open("w", newline="") as f:
+    with out_path(year).open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, COLUMNS)
         w.writeheader()
         for r in rows.values():
@@ -211,7 +211,7 @@ def main(year: int, as_of: date | None = None) -> None:
 
 
 def read_risk(year: int) -> dict[str, float]:
-    with out_path(year).open() as f:
+    with out_path(year).open(encoding="utf-8") as f:
         return {r["pcode"]: float(r["risk"]) for r in csv.DictReader(f) if r["risk"]}
 
 

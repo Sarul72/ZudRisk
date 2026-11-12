@@ -88,8 +88,8 @@ def main() -> dict:
         out_aimag[stage] = calibrate(aimag_stage_rows(stage, herds, aherds, aimag_of, compute=compute))
     text = json.dumps({"target": f"adult losses >= {HIGH_LOSS:.0%} of the herd", "stages": out,
                        "aimag_stages": out_aimag}, allow_nan=False)
-    OUT.write_text(text)
-    (SITE / "calibration.json").write_text(text)
+    OUT.write_text(text, encoding="utf-8")
+    (SITE / "calibration.json").write_text(text, encoding="utf-8")
     for name, res in (("soum", out), ("aimag", out_aimag)):
         print(f"calibration, {name}: " + "; ".join(f"{s} a {c['a']} b {c['b']} n {c['n']} bss {c['bss']}" for s, c in res.items()))
     return out

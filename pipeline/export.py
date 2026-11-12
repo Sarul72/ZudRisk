@@ -51,7 +51,7 @@ def winters_index(years: list[int]) -> list[str]:
 
 
 def write_index(years: list[int]) -> None:
-    (SITE / "winters.json").write_text(json.dumps(winters_index(years)))
+    (SITE / "winters.json").write_text(json.dumps(winters_index(years)), encoding="utf-8")
 
 
 def props_for(soum: dict, row: dict) -> dict:
@@ -65,7 +65,7 @@ def props_for(soum: dict, row: dict) -> dict:
 
 
 def main(year: int) -> None:
-    with out_path(year).open() as f:
+    with out_path(year).open(encoding="utf-8") as f:
         scores = {r["pcode"]: {k: v or None for k, v in r.items()} for r in csv.DictReader(f)}
     from pipeline import aimags  # aimags imports this module
     props = {s["pcode"]: props_for(s, scores.get(s["pcode"], {})) for s in load_soums()}
@@ -76,7 +76,7 @@ def main(year: int) -> None:
     SITE.mkdir(parents=True, exist_ok=True)
     out = SITE / f"risk_{label(year)}.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,
-                              separators=(",", ":")))
+                              separators=(",", ":")), encoding="utf-8")
     shutil.copy(out_path_json(year), SITE / f"validation_{label(year)}.json")
     size = out.stat().st_size
     print(f"{out}: {len(feats)} soums, {size / 1e6:.2f} MB")
@@ -104,13 +104,13 @@ def history(years: list[int], risk: dict[int, dict], aimag_risk: dict[int, dict]
 
 def write_history(years: list[int]) -> None:
     from pipeline.indicators import read_risk
-    national = {y: json.loads(out_path_json(y).read_text())["mortality_pct"] for y in years}
-    aimag_risk = {y: json.loads((SITE / f"aimag_{label(y)}.json").read_text()) for y in years}
+    national = {y: json.loads(out_path_json(y).read_text(encoding="utf-8"))["mortality_pct"] for y in years}
+    aimag_risk = {y: json.loads((SITE / f"aimag_{label(y)}.json").read_text(encoding="utf-8")) for y in years}
     zone_path = {y: SITE / f"zone_{label(y)}.json" for y in years}
-    zones = {y: json.loads(p.read_text()) for y, p in zone_path.items()} if all(p.exists() for p in zone_path.values()) else None
+    zones = {y: json.loads(p.read_text(encoding="utf-8")) for y, p in zone_path.items()} if all(p.exists() for p in zone_path.values()) else None
     h = history(years, {y: read_risk(y) for y in years}, aimag_risk, load_soums(), load_livestock(),
                 load_livestock_aimag(), national, zones)
-    (SITE / "history.json").write_text(json.dumps(h, separators=(",", ":"), allow_nan=False))
+    (SITE / "history.json").write_text(json.dumps(h, separators=(",", ":"), allow_nan=False), encoding="utf-8")
 
 
 def check() -> None:

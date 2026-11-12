@@ -33,7 +33,7 @@ def main() -> None:
     ndvi = load_series(NDVI_CSV)
     through = latest_summer(ndvi)
     trend = {pc: round(t, 4) for pc, s in ndvi.items() if (t := greenness_trend(s, through)) is not None}
-    (SITE / "greenness.json").write_text(json.dumps({"from": FIRST, "through": through, "per_decade": trend}))
+    (SITE / "greenness.json").write_text(json.dumps({"from": FIRST, "through": through, "per_decade": trend}), encoding="utf-8")
     v = sorted(trend.values())
     print(f"greenness {FIRST}-{through}: {len(trend)} soums, median {v[len(v) // 2]:+.4f}/decade, "
           f"{sum(x < 0 for x in v)} browning, range {v[0]:+.3f} to {v[-1]:+.3f}")

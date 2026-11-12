@@ -118,7 +118,7 @@ def _cds_call(u: str, key: str, body: dict | None = None, opener=None, timeout: 
 
 def cds_months(dataset: str, year: int, variable: str, auth: tuple[str, str] | None = None, opener=None) -> list[str]:
     """Months of a year the dataset has published, so a request never asks for one that does not exist yet."""
-    url, key = auth or cds_config(CDS_RC.read_text())
+    url, key = auth or cds_config(CDS_RC.read_text(encoding="utf-8"))
     inputs = {"product_type": ["monthly_averaged_reanalysis"], "year": [str(year)], "variable": [variable]}
     return sorted(_cds_call(f"{url}/retrieve/v1/processes/{dataset}/constraints", key, {"inputs": inputs}, opener,
                             CONSTRAINTS_TIMEOUT_S).get("month", []))
@@ -128,7 +128,7 @@ def cds_retrieve(dataset: str, inputs: dict, opener=None, poll_s: float = 15, ti
                  auth: tuple[str, str] | None = None) -> bytes:
     """Submit a Copernicus CDS job, wait for it, and return the file it made. The token goes to the API only,
     never to the object store the result is served from."""
-    url, key = auth or cds_config(CDS_RC.read_text())
+    url, key = auth or cds_config(CDS_RC.read_text(encoding="utf-8"))
 
     def call(u: str, body: dict | None = None) -> dict:
         return _cds_call(u, key, body, opener)

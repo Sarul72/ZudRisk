@@ -146,13 +146,13 @@ def rounded(d: dict) -> dict:
 def main(year: int, normals: list[int] = ()) -> dict:
     herds, aherds = load_livestock(), load_livestock_aimag()
     soums = {s["pcode"]: s for s in load_soums()}
-    with out_path(year).open() as f:
+    with out_path(year).open(encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
     scores = {r["pcode"]: (float(r["risk"]), soums[r["pcode"]]["aimag_pcode"]) for r in rows if r["risk"]}
     used = sorted({k for r in rows for k in ("cold", "snow", "summer", "pressure") if r[f"z_{k}"]})
     result = {"winter": f"{year}/{(year + 1) % 100:02d}", "indicators_used": used, "normal_winters": list(normals),
               "n_unscored": len(soums) - len(scores), **evaluate(year, scores, herds, aherds, list(normals))}
-    out_path_json(year).write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False))
+    out_path_json(year).write_text(json.dumps(result, indent=2, ensure_ascii=False, allow_nan=False), encoding="utf-8")
     return result
 
 

@@ -126,11 +126,11 @@ def zone_scores(soum_zone: dict[str, str], rows: dict[str, dict], herds: dict, c
 
 
 def soum_zone(site=SITE) -> dict[str, str]:
-    return {pc: v[0] for pc, v in json.loads((site / "soum_zones.json").read_text()).items() if v}
+    return {pc: v[0] for pc, v in json.loads((site / "soum_zones.json").read_text(encoding="utf-8")).items() if v}
 
 
 def write_scores(label: str, year: int, rows: dict[str, dict], herds: dict, census: int, site=SITE) -> None:
-    (site / f"zone_{label}.json").write_text(json.dumps(zone_scores(soum_zone(), rows, herds, census, year)))
+    (site / f"zone_{label}.json").write_text(json.dumps(zone_scores(soum_zone(), rows, herds, census, year)), encoding="utf-8")
 
 
 def ecoregions() -> list[tuple[str, object]]:
@@ -157,15 +157,15 @@ def main() -> None:
     zones = {z: shapely.union_all([g for n, g in inside if ZONES[n] == z]) for z in ZONE_ORDER
              if any(ZONES[n] == z for n, _ in inside)}
     feats = [feature(g, {"zone": z, "ecoregions": sorted({n for n, _ in inside if ZONES[n] == z})}) for z, g in zones.items()]
-    (SITE / "zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")))
+    (SITE / "zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")), encoding="utf-8")
     by_soum = {s["pcode"]: dominant(s["geom"], zones) for s in soums}
-    (SITE / "soum_zones.json").write_text(json.dumps(by_soum, separators=(",", ":")))
+    (SITE / "soum_zones.json").write_text(json.dumps(by_soum, separators=(",", ":")), encoding="utf-8")
     # the zone level the scores are summed on: soums dissolved by their zone, so its borders are soum borders
     shapes = soum_shapes()
     grouped = aimags.dissolve([{"zone": by_soum[s["pcode"]][0], "geom": shapes[s["pcode"]]} for s in soums if by_soum[s["pcode"]]],
                               key="zone")
     (SITE / "zone_soums.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": [
-        feature(grouped[z], {"pcode": z}, simplify=False) for z in ZONE_ORDER if z in grouped]}, separators=(",", ":")))
+        feature(grouped[z], {"pcode": z}, simplify=False) for z in ZONE_ORDER if z in grouped]}, separators=(",", ":")), encoding="utf-8")
     total = country.area
     print("zones: " + ", ".join(f"{z} {g.area / total:.1%}" for z, g in zones.items()) +
           f"; soums by zone {dict(sorted(Counter(v[0] for v in by_soum.values() if v).items()))}")

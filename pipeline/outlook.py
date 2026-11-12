@@ -64,11 +64,11 @@ def main(through: str) -> None:
     feats = [feature(shapes[s["pcode"]], {**props_for(s, rows.get(s["pcode"], {})), **extra}, simplify=False)
              for s in load_soums()]
     (SITE / f"outlook_{label(year)}.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
+        json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     aimags.write_scores(label(year), rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     zones.write_scores(label(year), year, rows, load_livestock(), indicators.census_year(year, as_of), site=SITE)
     (SITE / "outlook.json").write_text(json.dumps({"winter": label(year), "stage": stage, "data_through": through,
-                                                   "as_of": as_of.isoformat(), "made": date.today().isoformat()}))
+                                                   "as_of": as_of.isoformat(), "made": date.today().isoformat()}), encoding="utf-8")
     hist = Counter(r["risk_class"] for r in rows.values())
     n = Counter(r["n_indicators"] for r in rows.values())
     print(f"outlook {label(year)} stage {stage} (data to {through}): indicators {dict(n)}, classes {dict(sorted(hist.items(), key=str))}")

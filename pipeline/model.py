@@ -228,10 +228,10 @@ def main() -> dict:
     hay = {}
     for (a, y), v in sorted(hay_su.items()):
         hay.setdefault(a, {})[str(y)] = round(math.exp(v), 1)
-    (SITE / "hay.json").write_text(json.dumps({"unit": "kg of hay laid in per sheep unit, aimag", "by_aimag": hay}))
+    (SITE / "hay.json").write_text(json.dumps({"unit": "kg of hay laid in per sheep unit, aimag", "by_aimag": hay}), encoding="utf-8")
     text = json.dumps(out, allow_nan=False)
-    OUT.write_text(text)
-    (SITE / "model.json").write_text(text)
+    OUT.write_text(text, encoding="utf-8")
+    (SITE / "model.json").write_text(text, encoding="utf-8")
     v = sorted(vuln.values())
     print(f"model: {len(soum_rows)} soum-winters + {len(rows) - len(soum_rows)} aimag-winters; held-out soum {pooled_}; "
           f"without aimag rows {without}; held-out aimag {pooled_aimag}; "

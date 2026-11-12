@@ -54,8 +54,8 @@ def main(winters: list[int], normals: list[int], aimag_winters: list[int] = ()) 
         if stage in ("oct", SEAS5) and aimag_winters:
             out[stage]["pooled_aimag"] = rounded(pooled_aimag(by_aimag))
     text = json.dumps(out, indent=2, allow_nan=False)
-    OUT.write_text(text)
-    (SITE / "asof_validation.json").write_text(text)
+    OUT.write_text(text, encoding="utf-8")
+    (SITE / "asof_validation.json").write_text(text, encoding="utf-8")
     return out
 
 

@@ -131,7 +131,7 @@ def main() -> None:
             if all(means[v][pcode] is not None for v in VARS):
                 means["t2m"][pcode] = to_celsius(means["t2m"][pcode])
                 rows.append((pcode, ym, *(round(means[v][pcode], 5) for v in VARS)))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "yyyymm", *VARS.values()])
         w.writerows(rows)
@@ -141,7 +141,7 @@ def main() -> None:
 def load_era5(path: Path = OUT) -> dict[str, dict[str, dict[str, float]]]:
     """pcode -> variable (sde, rsn, snowc, t2m in °C) -> {yyyymm: value}."""
     out: dict[str, dict[str, dict[str, float]]] = {}
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for r in csv.DictReader(f):
             series = out.setdefault(r["pcode"], {v: {} for v in VARS})
             for v, col in VARS.items():

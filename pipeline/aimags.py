@@ -58,13 +58,13 @@ def write_shapes() -> None:
     feats = [feature(g, {"pcode": a, "name_mn": first[a]["aimag_mn"], "name_en": first[a]["aimag_en"],
                          "is_ub": first[a]["is_ub"]}, simplify=False) for a, g in dissolve(soums).items()]
     out = SITE / "aimags.geojson"
-    out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")))
+    out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print(f"{out}: {len(feats)} aimags, {out.stat().st_size / 1e6:.2f} MB")
 
 
 def write_scores(label: str, rows: dict[str, dict], herds: dict, census: int, site=SITE) -> None:
     soums = load_soums()
-    (site / f"aimag_{label}.json").write_text(json.dumps(summary(soums, rows, herd_weights(soums, herds, census))))
+    (site / f"aimag_{label}.json").write_text(json.dumps(summary(soums, rows, herd_weights(soums, herds, census))), encoding="utf-8")
 
 
 def check() -> None:

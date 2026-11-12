@@ -51,7 +51,7 @@ def read(path: Path) -> tuple[np.ma.MaskedArray, np.ndarray, np.ndarray]:
 
 def load_series(path: Path) -> dict[str, dict[str, float]]:
     out: dict[str, dict[str, float]] = {}
-    with path.open() as f:
+    with path.open(encoding="utf-8") as f:
         for pcode, ym, v in csv.reader(f):
             if pcode != "pcode":
                 out.setdefault(pcode, {})[ym] = float(v)
@@ -70,7 +70,7 @@ def main() -> None:
         for pcode, v in soum_means(read(RAW / f"A{ym}.nc4")[0], cells).items():
             if v is not None:
                 rows.append((pcode, ym, round(v, 5)))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "yyyymm", "snow_m"])
         w.writerows(rows)

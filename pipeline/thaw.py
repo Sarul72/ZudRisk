@@ -152,7 +152,7 @@ def main() -> dict:
         for y, v in tot.items():
             z = None if v is None else zscore(v, base)
             rows.append((pc, y, "" if v is None else round(v, 3), "" if z is None else round(z, 4)))
-    with OUT.open("w", newline="") as f:
+    with OUT.open("w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
         w.writerow(["pcode", "winter", "thaw_days", "z_thaw"])
         w.writerows(rows)
@@ -161,7 +161,7 @@ def main() -> dict:
 
 
 def load(p: Path | None = None) -> dict[tuple[str, int], float | None]:
-    with (p or OUT).open() as f:
+    with (p or OUT).open(encoding="utf-8") as f:
         return {(r["pcode"], int(r["winter"])): float(r["z_thaw"]) if r["z_thaw"] else None for r in csv.DictReader(f)}
 
 
