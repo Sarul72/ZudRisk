@@ -49,7 +49,7 @@ const T = {
     zone_no_chance: "Байгалийн бүсийн түвшинд магадлал тохируулаагүй тул ангиллаар харуулав.",
     whole_winter: "бүтэн өвөл",
     risk: "Эрсдэл", ind: { cold: "Хүйтэн", snow: "Цас", summer: "Зуны бэлчээр", pressure: "Ачаалал" },
-    cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / бэлчээрийн км²",
+    cold_c: "11–2 сарын дундаж", cold_c_sofar: "11 сараас өнөөг хүртэлх дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / бэлчээрийн км²",
     missing: "Дутуу үзүүлэлт",
     snow_days: "Цастай өдөр", density: "Цасны хамгийн их нягт", unit_density: "кг/м³",
     months: { oct: "10-р сар", nov: "11-р сар", dec: "12-р сар", jan: "1-р сар", feb: "2-р сар", mar: "3-р сар", oct_seas5: "10-р сар + SEAS5" },
@@ -118,7 +118,7 @@ const T = {
     zone_no_chance: "No chance is calibrated for natural zones, so the map shows classes.",
     whole_winter: "whole winter",
     risk: "Risk", ind: { cold: "Cold", snow: "Snow", summer: "Summer pasture", pressure: "Pressure" },
-    cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km² of pasture",
+    cold_c: "Nov–Feb mean", cold_c_sofar: "Mean since November", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km² of pasture",
     missing: "Missing indicators",
     snow_days: "Snow-cover days", density: "Densest monthly snow", unit_density: "kg/m³",
     months: { oct: "Oct", nov: "Nov", dec: "Dec", jan: "Jan", feb: "Feb", mar: "Mar", oct_seas5: "Oct + SEAS5" },
@@ -162,6 +162,8 @@ let model = null, greenness = null, hist = null, hay = null, zones = null, soumZ
 // P(losses >= 5 %) from the risk, fitted per stage (pipeline.calibrate): soums on 2011/12-2024/25, aimags on
 // 2000/01-2024/25. None where the held-out Brier skill is 0 or below: no number without skill behind it.
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
+// the November to January outlook stages have only the winter months so far, not yet November to February
+const coldSoFar = (stage) => stage === "nov" || stage === "dec" || stage === "jan";
 const curStage = () => (isOutlook() && outlook ? outlook.stage : "mar"); // a hindcast winter is the whole winter
 const calOf = (lvl, stage) => {
   const c = calibration?.[lvl === "aimag" ? "aimag_stages" : "stages"]?.[stage];
@@ -322,7 +324,7 @@ function popup(p) {
   const z = KEYS.map((k) => `${t.ind[k]} z: ${unseen(k) ? t.not_observed : fmt(p[`z_${k}`])}`).join("<br>");
   const missing = KEYS.filter((k) => p[`z_${k}`] === null && !unseen(k)).map((k) => t.ind[k]);
   return `<b>${esc(soumName(p))}</b><br>${t.risk}: <b>${t.classes[p.risk_class]}</b> (${fmt(p.risk, 4)})<br>${chanceLine(t, p)}${z}<br>
-    <small>${t.cold_c}: ${fmt(p.cold_c, 1)} °C · ${t.snow_cm}: ${fmt(p.snow_m === null ? null : p.snow_m * 100, 0)} cm ·
+    <small>${coldSoFar(p.stage) ? t.cold_c_sofar : t.cold_c}: ${fmt(p.cold_c, 1)} °C · ${t.snow_cm}: ${fmt(p.snow_m === null ? null : p.snow_m * 100, 0)} cm ·
     ${t.ndvi}: ${fmt(p.ndvi, 2)} · ${t.su}: ${fmt(p.su_per_km2, 0)}${p.is_centre ? t.centre : p.is_ub ? t.ub_density : ""}</small>
     <br><small>${t.snow_days}: ${fmt(p.snow_days, 0)} · ${t.density}: ${fmt(p.density_kgm3, 0)} ${t.unit_density} (z ${fmt(p.z_density)})
     <br><i>${t.proxy}</i></small>` +
