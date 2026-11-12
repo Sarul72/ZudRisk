@@ -64,6 +64,19 @@ def props_for(soum: dict, row: dict) -> dict:
     return props
 
 
+def copy_validation(src: Path, dst: Path) -> None:
+    """A winter's validation to the site; a winter whose losses are not out yet has none, and leaves none behind."""
+    if src.exists():
+        shutil.copy(src, dst)
+    else:
+        dst.unlink(missing_ok=True)
+
+
+def national_pct(path: Path) -> float | None:
+    """A winter's national mortality from its validation, or None while its losses are not out."""
+    return json.loads(path.read_text(encoding="utf-8"))["mortality_pct"] if path.exists() else None
+
+
 def main(year: int) -> None:
     with out_path(year).open(encoding="utf-8") as f:
         scores = {r["pcode"]: {k: v or None for k, v in r.items()} for r in csv.DictReader(f)}
@@ -77,7 +90,7 @@ def main(year: int) -> None:
     out = SITE / f"risk_{label(year)}.geojson"
     out.write_text(json.dumps({"type": "FeatureCollection", "features": feats}, ensure_ascii=False,
                               separators=(",", ":")), encoding="utf-8")
-    shutil.copy(out_path_json(year), SITE / f"validation_{label(year)}.json")
+    copy_validation(out_path_json(year), SITE / f"validation_{label(year)}.json")
     size = out.stat().st_size
     print(f"{out}: {len(feats)} soums, {size / 1e6:.2f} MB")
     if size > MAX_BYTES:
@@ -104,7 +117,7 @@ def history(years: list[int], risk: dict[int, dict], aimag_risk: dict[int, dict]
 
 def write_history(years: list[int]) -> None:
     from pipeline.indicators import read_risk
-    national = {y: json.loads(out_path_json(y).read_text(encoding="utf-8"))["mortality_pct"] for y in years}
+    national = {y: national_pct(out_path_json(y)) for y in years}
     aimag_risk = {y: json.loads((SITE / f"aimag_{label(y)}.json").read_text(encoding="utf-8")) for y in years}
     zone_path = {y: SITE / f"zone_{label(y)}.json" for y in years}
     zones = {y: json.loads(p.read_text(encoding="utf-8")) for y, p in zone_path.items()} if all(p.exists() for p in zone_path.values()) else None
@@ -143,6 +156,20 @@ def check() -> None:
     hz = history([2011, 2012], {2011: {}, 2012: {}}, {2011: {}, 2012: {}}, [], {}, {}, {},
                  zones={2011: {"steppe": {"risk": 0.2, "mortality": 0.05}}, 2012: {}})
     assert hz["zone"] == {"steppe": {"risk": [0.2, None], "mort": [0.05, None]}}, hz
+
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        p = Path(d) / "validation_2025.json"
+        assert national_pct(p) is None, "a winter whose losses are not out has no national mortality"
+        p.write_text(json.dumps({"mortality_pct": 2.5}), encoding="utf-8")
+        assert national_pct(p) == 2.5
+        site = Path(d) / "site"
+        site.mkdir()
+        (site / "validation_2025-26.json").write_text("{}", encoding="utf-8")
+        copy_validation(Path(d) / "absent.json", site / "validation_2025-26.json")
+        assert not (site / "validation_2025-26.json").exists(), "a stale validation file is not left behind"
+        copy_validation(p, site / "validation_2025-26.json")
+        assert json.loads((site / "validation_2025-26.json").read_text(encoding="utf-8")) == {"mortality_pct": 2.5}
     print("export check: ok")
 
 

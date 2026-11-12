@@ -11,6 +11,23 @@ from pipeline.validate import aimag_pairs, pooled, pooled_aimag, pooled_rows, ro
 DZUD = [2009, 2015, 2022, 2023]
 NORMAL_FROM, NORMAL_TO = 2011, 2023  # soum-level losses start in 2012; kept to 2023 so the normals stay the pre-registered pair
 WINTERS = list(range(2000, 2025))  # 2000/01 (MODIS's first summer) on; soum losses from 2011/12, aimag losses before
+# Winters scored and shown but not validated: their losses are not published yet (2025/26's come with NSO's 2026 loss
+# rows). When they are, the winter moves to WINTERS and into every test.
+PENDING = [2025]
+
+
+def shown() -> list[int]:
+    """Every winter on the map: the validated ones and those whose losses are still to come."""
+    return WINTERS + PENDING
+
+
+def score_pending() -> None:
+    """Score the pending winters and write the site's winter list and history; no losses, so no validation."""
+    for y in PENDING:
+        indicators.main(y)
+        export.main(y)
+    export.write_index(shown())
+    export.write_history(shown())
 POOLED = Path("data/derived/pooled.json")
 
 
@@ -55,8 +72,7 @@ def main() -> None:
     res = {**rounded(pooled(rows)), "every_winter": rounded(pooled(every)), "every_winter_aimag": rounded(pooled_aimag(by_aimag))}
     POOLED.write_text(json.dumps(res, indent=2), encoding="utf-8")
     (export.SITE / "pooled.json").write_text(json.dumps(res, indent=2), encoding="utf-8")
-    export.write_index(WINTERS)
-    export.write_history(WINTERS)
+    score_pending()  # also writes the winter list and history over WINTERS and PENDING
     aimags.write_shapes()
     print(f"pooled: {res}")
     snow = compare.main(winters)
@@ -77,6 +93,8 @@ def check() -> None:
         herds[("A", y + 1, "loss")] = {**full, "sheep": lost}
     assert normal_winters(herds) == [2013, 2021]
     assert WINTERS == list(range(2000, 2025)), WINTERS  # 2000/01 (MODIS's first summer) to the last winter with losses
+    assert PENDING == [2025] and PENDING[0] == WINTERS[-1] + 1, PENDING  # scored and shown, its losses not out yet
+    assert shown() == WINTERS + PENDING
     rows = [("A", 2013, 0.1, 0.01, 0.0), ("B", 2013, 0.2, 0.02, 0.01), ("A", 2023, 0.9, 0.3, 0.29), ("B", 2023, 0.5, 0.1, 0.09)]
     res = pooled(rows)
     assert res["spearman"] == 1.0 and res["n"] == 4 and res["winters"] == [2013, 2023], res

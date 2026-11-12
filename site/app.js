@@ -24,7 +24,7 @@ const T = {
     search: "Сум хайх", legend: "Тайлбар", validation: "Бодит хорогдолтой харьцуулалт",
     classes: ["Маш бага", "Бага", "Дунд", "Өндөр", "Маш өндөр"], none: "Тооцоогүй / мэдээлэл хүрэлцээгүй",
     no_herd: "Тооллогоор мал бүртгэлгүй тул тооцоогүй", ub_density: " (Улаанбаатарын дундаж)",
-    nodata: "Мэдээлэл хүрэлцээгүй",
+    nodata: "Мэдээлэл хүрэлцээгүй", no_losses_yet: "ҮСХ энэ өвлийн хорогдлыг хараахан нийтлээгүй тул шалгаагүй байна.",
     n: "Харьцуулсан сум", rho_soum: "Spearman ρ, сум", excess: "Spearman ρ, илүүдэл хорогдол",
     rho_aimag: "Spearman ρ, аймаг", top: "Эрсдэлийн дээд 20%-ийн хорогдлын дээд 20%-д орсон хувь",
     mort: "Хорогдол (аймгийн нийлбэр, УБ-гүй, хонин толгой)",
@@ -93,7 +93,7 @@ const T = {
     search: "Find a soum", legend: "Legend", validation: "Against recorded losses",
     classes: ["Very low", "Low", "Medium", "High", "Very high"], none: "Not scored / insufficient data",
     no_herd: "The census records no livestock here, so not scored", ub_density: " (Ulaanbaatar's density)",
-    nodata: "Insufficient data",
+    nodata: "Insufficient data", no_losses_yet: "NSO has not published this winter's losses yet, so it is not validated.",
     n: "Soums compared", rho_soum: "Spearman ρ, soum", excess: "Spearman ρ, excess mortality",
     rho_aimag: "Spearman ρ, aimag", top: "Top-20% risk soums in top-20% losses",
     mort: "Mortality (aimag totals, excl. Ulaanbaatar, sheep units)",
@@ -408,6 +408,9 @@ function render() {
       [t.mort, `${fmt(v.mortality_pct, 1)}%`],
     ]);
     $("unit_note").textContent = v.validation_unit === "aimag" ? t.aimag_only : "";
+  } else if (!isOutlook() && soumGeo) {
+    $("validation").textContent = t.no_losses_yet;
+    $("unit_note").textContent = "";
   }
   if (pooled) {
     $("pooled").innerHTML = table([
@@ -507,7 +510,8 @@ async function load(label) {
   const key = label === "outlook" ? outlook.winter : label;
   const [geo, v, a, z] = await Promise.all([
     fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
-    label === "outlook" ? asof[outlook.stage] : fetch(`data/validation_${key}.json`).then((r) => r.json()),
+    // a winter whose losses NSO has not published yet is scored but has no validation file
+    label === "outlook" ? asof[outlook.stage] : fetch(`data/validation_${key}.json`).then((r) => (r.ok ? r.json() : null)),
     fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
     fetch(`data/zone_${key}.json`).then((r) => (r.ok ? r.json() : {})),
   ]);
