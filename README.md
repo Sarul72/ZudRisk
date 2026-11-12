@@ -9,11 +9,15 @@ An open, reproducible estimate of dzud (зуд) risk for every soum of Mongolia,
 It covers research hindcasts of 25 winters (2000/01-2024/25) plus a 2026/27 outlook updated monthly. It is not a
 warning.
 
+Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "Publishing").
+
 ## What the site shows
 
 - **Risk** per soum, aimag or natural zone for any winter: four indicators (cold, snow, summer pasture, grazing
   pressure) as z-scores, weighted into one score and five classes.
-- **Chance** of adult losses of 5 % or more, in the soum popup. It is calibrated per outlook stage on 2011/12-2024/25.
+- **Chance** of adult losses of 5 % or more. The map is coloured by it at soum and aimag level; the five classes stay
+  one click away ("Өнгө / Colour"). Soums are calibrated per outlook stage on 2011/12-2024/25, aimags on their own
+  525 aimag-winters 2000/01-2024/25. A stage whose held-out Brier skill is 0 or below shows classes, not a chance.
 - **Vulnerability** from a small learned model, replaying 20 winters' weather on today's herds.
 - **Greenness trend** (desertification) and the six natural zones.
 - **Validation** beside every map: how each winter and each outlook stage ranked the losses that followed.
@@ -62,7 +66,7 @@ uv run python -m pipeline.seasonal --fetch && uv run python -m pipeline.seasonal
 uv run python -m pipeline.hindcast            # natural zones, 25 winters scored, the pooled tests, snow comparison,
                                               # outlook stages, chance calibration, greenness trend and the model
 uv run python -m pipeline.outlook --through 2026-10   # the 2026/27 outlook at its latest stage
-python3 -m http.server -d site 8765           # open http://localhost:8765
+python3 -m http.server -d site 8765           # open http://localhost:8765 (on Windows: START_SITE.bat)
 ```
 
 `pipeline.zones` downloads RESOLVE Ecoregions 2017 (149 MB) once. `pipeline.ice` (see "Tested and not used") is not
@@ -71,8 +75,19 @@ part of the run.
 ## Monthly outlook update (November 2026 to March 2027)
 
 `pipeline.update` does the whole update and is safe to run daily: it refreshes ERA5-Land and the NSO census, then
-publishes the newest stage whose data has landed, and does nothing out of season or when that stage is out.
-To run it every day at 09:30 on this Mac (a missed run happens at wake; log in `~/Library/Logs/zudrisk-update.log`):
+publishes the newest stage whose data has landed, and does nothing out of season or when that stage is out. After it
+publishes, it commits `site/data` alone and pushes it, so the online site follows (`--no-push` skips the push).
+
+On Windows, to run it every day at 09:30 (Git must be able to push without asking, as Git for Windows' credential
+manager does after one `git push` by hand):
+
+```bat
+schtasks /Create /SC DAILY /ST 09:30 /TN ZudRiskUpdate /TR "cmd /c cd /d %CD% && uv run python -m pipeline.update >> %LOCALAPPDATA%\zudrisk-update.log 2>&1"
+```
+
+Run it from the ZudRisk folder. To stop it: `schtasks /Delete /TN ZudRiskUpdate /F`.
+
+To run it every day at 09:30 on a Mac (a missed run happens at wake; log in `~/Library/Logs/zudrisk-update.log`):
 
 ```bash
 sed "s|__HOME__|$HOME|g" docs/launchd/mn.zudrisk.update.plist > ~/Library/LaunchAgents/mn.zudrisk.update.plist && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/mn.zudrisk.update.plist
@@ -90,12 +105,18 @@ uv run python -m pipeline.era5 && uv run python -m pipeline.outlook --through 20
 `outlook` refuses a stage whose months have not landed and names them; run it again a few days later.
 NASA POWER (`pipeline.power`) is no longer scored: it runs 5-6 weeks behind.
 
+## Publishing
+
+`.github/workflows/pages.yml` deploys `site/` to GitHub Pages on every push to `main` that changes it. Once, in the
+repository on GitHub: Settings -> Pages -> Build and deployment -> Source: **GitHub Actions**. Nothing under
+`data/raw/` and no credential is committed (`.gitignore`); `site/` is about 14 MB of Pages' 1 GB.
+
 ## Self-checks
 
 Each step has one, run from local files:
 
 ```bash
-for m in boundaries http era5 ndvi gldas nso indicators validate export aimags compare asof hindcast outlook trends model power zones seasonal ice calibrate update; do uv run python -m pipeline.$m --check; done; uv run python -m pipeline.score
+for m in boundaries http era5 ndvi gldas nso indicators validate export aimags compare asof hindcast outlook trends model power zones seasonal ice calibrate update herdmix thaw; do uv run python -m pipeline.$m --check; done; uv run python -m pipeline.score
 ```
 
 ## Tested and not used
@@ -105,5 +126,15 @@ for m in boundaries http era5 ndvi gldas nso indicators validate export aimags c
   and 0.051 (n 525). Added to the model, held-out soum rho fell 0.372 -> 0.358 and AUC 0.745 -> 0.730 (aimag rho
   rose 0.523 -> 0.542). The rule fixed before the run was to keep them only if both soum figures rose.
   Monthly means may be too coarse: a crust is a one-day thaw, which a month's mean melt hides.
+- **Herd composition (`pipeline.herdmix`)**: each species' share of the census in sheep units (camel, horse, cattle,
+  goat; sheep the reference) added to the model. Held-out soum rho fell 0.372 -> 0.352 and AUC 0.745 -> 0.732
+  (aimag rho rose 0.523 -> 0.538). The rule fixed before the run was to keep them only if both soum figures rose.
 - **SEAS5 seasonal forecast (`pipeline.seasonal`)**: shown on the site as the "Oct + SEAS5" stage; it lowers the
   October stage's skill, so the outlook does not use it.
+
+## Waiting for data
+
+- **Iron dzud from daily data (`pipeline.thaw`)**: thaw days on snow, Nov-Feb, from ERA5-Land daily maxima (UTC+8).
+  The code and its test are in; the 100 CDS requests are not, since they need the CDS account. Run
+  `uv run python -m pipeline.thaw --fetch` (hours; it resumes), then `uv run python -m pipeline.thaw`, which prints the
+  verdict under the same rule as the monthly test.
