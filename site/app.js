@@ -157,6 +157,7 @@ let calibration = null, scale = "chance"; // the map's colour: the chance where 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
 let zoneGeo = null, zoneScores = {};
+let pending = new Set(); // winters scored but not validated yet: no validation file to ask for (data/pending.json)
 let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
 // P(losses >= 5 %) from the risk, fitted per stage (pipeline.calibrate): soums on 2011/12-2024/25, aimags on
 // 2000/01-2024/25. None where the held-out Brier skill is 0 or below: no number without skill behind it.
@@ -511,7 +512,7 @@ async function load(label) {
   const [geo, v, a, z] = await Promise.all([
     fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
     // a winter whose losses NSO has not published yet is scored but has no validation file
-    label === "outlook" ? asof[outlook.stage] : fetch(`data/validation_${key}.json`).then((r) => (r.ok ? r.json() : null)),
+    label === "outlook" ? asof[outlook.stage] : pending.has(key) ? null : fetch(`data/validation_${key}.json`).then((r) => (r.ok ? r.json() : null)),
     fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
     fetch(`data/zone_${key}.json`).then((r) => (r.ok ? r.json() : {})),
   ]);
@@ -558,8 +559,10 @@ Promise.all([
   optional("data/soum_zones.json"),
   optional("data/zone_soums.geojson"),
   optional("data/calibration.json"),
-]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg, cal]) => {
+  optional("data/pending.json"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg, cal, pd]) => {
   calibration = cal;
+  pending = new Set(pd ?? []);
   aimagGeo = g;
   winters = w;
   pooled = p;

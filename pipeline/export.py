@@ -54,6 +54,11 @@ def write_index(years: list[int]) -> None:
     (SITE / "winters.json").write_text(json.dumps(winters_index(years)), encoding="utf-8")
 
 
+def write_pending(years: list[int], site: Path = SITE) -> None:
+    """The winters on the map whose losses are not out yet, so the site asks no validation file for them."""
+    (site / "pending.json").write_text(json.dumps(winters_index(years)), encoding="utf-8")
+
+
 def props_for(soum: dict, row: dict) -> dict:
     """A soum's map properties from an indicator row whose missing values are None."""
     props = {k: soum[k] for k in ("pcode", "name_mn", "name_en", "aimag_mn", "aimag_en", "is_ub")}
@@ -170,6 +175,8 @@ def check() -> None:
         assert not (site / "validation_2025-26.json").exists(), "a stale validation file is not left behind"
         copy_validation(p, site / "validation_2025-26.json")
         assert json.loads((site / "validation_2025-26.json").read_text(encoding="utf-8")) == {"mortality_pct": 2.5}
+        write_pending([2025], site)
+        assert json.loads((site / "pending.json").read_text(encoding="utf-8")) == ["2025-26"], "the site asks no validation of these"
     print("export check: ok")
 
 

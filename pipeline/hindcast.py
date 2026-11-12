@@ -27,6 +27,7 @@ def score_pending() -> None:
         indicators.main(y)
         export.main(y)
     export.write_index(shown())
+    export.write_pending(PENDING)
     export.write_history(shown())
 POOLED = Path("data/derived/pooled.json")
 

@@ -18,6 +18,7 @@ Run 2026-11-13, all 25 validated winters rescored:
 The map is read once over WFS (GML in EPSG:32648, WGS 84 / UTM 48N) and projected here with the standard library;
 only the derived shares are published, citing EIC as Government Resolution 85 (2010) asks."""
 import csv
+import functools
 import math
 import re
 import sys
@@ -80,10 +81,12 @@ def pasture_share(geom, other) -> float:
     return round(1 - geom.intersection(other).area / geom.area, 4)
 
 
+@functools.cache
 def load_shares(path: Path = OUT) -> dict[str, float]:
-    """pcode -> pasture share; an empty dict when the file is absent, which leaves the whole soum as its area."""
+    """pcode -> pasture share. Read once per run. A missing file stops the run: falling back to whole soums would
+    publish scores on another definition of grazing pressure than the README's."""
     if not path.exists():
-        return {}
+        raise FileNotFoundError(f"{path} is missing: run `uv run python -m pipeline.pasture` first")
     with path.open(encoding="utf-8") as f:
         return {r["pcode"]: float(r["pasture_share"]) for r in csv.DictReader(f)}
 
@@ -132,7 +135,11 @@ def check() -> None:
     from shapely.geometry import box
     assert pasture_share(box(0, 0, 4, 1), box(3, 0, 5, 1)) == 0.75
     assert pasture_share(box(0, 0, 1, 1), box(5, 5, 6, 6)) == 1.0
-    assert load_shares(Path("no/such/file.csv")) == {}
+    try:
+        load_shares(Path("no/such/file.csv"))
+        raise AssertionError("a missing pasture file must stop the run, not fall back to whole soums")
+    except FileNotFoundError as e:
+        assert "pipeline.pasture" in str(e)
     print("pasture check: ok")
 
 
