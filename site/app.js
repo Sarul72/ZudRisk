@@ -9,13 +9,16 @@ const RISK_CUTS = [-1, -0.5, 0.5, 1]; // pipeline/score.py CUTS
 const CHANCE = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"]; // ColorBrewer YlOrRd-6
 const CHANCE_CUTS = [0.05, 0.1, 0.2, 0.35, 0.5]; // the base rate of losses >= 5 % is about 15 %
 const GREY = "#bbbbbb";
+const DECREE_COLORS = { black: "#1a1a1a", white: "#2c7fb8", black_moderate: "#7f7f7f", white_moderate: "#a6cee3", none: "#f7f7f7" };
+const DECREE_ORDER = ["black", "white", "black_moderate", "white_moderate", "none"];
+const DECREE_THRESH = { mountain: [25, 16], taiga: [25, 16], forest_steppe: [25, 16], steppe: [22, 11], desert: [12, 5] }; // cm, pipeline.decree286
 const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert: "#d95f0e" };
 const KEYS = ["cold", "snow", "summer", "pressure"];
 
 const T = {
   mn: {
     title: "Зудын эрсдэл", subtitle: "Сум бүрээр: 2000/01 оноос хойших 25 өвлийн ретро тооцоо, 2026/27 оны төлөв, эмзэг байдал, ногоорлын чиг хандлага", winter: "Өвөл",
-    view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)", zone: "Байгалийн бүс" },
+    view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)", zone: "Байгалийн бүс", decree: "286-р тогтоол (үндсэн шалгуур)" },
     zone: "Байгалийн бүс", zone_legend: "Монгол орны байгалийн бүс",
     zones: { mountain: "Өндөр уулын бүс", taiga: "Тайгын бүс", forest_steppe: "Ойт хээрийн (хангайн) бүс", steppe: "Хээрийн бүс",
       desert: "Цөл, говийн бүс (цөлжүү хээрийг оруулсан*)" },
@@ -59,6 +62,14 @@ const T = {
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
     level_soum: "Сум", level_aimag: "Аймаг", level_zone: "Бүс", zone_table: "Байгалийн бүсүүд (эрсдэлээр)",
     zone_risk: "Бүсийн сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", zone_mort: "Энэ өвлийн хорогдол",
+    decree_view: "286-р тогтоол (үндсэн шалгуур)",
+    decree_caveat: "Туслах шалгуур (өдрийн хамгийн бага температур, салхи), цасны нягтыг үнэлээгүй; сар бүрээр; суурь 2001–2020. Албан ёсны үнэлгээ биш.",
+    decree_legend: "Засгийн газрын 2015 оны 286-р тогтоол, 5-р хавсралт: өвлийн аль нэг сард биелсэн хамгийн хүнд төрөл",
+    decree_status: { black: "Хар зуд", white: "Цагаан зуд (нягтгүйгээр)", black_moderate: "Хараар зудархуу", white_moderate: "Цагаанаар зудархуу (нягтгүйгээр)", none: "Шалгуур биелээгүй", unassessed: "Үнэлэх өгөгдөлгүй" },
+    decree_summer: { drought: "гантай", near: "гандуу", unassessed: "мэдээгүй" }, decree_summer_none: "ган биш",
+    decree_prev_summer: "Өмнөх зун", decree_depth: "цас", decree_threshold: "босго", decree_anom: "температурын хазайлт", decree_months: "Биелсэн сар",
+    decree_loss: (v) => `Хорогдол ≥5% болсон сум-өвлийн хувь (2011/12-оос): цагаан зуд ${pct(v.white)}, хараар зудархуу ${pct(v.black_moderate)}, цагаанаар зудархуу ${pct(v.white_moderate)}, шалгуур биелээгүй ${pct(v.none)}; харьцуулахад ZudRisk-ийн «маш өндөр» анги ${pct(v.risk_class_4)}.`,
+    decree_official: (r) => `ЦУОШГ-ын албан жагсаалттай (${r.n} агшин зураг): албан ёсоор «цагаан зуд» гэж нэрлэгдсэн сумдын ${r.white}%-ийг энд цагаан зуд, ${r.any}%-ийг цагаан зуд эсвэл зудархуу гэж тэмдэглэв. Албан жагсаалт нь бэлчээр дээр хэмжсэн цас ашигладаг, «−3°C» нөхцөлийг шаарддаггүй бололтой. Жагсаалтад ороогүй сум «зудгүй» гэсэн үг биш.`,
     zone_level_note: "Сум бүр талбайн ихэнхийг нь эзэлсэн бүсэд тоологдоно; бүсийн хил нь эдгээр сумдын хил. * Цөлжүү хээрийг цөл, говийн бүсэд оруулсан нь бидний сонголт (эх зурагт хээрийн бүсэд), 286-р тогтоолын говь цөлийн цасны босгыг хэрэглэхийн тулд.", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
     aimag_risk: "Сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", soums_n: "сум", zoom_to: "Газрын зураг дээр харах",
     aimag_suffix: " (аймаг)", centre: " (аймгийн төв: аймгийн дундаж)",
@@ -84,7 +95,7 @@ const T = {
   },
   en: {
     title: "Dzud risk", subtitle: "Per soum: hindcasts of the 25 winters since 2000/01, the 2026/27 outlook, vulnerability and the greenness trend", winter: "Winter",
-    view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)", zone: "Natural zones" },
+    view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)", zone: "Natural zones", decree: "Resolution 286 (main criteria)" },
     zone: "Natural zone", zone_legend: "Natural zones of Mongolia",
     zones: { mountain: "High mountain", taiga: "Taiga", forest_steppe: "Forest steppe (khangai)", steppe: "Steppe",
       desert: "Desert and gobi (desert steppe included*)" },
@@ -128,6 +139,14 @@ const T = {
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
     level_soum: "Soum", level_aimag: "Aimag", level_zone: "Zone", zone_table: "Natural zones (by risk)",
     zone_risk: "The zone's soum risk weighted by herd size", zone_mort: "Losses this winter",
+    decree_view: "Resolution 286 (main criteria)",
+    decree_caveat: "Auxiliary criteria (daily minimum temperature, wind) and snow density not assessed; by month; baseline 2001–2020. Not an official assessment.",
+    decree_legend: "Government Resolution 286 (2015), annex 5: the most severe type met in any winter month",
+    decree_status: { black: "Black dzud", white: "White dzud (density not assessed)", black_moderate: "Black, moderate", white_moderate: "White, moderate (density not assessed)", none: "No main criterion met", unassessed: "Not assessed" },
+    decree_summer: { drought: "drought", near: "near-drought", unassessed: "no data" }, decree_summer_none: "no drought",
+    decree_prev_summer: "Previous summer", decree_depth: "snow", decree_threshold: "threshold", decree_anom: "temperature anomaly", decree_months: "Months met",
+    decree_loss: (v) => `Share of soum-winters with adult losses ≥5% (2011/12 on): white ${pct(v.white)}, black moderate ${pct(v.black_moderate)}, white moderate ${pct(v.white_moderate)}, no criterion met ${pct(v.none)}; for comparison, ZudRisk's very-high class ${pct(v.risk_class_4)}.`,
+    decree_official: (r) => `Against NAMEM's official lists (${r.n} snapshots): of the soums named in white dzud, ${r.white}% are flagged white here and ${r.any}% white or moderate. The official lists use snow measured on pasture and seem not to require the −3 °C condition. A soum missing from a list is not an official "no".`,
     zone_level_note: "Each soum counts in the zone covering most of it; a zone's border here is its soums' borders. * Desert steppe is counted in the desert and gobi zone by our choice (the source map has it in the steppe zone), to use Resolution 286's gobi snow thresholds.", level: "Map level", aimags: "Aimags (by risk)",
     aimag_risk: "Soum risk weighted by herd size", soums_n: "soums", zoom_to: "Show on the map",
     aimag_suffix: " (aimag)", centre: " (aimag centre: the aimag's density)",
@@ -157,6 +176,7 @@ let calibration = null, scale = "chance"; // the map's colour: the chance where 
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
 let zoneGeo = null, zoneScores = {};
+let decree = null, decreeVal = null; // the chosen winter's Resolution 286 flags, and their check (pipeline.decree286)
 let pending = new Set(); // winters scored but not validated yet: no validation file to ask for (data/pending.json)
 let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
 // P(losses >= 5 %) from the risk, fitted per stage (pipeline.calibrate): soums on 2011/12-2024/25, aimags on
@@ -198,6 +218,7 @@ const sel = document.getElementById("winter");
 const $ = (id) => document.getElementById(id);
 
 function fillOf(p) {
+  if (view === "decree") return DECREE_COLORS[decree?.soums[p.pcode]?.status] ?? GREY;
   if (view === "vuln") { const v = model?.vulnerability[p.pcode]; return v == null ? GREY : VULN[bin(v, VULN_CUTS)]; }
   if (view === "green") { const v = greenness?.per_decade[p.pcode]; return v == null ? GREY : GREEN[bin(v, GREEN_CUTS)]; }
   if (p.risk_class === null) return GREY;
@@ -317,7 +338,26 @@ function aimagPopup(p) {
     ${chanceLine(t, { risk: a.risk }, "aimag")}<small>${t.aimag_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>${hayLine(p.pcode)}${chart}`;
 }
 
+const pct = (x) => (x == null ? "–" : `${Math.round(100 * x.loss5)}%`);
+const ymLabel = (ym) => `${ym.slice(0, 4)}-${ym.slice(4)}`;
+
+function decreePopup(p) {
+  const t = T[lang], r = decree?.soums[p.pcode];
+  if (!r) return `<b>${esc(soumName(p))}</b><br>${esc(t.decree_status.unassessed)}`;
+  const th = DECREE_THRESH[r.zone] ?? [null, null];
+  const months = Object.keys(r.by_month).map((m) => {
+    const i = r.inputs[m], f = r.by_month[m];
+    const types = f == null ? t.decree_status.unassessed : f.length ? f.map((x) => t.decree_status[x]).join(", ") : t.decree_status.none;
+    return `${ymLabel(m)}: <b>${esc(types)}</b> <small>(${t.decree_depth} ${fmt(i.depth_cm, 0)} cm, ${t.decree_threshold} ${th[0]}/${th[1]}; ${t.decree_anom} ${fmt(i.t_anom, 1)} °C)</small>`;
+  });
+  const summer = r.summer == null ? t.decree_summer_none : t.decree_summer[r.summer];
+  return `<b>${esc(soumName(p))}</b><br>${esc(t.decree_view)}: <b>${esc(t.decree_status[r.status])}</b>` +
+    (r.months.length ? `<br>${t.decree_months}: ${r.months.map(ymLabel).join(", ")}` : "") +
+    `<br>${t.decree_prev_summer}: ${esc(summer)}<br>${months.join("<br>")}<br><small><i>${esc(t.decree_caveat)}</i></small>`;
+}
+
 function popup(p) {
+  if (view === "decree") return decreePopup(p);
   const t = T[lang], chart = `<br>${histChart(hist?.soum[p.pcode], p.risk)}`;
   if (p.risk_class === null) return `<b>${esc(soumName(p))}</b><br>${p.no_herd ? t.no_herd : t.nodata}${extraLines(p)}${chart}`;
   const unseen = (k) => p.stage === "oct" && (k === "cold" || k === "snow"); // pre-winter: no winter month yet
@@ -340,6 +380,15 @@ function legendRows(colors, labels) {
   return labels.map((_, i) => `<div><i style="background:${colors[n - i]}"></i>${esc(labels[n - i])}</div>`).join("");
 }
 
+/** Across the official snapshots naming white-dzud soums: the share flagged white here, and white or moderate. */
+function officialSummary(rows) {
+  const white = (rows ?? []).filter((r) => r.category === "white");
+  const named = white.reduce((s, r) => s + r.named, 0);
+  const hit = white.reduce((s, r) => s + r.both, 0);
+  const any = white.reduce((s, r) => s + r.both_any, 0);
+  return { n: white.length, white: named ? Math.round((100 * hit) / named) : "–", any: named ? Math.round((100 * any) / named) : "–" };
+}
+
 function renderLegend(t) {
   let html, note = "";
   if (view === "vuln" && model) {
@@ -349,6 +398,11 @@ function renderLegend(t) {
     html = `<p class="note">${esc(t.zone_legend)}</p>` + Object.keys(ZONE_COLORS)
       .map((z) => `<div><i style="background:${ZONE_COLORS[z]}"></i>${esc(t.zones[z])}</div>`).join("");
     note = t.zone_note;
+  } else if (view === "decree") {
+    html = `<p class="banner">${esc(t.decree_caveat)}</p><p class="note">${esc(t.decree_legend)}</p>` +
+      DECREE_ORDER.map((s) => `<div><i style="background:${DECREE_COLORS[s]}"></i>${esc(t.decree_status[s])}</div>`).join("") +
+      `<div><i style="background:${GREY}"></i>${esc(t.decree_status.unassessed)}</div>`;
+    note = decreeVal ? `${t.decree_loss(decreeVal)} ${t.decree_official(officialSummary(decreeVal.official))}` : "";
   } else if (view === "green" && greenness) {
     html = `<p class="note">${esc(t.green_legend(greenness))}</p>${legendRows(GREEN, t.green_classes)}<div><i style="background:${GREY}"></i>${esc(t.nodata)}</div>`;
     note = t.green_note;
@@ -511,12 +565,13 @@ function findSoum() {
 
 async function load(label) {
   const key = label === "outlook" ? outlook.winter : label;
-  const [geo, v, a, z] = await Promise.all([
+  const [geo, v, a, z, d] = await Promise.all([
     fetch(label === "outlook" ? `data/outlook_${key}.geojson` : `data/risk_${key}.geojson`).then((r) => r.json()),
     // a winter whose losses NSO has not published yet is scored but has no validation file
     label === "outlook" ? asof[outlook.stage] : pending.has(key) ? null : fetch(`data/validation_${key}.json`).then((r) => (r.ok ? r.json() : null)),
     fetch(`data/aimag_${key}.json`).then((r) => (r.ok ? r.json() : {})), // missing: aimags grey, soums still drawn
     fetch(`data/zone_${key}.json`).then((r) => (r.ok ? r.json() : {})),
+    fetch(`data/decree286_${key}.json`).then((r) => (r.ok ? r.json() : null)),
   ]);
   if (label !== sel.value) return; // a later choice won the race; drawing this one would mislabel the map
   shown = label;
@@ -524,6 +579,7 @@ async function load(label) {
   soumGeo = geo;
   aimagScores = a;
   zoneScores = z;
+  decree = d;
   draw();
 }
 
@@ -562,7 +618,9 @@ Promise.all([
   optional("data/zone_soums.geojson"),
   optional("data/calibration.json"),
   optional("data/pending.json"),
-]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg, cal, pd]) => {
+  optional("data/decree286_validation.json"),
+]).then(async ([w, p, a, o, g, m, gr, h, hy, zn, sz, zg, cal, pd, dv]) => {
+  decreeVal = dv;
   calibration = cal;
   pending = new Set(pd ?? []);
   aimagGeo = g;

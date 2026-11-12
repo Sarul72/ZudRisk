@@ -199,8 +199,11 @@ def validate(years: list[int]) -> dict:
         want = set(ORDER) if cat == "dzud_any" else {cat}
         flagged = {pc for pc, r in soums.items() if set(r["by_month"].get(ym) or []) & want}
         both = len(named & flagged)
+        # white dzud named officially and flagged here as white or moderate: the depth part alone, since NAMEM's
+        # white dzud seems not to need the -3 °C month and uses snow measured on pasture
+        wide = {pc for pc, r in soums.items() if set(r["by_month"].get(ym) or []) & ({"white", "white_moderate"} if cat == "white" else want)}
         res["official"].append({"winter": w, "as_of": d, "category": cat, "named": len(named), "flagged": len(flagged),
-                                "both": both, "recall": round(both / len(named), 3) if named else None,
+                                "both": both, "both_any": len(named & wide), "recall": round(both / len(named), 3) if named else None,
                                 "precision": round(both / len(flagged), 3) if flagged else None})
     (export.SITE / "decree286_validation.json").write_text(json.dumps(res, indent=1), encoding="utf-8")
     return res
