@@ -22,7 +22,9 @@ Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "
   one click away ("Өнгө / Colour"). Soums are calibrated per outlook stage on 2011/12-2024/25, aimags on their own
   525 aimag-winters 2000/01-2024/25. A stage whose held-out Brier skill is 0 or below shows classes, not a chance.
 - **Vulnerability** from a small learned model, replaying 20 winters' weather on today's herds.
-- **Greenness trend** (desertification) and the six natural zones.
+- **Greenness trend** (desertification) and five natural zones from Mongolia's natural zoning map
+  (`data/source/naturalzone`). Desert steppe is counted in the desert (gobi) zone by our choice, for Resolution 286's
+  gobi snow thresholds; the map has it in the steppe zone, and the site says so.
 - **Validation** beside every map: how each winter and each outlook stage ranked the losses that followed.
 
 ## How well it works (2026-11-13)
@@ -73,7 +75,7 @@ uv run python -m pipeline.outlook --through 2026-10   # the 2026/27 outlook at i
 python3 -m http.server -d site 8765           # open http://localhost:8765 (on Windows: START_SITE.bat)
 ```
 
-`pipeline.zones` downloads RESOLVE Ecoregions 2017 (149 MB) once. `pipeline.ice` (see "Tested and not used") is not
+`pipeline.zones` reads the natural zoning map in `data/source/naturalzone`. `pipeline.ice` (see "Tested and not used") is not
 part of the run.
 
 ## Monthly outlook update (November 2026 to March 2027)

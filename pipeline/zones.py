@@ -1,13 +1,19 @@
-"""Mongolia's natural zones (high mountain, taiga, forest steppe, steppe, desert steppe, desert) from the RESOLVE
-Ecoregions 2017 polygons (Dinerstein et al. 2017, CC BY 4.0), each ecoregion assigned to its zone by name; and each
-soum's zone as the one covering most of it. Read with the standard library: a shapefile is a few structs."""
+"""Mongolia's natural zones per soum, from the national natural zoning map supplied to the project
+(data/source/naturalzone: 12 subzones in 5 main zones, WGS 84 / UTM 48N, edited 2026-09). Each subzone joins one of
+ZudRisk's five zones, and each soum takes the zone covering most of it. Read with the standard library: a shapefile
+is a few structs, and the projection is pipeline.pasture.utm_inverse.
+
+One choice is ZudRisk's, not the map's: the map puts desert steppe (Цөлжүү хээр) in its steppe zone, and ZudRisk
+counts it as desert (gobi). Government Resolution 286 (2015), annex 5, sets dzud snow thresholds for "говь, цөлийн
+бүс" (12 and 5 cm) apart from the steppe's (22 and 11 cm), and desert steppe is gobi. The site says so beside the
+zones. Before 2026-11-13 the zones came from RESOLVE Ecoregions 2017, grouped by name."""
 import json
 from collections import Counter
 import struct
 import sys
-import zipfile
 from pathlib import Path
 
+import numpy as np
 import shapely
 from shapely.geometry import LinearRing, Polygon
 
@@ -15,37 +21,41 @@ from pipeline import aimags
 from pipeline.boundaries import load_soums
 from pipeline.nso import sheep_units
 from pipeline.export import SITE, feature, soum_shapes
+from pipeline.pasture import utm_inverse
 
-URL = "https://storage.googleapis.com/teow2016/Ecoregions2017.zip"
-RAW = Path("data/raw/Ecoregions2017.zip")
-BBOX = (87.0, 41.0, 120.5, 52.5)  # Mongolia with a margin; records outside are never parsed
-ZONE_ORDER = ["mountain", "taiga", "forest_steppe", "steppe", "desert_steppe", "desert"]
-# Each ecoregion touching Mongolia, by its RESOLVE name, to the zone of Mongolia's own physical geography
-ZONES = {
-    "Altai alpine meadow and tundra": "mountain",
-    "Khangai Mountains alpine meadow": "mountain",
-    "Sayan alpine meadows and tundra": "mountain",
-    "Khangai Mountains conifer forests": "taiga",
-    "Sayan montane conifer forests": "taiga",
-    "Trans-Baikal conifer forests": "taiga",
-    "Selenge-Orkhon forest steppe": "forest_steppe",
-    "Daurian forest steppe": "forest_steppe",
-    "Altai montane forest and forest steppe": "forest_steppe",
-    "Mongolian-Manchurian grassland": "steppe",
-    "Sayan Intermontane steppe": "steppe",
-    "Eastern Gobi desert steppe": "desert_steppe",
-    "Gobi Lakes Valley desert steppe": "desert_steppe",
-    "Great Lakes Basin desert steppe": "desert_steppe",
-    "Alashan Plateau semi-desert": "desert",
-    "Junggar Basin semi-desert": "desert",
-    "Taklimakan desert": "desert",  # a sliver where the two datasets' borders disagree, in the south-west Gobi
+SRC = Path("data/source/naturalzone")
+ZONE_ORDER = ["mountain", "taiga", "forest_steppe", "steppe", "desert"]
+# The map's 12 subzones (field NAME_1) to ZudRisk's zones; the map's own main zone (ID_1) agrees except where noted
+SUBZONES = {
+    "Өндөр уулын нуга, тундр": "mountain",
+    "Өндөр уулын хээр": "mountain",
+    "Уулын тайга": "taiga",
+    "Уулын ойт хээр": "forest_steppe",
+    "Нугажуу хээр": "forest_steppe",
+    "Хуурай хээр": "steppe",
+    "Хуурайвтар хээр": "steppe",
+    "Гандуу хээр": "steppe",
+    "Цөлжүү хээр": "desert",  # the map: steppe (ID_1 3); ZudRisk's choice: gobi, for Resolution 286's thresholds
+    "Хээржүү цөл": "desert",
+    "Жинхэнэ цөл": "desert",
+    "Хэт хуурай цөл": "desert",
 }
+_FONT = str.maketrans({"Є": "Ө", "є": "ө", "Ї": "Ү", "ї": "ү"})
 
 
-def zone_of(eco_name: str) -> str:
-    if eco_name not in ZONES:
-        raise KeyError(f"no natural zone for ecoregion {eco_name!r}: add it to ZONES")
-    return ZONES[eco_name]
+def fix_name(name: str) -> str:
+    """The file was typed with a Ukrainian-font habit: Є/є/Ї/ї where Mongolian has Ө/ө/Ү/ү."""
+    return name.translate(_FONT)
+
+
+def zone_of(subzone: str) -> str:
+    if subzone not in SUBZONES:
+        raise KeyError(f"no natural zone for subzone {subzone!r}: add it to SUBZONES")
+    return SUBZONES[subzone]
+
+
+def to_lonlat(geom):
+    return shapely.transform(geom, lambda xy: np.array([utm_inverse(x, y) for x, y in xy]))
 
 
 def polygon_of(content: bytes):
@@ -60,13 +70,6 @@ def polygon_of(content: bytes):
         ring = LinearRing([(xy[2 * i], xy[2 * i + 1]) for i in range(a, b)])
         (holes if ring.is_ccw else outers).append(shapely.make_valid(Polygon(ring)))
     return shapely.difference(shapely.union_all(outers), shapely.union_all(holes)) if holes else shapely.union_all(outers)
-
-
-def _bbox_hits(content: bytes) -> bool:
-    if struct.unpack_from("<i", content)[0] != 5:
-        return False
-    x0, y0, x1, y1 = struct.unpack_from("<4d", content, 4)
-    return x0 <= BBOX[2] and x1 >= BBOX[0] and y0 <= BBOX[3] and y1 >= BBOX[1]
 
 
 def iter_shp(f):
@@ -133,30 +136,31 @@ def write_scores(label: str, year: int, rows: dict[str, dict], herds: dict, cens
     (site / f"zone_{label}.json").write_text(json.dumps(zone_scores(soum_zone(), rows, herds, census, year)), encoding="utf-8")
 
 
-def ecoregions() -> list[tuple[str, object]]:
-    """(ECO_NAME, geometry) for every ecoregion whose box touches Mongolia's."""
-    if not RAW.exists():
-        from pipeline.http import download
-        download(URL, RAW)
+def natural_zones() -> list[tuple[str, object]]:
+    """(subzone, lon/lat geometry) for every polygon of the map inside Mongolia; the slivers its union left outside
+    the border (FID_Mongol -1) are dropped."""
     out = []
-    with zipfile.ZipFile(RAW) as z, z.open("Ecoregions2017.shp") as shp, z.open("Ecoregions2017.dbf") as dbf:
+    with (SRC / "naturalzone.shp").open("rb") as shp, (SRC / "naturalzone.dbf").open("rb") as dbf:
         for content, row in zip(iter_shp(shp), read_dbf(dbf)):
-            if _bbox_hits(content):
-                out.append((row["ECO_NAME"], polygon_of(content)))
+            if row.get("FID_Mongol") == "-1":
+                continue
+            g = polygon_of(content)
+            if g is not None and not g.is_empty:
+                out.append((fix_name(row["NAME_1"]), to_lonlat(g)))
     return out
 
 
 def main() -> None:
     soums = load_soums()
     country = shapely.union_all([s["geom"] for s in soums])
-    inside = [(n, g.intersection(country)) for n, g in ecoregions() if g.intersects(country)]
+    inside = [(n, g.intersection(country)) for n, g in natural_zones() if g.intersects(country)]
     inside = [(n, g) for n, g in inside if g.area > 1e-6]
-    missing = sorted({n for n, _ in inside if n not in ZONES})
+    missing = sorted({n for n, _ in inside if n not in SUBZONES})
     if missing:
-        sys.exit(f"ecoregions in Mongolia with no zone: {missing}")
-    zones = {z: shapely.union_all([g for n, g in inside if ZONES[n] == z]) for z in ZONE_ORDER
-             if any(ZONES[n] == z for n, _ in inside)}
-    feats = [feature(g, {"zone": z, "ecoregions": sorted({n for n, _ in inside if ZONES[n] == z})}) for z, g in zones.items()]
+        sys.exit(f"subzones in Mongolia with no zone: {missing}")
+    zones = {z: shapely.union_all([g for n, g in inside if SUBZONES[n] == z]) for z in ZONE_ORDER
+             if any(SUBZONES[n] == z for n, _ in inside)}
+    feats = [feature(g, {"zone": z, "subzones": sorted({n for n, _ in inside if SUBZONES[n] == z})}) for z, g in zones.items()]
     (SITE / "zones.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": feats}, separators=(",", ":")), encoding="utf-8")
     by_soum = {s["pcode"]: dominant(s["geom"], zones) for s in soums}
     (SITE / "soum_zones.json").write_text(json.dumps(by_soum, separators=(",", ":")), encoding="utf-8")
@@ -190,13 +194,17 @@ def check() -> None:
     rows = list(read_dbf(io.BytesIO(head + desc + b"\r" + rec + b"\x1a")))
     assert rows == [{"ECO_NAME": "Gobi désert", "BIOME": "13"}], rows
 
-    assert zone_of("Khangai Mountains alpine meadow") == "mountain"
-    assert zone_of("Mongolian-Manchurian grassland") == "steppe"
+    assert fix_name("Єндєр уулын нуга, тундр") == "Өндөр уулын нуга, тундр", "the file's Є/є/Ї/ї stand for Ө/ө/Ү/ү"
+    assert fix_name("Цєлжїї хээр") == "Цөлжүү хээр"
+    assert zone_of("Уулын тайга") == "taiga" and zone_of("Нугажуу хээр") == "forest_steppe"
+    assert zone_of("Гандуу хээр") == "steppe" and zone_of("Хэт хуурай цөл") == "desert"
+    assert zone_of("Цөлжүү хээр") == "desert", "a choice: the map puts it in the steppe zone, ZudRisk counts it as gobi"
+    assert set(SUBZONES.values()) == set(ZONE_ORDER) and len(SUBZONES) == 12
     try:
-        zone_of("Atlantis reef")
-        raise AssertionError("an ecoregion with no zone must be named, not dropped")
+        zone_of("Атлантын хад")
+        raise AssertionError("a subzone with no zone must be named, not dropped")
     except KeyError as e:
-        assert "Atlantis reef" in str(e)
+        assert "Атлантын хад" in str(e)
 
     zones = {"steppe": box(0, 0, 3, 1), "desert": box(3, 0, 4, 1)}
     assert dominant(box(0, 0, 4, 1), zones) == ("steppe", 0.75)

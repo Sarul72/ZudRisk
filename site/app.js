@@ -9,7 +9,7 @@ const RISK_CUTS = [-1, -0.5, 0.5, 1]; // pipeline/score.py CUTS
 const CHANCE = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"]; // ColorBrewer YlOrRd-6
 const CHANCE_CUTS = [0.05, 0.1, 0.2, 0.35, 0.5]; // the base rate of losses >= 5 % is about 15 %
 const GREY = "#bbbbbb";
-const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert_steppe: "#fdb863", desert: "#d95f0e" };
+const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert: "#d95f0e" };
 const KEYS = ["cold", "snow", "summer", "pressure"];
 
 const T = {
@@ -18,8 +18,8 @@ const T = {
     view: "Давхарга", views: { risk: "Зудын эрсдэл (сонгосон өвөл)", vuln: "Эмзэг байдал (сургасан загвар)", green: "Ногоорлын чиг хандлага (цөлжилт)", zone: "Байгалийн бүс" },
     zone: "Байгалийн бүс", zone_legend: "Монгол орны байгалийн бүс",
     zones: { mountain: "Өндөр уулын бүс", taiga: "Тайгын бүс", forest_steppe: "Ойт хээрийн (хангайн) бүс", steppe: "Хээрийн бүс",
-      desert_steppe: "Цөлөрхөг хээрийн (говийн) бүс", desert: "Цөлийн бүс" },
-    zone_note: "RESOLVE Ecoregions 2017-ийн экобүсүүдийг нэрээр нь Монголын байгалийн зургаан бүсэд нэгтгэв (жишээ нь Selenge-Orkhon forest steppe → ойт хээр). Сум бүрийг талбайн ихэнхийг эзэлсэн бүсэд нь хамааруулна. Нарийн хил бүсчлэлийн эх сурвалжаас хамаарч өөр байж болно.",
+      desert: "Цөл, говийн бүс (цөлжүү хээрийг оруулсан*)" },
+    zone_note: "АНХААРУУЛГА: Цөлжүү хээрийг цөлийн (говийн) бүсэд оруулсан нь бидний сонголт. Эх зурагт цөлжүү хээр нь хээрийн бүсийн дэд бүс; бид түүнийг говь гэж үзэж цөлд тооцов, учир нь Засгийн газрын 2015 оны 286-р тогтоолын 5-р хавсралт зудын цасны босгыг «говь, цөлийн бүс»-д (12 ба 5 см) хээрийнхээс (22 ба 11 см) тусад нь тогтоодог. Хээрт тооцвол 41 сумын бүс өөр болж, цөлийн бүсийн сум 69-өөс 30 болно. Бүсчлэл: Монгол орны байгалийн бүсчлэлийн зураг (12 дэд бүс, 5 үндсэн бүс), төсөлд өгсөн. Сум бүрийг талбайн ихэнхийг эзэлсэн бүсэд нь хамааруулна.",
     zone_share: (s) => `сумын ${Math.round(s * 100)}%`,
     search: "Сум хайх", legend: "Тайлбар", validation: "Бодит хорогдолтой харьцуулалт",
     classes: ["Маш бага", "Бага", "Дунд", "Өндөр", "Маш өндөр"], none: "Тооцоогүй / мэдээлэл хүрэлцээгүй",
@@ -37,7 +37,7 @@ const T = {
     limits: "Хязгаарлалт",
     limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. ҮСХ сумын хорогдлыг 2011/12-оос эхэлж гаргадаг тул түүнээс өмнөх өвлүүдийг (2000/01–2010/11) бодит хорогдолтой зөвхөн аймгаар харьцуулна. 2001/02–2019/20 оны өвлүүд энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). ҮСХ-ны бэлтгэсэн өвс тэжээлийг (зөвхөн аймгаар, сумаар байхгүй) хонин толгойд ногдуулж сургасан загварт оруулсан, тогтмол оноонд оруулаагүй; малчдын бэлтгэлийн өгөгдөл байхгүй хэвээр. Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
     sources: "Эх сурвалж",
-    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: RESOLVE Ecoregions 2017 (Dinerstein нар, 2017, CC BY 4.0). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
+    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: Монгол орны байгалийн бүсчлэлийн зураг, төсөлд өгсөн (цөлжүү хээрийг цөлд оруулсан). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
     chance: (p, bss) => `Хорогдол ≥5% болох магадлал: <b>${p}%</b> <small>(өнгөрсөн өвлүүдээр тохируулсан, Brier skill ${fmt(bss, 2)})</small>`,
     scale: "Өнгө", scale_chance: "Магадлал", scale_class: "Ангилал",
     chance_legend: (stage, bss) => `Хорогдол ≥5% болох магадлал (${stage}, Brier skill ${fmt(bss, 2)})`,
@@ -59,7 +59,7 @@ const T = {
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
     level_soum: "Сум", level_aimag: "Аймаг", level_zone: "Бүс", zone_table: "Байгалийн бүсүүд (эрсдэлээр)",
     zone_risk: "Бүсийн сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", zone_mort: "Энэ өвлийн хорогдол",
-    zone_level_note: "Сум бүр талбайн ихэнхийг нь эзэлсэн бүсэд тоологдоно; бүсийн хил нь эдгээр сумдын хил.", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
+    zone_level_note: "Сум бүр талбайн ихэнхийг нь эзэлсэн бүсэд тоологдоно; бүсийн хил нь эдгээр сумдын хил. * Цөлжүү хээрийг цөл, говийн бүсэд оруулсан нь бидний сонголт (эх зурагт хээрийн бүсэд), 286-р тогтоолын говь цөлийн цасны босгыг хэрэглэхийн тулд.", level: "Харах түвшин", aimags: "Аймгууд (эрсдэлээр)",
     aimag_risk: "Сумдын эрсдэлийг малын тоогоор жигнэсэн дундаж", soums_n: "сум", zoom_to: "Газрын зураг дээр харах",
     aimag_suffix: " (аймаг)", centre: " (аймгийн төв: аймгийн дундаж)",
     proxy: "Тогтоол 286: цагаан зуд ≥ 250, төмөр зуд ≥ 350 кг/м³. ERA5-Land-ын сумын сарын дундаж (цасны зузаанаар жигнэсэн) 2001–2024 онд хамгийн ихдээ 240 орчим хүрсэн тул z-ээр нь харьцуулна. Шалгагдаагүй орлуулагч, оноонд ороогүй.",
@@ -87,8 +87,8 @@ const T = {
     view: "Layer", views: { risk: "Dzud risk (chosen winter)", vuln: "Vulnerability (learned model)", green: "Greenness trend (desertification)", zone: "Natural zones" },
     zone: "Natural zone", zone_legend: "Natural zones of Mongolia",
     zones: { mountain: "High mountain", taiga: "Taiga", forest_steppe: "Forest steppe (khangai)", steppe: "Steppe",
-      desert_steppe: "Desert steppe (gobi)", desert: "Desert" },
-    zone_note: "RESOLVE Ecoregions 2017 grouped by name into Mongolia's six natural zones (Selenge-Orkhon forest steppe → forest steppe, say). Each soum takes the zone covering most of it. Exact borders differ between zonings.",
+      desert: "Desert and gobi (desert steppe included*)" },
+    zone_note: "NOTE: putting desert steppe in the desert (gobi) zone is our choice. The source map has desert steppe as a subzone of the steppe zone; we count it as gobi because Government Resolution 286 (2015), annex 5, sets dzud snow thresholds for the \"gobi and desert zone\" (12 and 5 cm) apart from the steppe's (22 and 11 cm). Counted as steppe, 41 soums would change zone and the desert zone would have 30 soums instead of 69. Zoning: Mongolia's natural zoning map (12 subzones, 5 main zones), supplied to the project. Each soum takes the zone covering most of it.",
     zone_share: (s) => `${Math.round(s * 100)}% of the soum`,
     search: "Find a soum", legend: "Legend", validation: "Against recorded losses",
     classes: ["Very low", "Low", "Medium", "High", "Very high"], none: "Not scored / insufficient data",
@@ -106,7 +106,7 @@ const T = {
     limits: "Limits",
     limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. NSO publishes soum losses from 2011/12 only, so the winters before (2000/01–2010/11) are checked against losses by aimag. Winters 2001/02 to 2019/20 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness explain about half of the variation in losses (Nandintsetseg et al. 2018). NSO's hay laid in (by aimag only; there is no soum figure), per sheep unit, enters the learned model, not the fixed score; herder preparedness is still not in the data. The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
     sources: "Sources",
-    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: RESOLVE Ecoregions 2017 (Dinerstein et al. 2017, CC BY 4.0). Livestock and losses: NSO Mongolia (1212.mn).",
+    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: Mongolia's natural zoning map, supplied to the project (desert steppe counted as desert). Livestock and losses: NSO Mongolia (1212.mn).",
     chance: (p, bss) => `Chance of losses ≥5%: <b>${p}%</b> <small>(calibrated on past winters, Brier skill ${fmt(bss, 2)})</small>`,
     scale: "Colour", scale_chance: "Chance", scale_class: "Class",
     chance_legend: (stage, bss) => `Chance of losses ≥5% (${stage}, Brier skill ${fmt(bss, 2)})`,
@@ -128,7 +128,7 @@ const T = {
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
     level_soum: "Soum", level_aimag: "Aimag", level_zone: "Zone", zone_table: "Natural zones (by risk)",
     zone_risk: "The zone's soum risk weighted by herd size", zone_mort: "Losses this winter",
-    zone_level_note: "Each soum counts in the zone covering most of it; a zone's border here is its soums' borders.", level: "Map level", aimags: "Aimags (by risk)",
+    zone_level_note: "Each soum counts in the zone covering most of it; a zone's border here is its soums' borders. * Desert steppe is counted in the desert and gobi zone by our choice (the source map has it in the steppe zone), to use Resolution 286's gobi snow thresholds.", level: "Map level", aimags: "Aimags (by risk)",
     aimag_risk: "Soum risk weighted by herd size", soums_n: "soums", zoom_to: "Show on the map",
     aimag_suffix: " (aimag)", centre: " (aimag centre: the aimag's density)",
     proxy: "Resolution 286: white dzud ≥ 250, iron dzud ≥ 350 kg/m³. ERA5-Land soum monthly means (weighted by snow depth) peaked near 240 in 2001–2024, so read the z. Unvalidated proxy, not scored.",
