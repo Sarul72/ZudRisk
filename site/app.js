@@ -6,6 +6,8 @@ const GREEN = ["#a6611a", "#f5f5f5", "#c7e9c0", "#74c476", "#238b45"]; // browni
 const VULN_CUTS = [0.1, 0.2, 0.3, 0.4];
 const GREEN_CUTS = [0, 0.01, 0.02, 0.04];
 const RISK_CUTS = [-1, -0.5, 0.5, 1]; // pipeline/score.py CUTS
+const CHANCE = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"]; // ColorBrewer YlOrRd-6
+const CHANCE_CUTS = [0.05, 0.1, 0.2, 0.35, 0.5]; // the base rate of losses >= 5 % is about 15 %
 const GREY = "#bbbbbb";
 const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert_steppe: "#fdb863", desert: "#d95f0e" };
 const KEYS = ["cold", "snow", "summer", "pressure"];
@@ -37,6 +39,15 @@ const T = {
     sources: "Эх сурвалж",
     sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: RESOLVE Ecoregions 2017 (Dinerstein нар, 2017, CC BY 4.0). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
     chance: (p, bss) => `Хорогдол ≥5% болох магадлал: <b>${p}%</b> <small>(өнгөрсөн өвлүүдээр тохируулсан, Brier skill ${fmt(bss, 2)})</small>`,
+    scale: "Өнгө", scale_chance: "Магадлал", scale_class: "Ангилал",
+    chance_legend: (stage, bss) => `Хорогдол ≥5% болох магадлал (${stage}, Brier skill ${fmt(bss, 2)})`,
+    chance_classes: ["< 5%", "5–10%", "10–20%", "20–35%", "35–50%", "≥ 50%"],
+    chance_note: (lvl) => lvl === "aimag"
+      ? "Аймгийн эрсдэлийг (сумдын эрсдэлийн малын тоогоор жигнэсэн дундаж) 2000/01–2024/25 оны 525 аймаг-өвлийн хорогдлоор магадлал болгож тохируулав. Шат бүрийг тус тусад нь, нэг өвлийг хасаж шалгасан."
+      : "Сумын эрсдэлийг 2011/12–2024/25 оны сум-өвлийн хорогдлоор магадлал болгож тохируулав. Шат бүрийг тус тусад нь, нэг өвлийг хасаж шалгасан.",
+    no_skill: "Энэ шатны магадлал суурь давтамжаас илүү биш (Brier skill ≤ 0) тул ангиллаар харуулав.",
+    zone_no_chance: "Байгалийн бүсийн түвшинд магадлал тохируулаагүй тул ангиллаар харуулав.",
+    whole_winter: "бүтэн өвөл",
     risk: "Эрсдэл", ind: { cold: "Хүйтэн", snow: "Цас", summer: "Зуны бэлчээр", pressure: "Ачаалал" },
     cold_c: "11–2 сарын дундаж", snow_cm: "Цасны хамгийн их сарын дундаж", ndvi: "7–8 сарын NDVI", su: "Хонин толгой / км²",
     missing: "Дутуу үзүүлэлт",
@@ -97,6 +108,15 @@ const T = {
     sources: "Sources",
     sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: RESOLVE Ecoregions 2017 (Dinerstein et al. 2017, CC BY 4.0). Livestock and losses: NSO Mongolia (1212.mn).",
     chance: (p, bss) => `Chance of losses ≥5%: <b>${p}%</b> <small>(calibrated on past winters, Brier skill ${fmt(bss, 2)})</small>`,
+    scale: "Colour", scale_chance: "Chance", scale_class: "Class",
+    chance_legend: (stage, bss) => `Chance of losses ≥5% (${stage}, Brier skill ${fmt(bss, 2)})`,
+    chance_classes: ["< 5%", "5–10%", "10–20%", "20–35%", "35–50%", "≥ 50%"],
+    chance_note: (lvl) => lvl === "aimag"
+      ? "The aimag risk (its soums' risk weighted by herd size) is calibrated as a chance on the 525 aimag-winters 2000/01–2024/25, each stage on its own and checked one winter held out at a time."
+      : "The soum risk is calibrated as a chance on the soum-winters 2011/12–2024/25, each stage on its own and checked one winter held out at a time.",
+    no_skill: "This stage's chance does not beat the base rate (Brier skill ≤ 0), so the map shows classes.",
+    zone_no_chance: "No chance is calibrated for natural zones, so the map shows classes.",
+    whole_winter: "whole winter",
     risk: "Risk", ind: { cold: "Cold", snow: "Snow", summer: "Summer pasture", pressure: "Pressure" },
     cold_c: "Nov–Feb mean", snow_cm: "Deepest monthly mean snow", ndvi: "Jul–Aug NDVI", su: "Sheep units / km²",
     missing: "Missing indicators",
@@ -133,18 +153,27 @@ const T = {
   },
 };
 
-let calibration = null;
+let calibration = null, scale = "chance"; // the map's colour: the chance where its stage has skill, else the classes
 let lang = "mn", layer = null, validation = null, pooled = null, winters = [], asof = null, outlook = null;
 let level = "soum", view = "risk", shown = null, soumGeo = null, aimagGeo = null, aimagScores = {}, borders = null;
 let zoneGeo = null, zoneScores = {};
 let model = null, greenness = null, hist = null, hay = null, zones = null, soumZones = null, zoneFill = null, byName = {};
-// P(losses >= 5 %) from the risk, fitted per stage on 2011/12-2024/25 (pipeline.calibrate); none where it beats no base rate
-const chanceLine = (t, p) => {
-  const c = calibration?.stages[p.stage || "mar"];
-  if (!c || c.bss <= 0 || p.risk === null) return "";
-  return `${t.chance(Math.round(100 / (1 + Math.exp(-(c.a * p.risk + c.b)))), c.bss)}<br>`;
-};
+// P(losses >= 5 %) from the risk, fitted per stage (pipeline.calibrate): soums on 2011/12-2024/25, aimags on
+// 2000/01-2024/25. None where the held-out Brier skill is 0 or below: no number without skill behind it.
 const isOutlook = () => shown === "outlook"; // the view on the map, not a choice whose data is still loading
+const curStage = () => (isOutlook() && outlook ? outlook.stage : "mar"); // a hindcast winter is the whole winter
+const calOf = (lvl, stage) => {
+  const c = calibration?.[lvl === "aimag" ? "aimag_stages" : "stages"]?.[stage];
+  return c && c.bss > 0 ? c : null;
+};
+const chanceOf = (c, risk) => (c && risk != null ? 1 / (1 + Math.exp(-(c.a * risk + c.b))) : null);
+const chanceLine = (t, p, lvl = "soum") => {
+  const c = calOf(lvl, p.stage || curStage()), q = chanceOf(c, p.risk);
+  return q === null ? "" : `${t.chance(Math.round(100 * q), c.bss)}<br>`;
+};
+// the chance colours the map only in the risk view, at soum or aimag level, when chosen and when its stage has skill
+const useChance = () => view === "risk" && level !== "zone" && scale === "chance" && !!calOf(level, curStage());
+const chanceFill = (q) => (q === null ? GREY : CHANCE[bin(q, CHANCE_CUTS)]);
 
 const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
 const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -168,7 +197,8 @@ const $ = (id) => document.getElementById(id);
 function fillOf(p) {
   if (view === "vuln") { const v = model?.vulnerability[p.pcode]; return v == null ? GREY : VULN[bin(v, VULN_CUTS)]; }
   if (view === "green") { const v = greenness?.per_decade[p.pcode]; return v == null ? GREY : GREEN[bin(v, GREEN_CUTS)]; }
-  return p.risk_class === null ? GREY : COLORS[p.risk_class];
+  if (p.risk_class === null) return GREY;
+  return useChance() ? chanceFill(chanceOf(calOf("soum", p.stage || curStage()), p.risk)) : COLORS[p.risk_class];
 }
 
 function style(f) {
@@ -176,9 +206,13 @@ function style(f) {
   return { color: "#555", weight: 0.4, fillOpacity: 0.78, fillColor: fillOf(f.properties) };
 }
 
+function aimagFill(a) {
+  if (a?.risk_class == null) return GREY;
+  return useChance() ? chanceFill(chanceOf(calOf("aimag", curStage()), a.risk)) : COLORS[a.risk_class];
+}
+
 function aimagStyle(f) {
-  const c = aimagScores[f.properties.pcode]?.risk_class ?? null;
-  return { color: "#333", weight: 1, fillOpacity: 0.78, fillColor: c === null ? GREY : COLORS[c] };
+  return { color: "#333", weight: 1, fillOpacity: 0.78, fillColor: aimagFill(aimagScores[f.properties.pcode]) };
 }
 
 function aimagName(p) {
@@ -277,7 +311,7 @@ function aimagPopup(p) {
   const counts = a.counts.map((n, i) => `<i class="chip" style="background:${COLORS[i]}"></i>${esc(t.classes[i])}: ${esc(n)}`)
     .reverse().join("<br>");
   return `<b>${esc(aimagName(p))}</b><br>${t.risk}: <b>${t.classes[a.risk_class]}</b> (${fmt(a.risk, 4)})<br>
-    <small>${t.aimag_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>${hayLine(p.pcode)}${chart}`;
+    ${chanceLine(t, { risk: a.risk }, "aimag")}<small>${t.aimag_risk}</small><br>${counts}<br><small>${esc(a.n)} ${t.soums_n}</small>${hayLine(p.pcode)}${chart}`;
 }
 
 function popup(p) {
@@ -299,7 +333,8 @@ function table(rows) {
 }
 
 function legendRows(colors, labels) {
-  return labels.map((_, i) => `<div><i style="background:${colors[4 - i]}"></i>${esc(labels[4 - i])}</div>`).join("");
+  const n = labels.length - 1; // highest first
+  return labels.map((_, i) => `<div><i style="background:${colors[n - i]}"></i>${esc(labels[n - i])}</div>`).join("");
 }
 
 function renderLegend(t) {
@@ -314,8 +349,14 @@ function renderLegend(t) {
   } else if (view === "green" && greenness) {
     html = `<p class="note">${esc(t.green_legend(greenness))}</p>${legendRows(GREEN, t.green_classes)}<div><i style="background:${GREY}"></i>${esc(t.nodata)}</div>`;
     note = t.green_note;
+  } else if (useChance()) {
+    const st = curStage(), c = calOf(level, st);
+    html = `<p class="note">${esc(t.chance_legend(st === "mar" && !isOutlook() ? t.whole_winter : t.months[st], c.bss))}</p>` +
+      legendRows(CHANCE, t.chance_classes) + `<div><i style="background:${GREY}"></i>${esc(t.none)}</div>`;
+    note = t.chance_note(level);
   } else {
     html = legendRows(COLORS, t.classes) + `<div><i style="background:${GREY}"></i>${esc(t.none)}</div>`;
+    if (view === "risk" && scale === "chance" && calibration) note = level === "zone" ? t.zone_no_chance : t.no_skill;
   }
   $("legend").innerHTML = html;
   $("layer_note").textContent = note;
@@ -386,6 +427,15 @@ function render() {
     b.disabled = view !== "risk"; // vulnerability and greenness are per soum
   }
   $("level").setAttribute("aria-label", t.level);
+  $("scale_l").textContent = t.scale;
+  $("scale").setAttribute("aria-label", t.scale);
+  $("scale_row").hidden = view !== "risk" || !calibration;
+  const canChance = level !== "zone" && !!calOf(level, curStage()); // the choice is kept; the button shows what is drawn
+  for (const b of document.querySelectorAll("[data-scale]")) {
+    b.textContent = t[`scale_${b.dataset.scale}`];
+    b.setAttribute("aria-pressed", String(b.dataset.scale === (useChance() ? "chance" : "class")));
+    b.disabled = b.dataset.scale === "chance" && !canChance;
+  }
   if (zoneGeo) {
     const rank = (z) => zoneScores[z]?.risk ?? -Infinity;
     $("zones").innerHTML = zoneGeo.features.map((f) => f.properties.pcode).sort((a, b) => rank(b) - rank(a)).map((z) => {
@@ -401,10 +451,10 @@ function render() {
     $("aimags").innerHTML = aimagGeo.features.map((f) => f.properties)
       .sort((a, b) => rank(b.pcode) - rank(a.pcode))
       .map((p) => {
-        const a = aimagScores[p.pcode], c = a?.risk_class ?? null;
+        const a = aimagScores[p.pcode], c = a?.risk_class ?? null, q = c === null ? null : chanceOf(calOf("aimag", curStage()), a.risk);
         return `<tr><td><button type="button" class="link" data-aimag="${esc(p.pcode)}" title="${esc(t.zoom_to)}">` +
-          `<i class="chip" style="background:${c === null ? GREY : COLORS[c]}"></i>${esc(aimagName(p))}</button></td>` +
-          `<td>${c === null ? "–" : esc(t.classes[c])} ${a?.risk == null ? "" : fmt(a.risk)}</td></tr>`;
+          `<i class="chip" style="background:${aimagFill(a)}"></i>${esc(aimagName(p))}</button></td>` +
+          `<td>${c === null ? "–" : esc(t.classes[c])} ${a?.risk == null ? "" : fmt(a.risk)}${q === null ? "" : ` · ${Math.round(100 * q)}%`}</td></tr>`;
       }).join("");
   }
   if (soumGeo) {
@@ -473,6 +523,9 @@ async function load(label) {
 $("lang").addEventListener("click", () => { lang = lang === "mn" ? "en" : "mn"; render(); });
 for (const b of document.querySelectorAll("[data-level]")) {
   b.addEventListener("click", () => { if (level !== b.dataset.level) { level = b.dataset.level; if (soumGeo) draw(); else render(); } });
+}
+for (const b of document.querySelectorAll("[data-scale]")) {
+  b.addEventListener("click", () => { if (scale !== b.dataset.scale) { scale = b.dataset.scale; if (soumGeo) draw(); else render(); } });
 }
 $("view").addEventListener("change", (e) => { view = e.target.value; if (soumGeo) draw(); else render(); });
 $("search").addEventListener("change", findSoum);

@@ -12,7 +12,7 @@
   body { display: grid; grid-template-columns: 340px 1fr; grid-template-rows: auto 1fr; height: 100vh; }
   header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #fff; }
   header h1 { margin: 0; font-size: 18px; }
-  header .sub { color: var(--muted); font-size: 14px; flex: 1; }
+  header .sub { color: var(--muted); font-size: 14px; flex: 1 1 360px; }  /* too narrow for 360 px: its own row, not a column */
   header select, header input { font: inherit; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
   header input { width: 170px; }
   header button { font: inherit; padding: 4px 10px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; }
@@ -30,6 +30,11 @@
   header .seg button { border: 0; border-radius: 0; }
   header .seg button + button { border-left: 1px solid var(--line); }
   .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .scale-row { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 14px; color: var(--muted); }
+  .scale-row .seg button { font: inherit; padding: 3px 10px; border: 0; background: #fff; color: var(--ink); cursor: pointer; }
+  .scale-row .seg button + button { border-left: 1px solid var(--line); }
+  .scale-row .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .scale-row .seg button:disabled { color: #a3a9b5; cursor: not-allowed; }
   .seg button:disabled { color: #a3a9b5; cursor: not-allowed; }
   .chip { width: 11px; height: 11px; border: 1px solid #999; display: inline-block; margin-right: 6px; vertical-align: -1px; }
   button.link { font: inherit; color: inherit; background: none; border: 0; padding: 0; text-align: left; cursor: pointer; }
@@ -42,7 +47,7 @@
   @media (max-width: 1280px) { header .sub { flex-basis: 100%; order: 1; } }  /* below the controls, not a squeezed column */
   /* touch: every control at least 44 px, the header three rows so the map starts high on a phone */
   @media (max-width: 760px), (pointer: coarse) {
-    header button, header select, header input, .seg button { min-height: 44px; font-size: 16px; }
+    header button, header select, header input, .seg button, .scale-row .seg button { min-height: 44px; font-size: 16px; }
     aside button.link { display: inline-flex; align-items: center; min-height: 44px; }
     .leaflet-touch .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; }
   }
@@ -77,6 +82,7 @@
   <p class="note sub-m" data-t="subtitle"></p>
   <p class="banner" id="banner" hidden></p>
   <h2 data-t="legend"></h2>
+  <p class="scale-row" id="scale_row" hidden><span id="scale_l"></span> <span class="seg" id="scale" role="group"><button type="button" data-scale="chance" aria-pressed="true"></button><button type="button" data-scale="class" aria-pressed="false"></button></span></p>
   <div class="legend" id="legend"></div>
   <p class="note" id="layer_note"></p>
   <h2 data-t="zone_table"></h2>
@@ -108,6 +114,6 @@
 </aside>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-<script src="app.js?v=0.5.9"></script>
+<script src="app.js?v=0.6.0"></script>
 </body>
 </html>
