@@ -47,6 +47,8 @@ The learned model ranks below the fixed weights when each winter is held out: so
 - [Design and roadmap](docs/superpowers/specs/2026-11-08-zudrisk-design.md): the method and why.
 - [Data sources](docs/research/data-sources.md): the research behind every input.
 - [EIC data options](docs/research/eic-data-options.md): what eic.mn publishes and what ZudRisk and hazard can use (in Mongolian).
+- [Official dzud lists](docs/research/official-dzud-lists.md): where soums named in dzud or near-dzud are published (in
+  Mongolian); the lists found are in `data/source/dzud_official_lists.csv`, matched to soums by `pipeline.official`.
 - [Snow comparison](docs/research/snow-comparison.md): GLDAS against ERA5-Land, generated.
 - `docs/superpowers/plans/`: one implementation plan per version, v0.1-v0.5.
 
