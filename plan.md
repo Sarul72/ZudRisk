@@ -33,6 +33,8 @@ score or the model carries the rule that decides it, fixed before the run.
 | Idea | Outcome |
 |---|---|
 | 2025/26 on the map | Scored and shown, not validated until NSO publishes its losses (`hindcast.PENDING`). |
+| Resolution 286 view (main criteria) | `pipeline.summer`, `pipeline.decree286`, site layer. Losses >= 5 %: white 35.6 % (n 104), black moderate 35.1 % (154), white moderate 24.4 % (908), none 10.9 % (3520); ZudRisk's very-high class 58.3 % (235). Official white-dzud lists (6 snapshots): 4 % flagged white, 63 % white or moderate; the named soums' ERA5 depth is about 16 cm and their months are rarely 3 °C colder, so NAMEM's white dzud does not follow the main criteria as read here. |
+| Official dzud lists | 7 snapshots, 886 soum mentions, 884 matched to soums (`pipeline.official`). |
 | Natural zones from Mongolia's zoning map | `data/source/naturalzone` replaces RESOLVE; five zones; desert steppe counted as gobi by choice (Resolution 286's thresholds), stated on the site. 156 soums changed zone; scores unchanged. |
 | Popup cold label | "Mean since November" at the November to January outlook stages. |
 | Pasture area as the grazing-pressure denominator | EIC's rangeland map less its "other land" (`pipeline.pasture`). Rule fixed before the run: keep only if both soum rhos rise. Pre-registered 0.596 -> 0.600, every soum-winter 0.434 -> 0.440: kept. Aimag 0.547 -> 0.544, model rho 0.372 -> 0.373, AUC 0.745 -> 0.745. |
