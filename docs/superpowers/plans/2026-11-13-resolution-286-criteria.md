@@ -171,6 +171,13 @@ def check() -> None:
   - `validate(years: list[int]) -> dict`, which writes `site/data/decree286_validation.json`.
 - JSON shape per soum: `{"status": str, "months": [yyyymm], "summer": str | null, "by_month": {yyyymm: [types] | null}, "inputs": {yyyymm: {"depth_cm", "t_anom", "t_sd"}}, "zone": str}`.
 - Validation shape: `{status: {"n": int, "loss5": float}}` for soum-winters 2011/12 on with losses (adult losses in sheep units ≥ 5 % of the census), plus `"risk_class_4"` for ZudRisk's very-high class, for comparison.
+- Also against the official lists (`data/derived/dzud_official.csv`, from `pipeline.official`):
+  - Each snapshot is compared with the flags of the month that holds its `as_of` date (for 2024-02-20, February), for that winter.
+  - Categories pair up as follows: `white` with `white`, `white_moderate` with `white_moderate`, `black` with `black`. Official `iron` is left out, since ZudRisk cannot assess it. `dzud_any` pairs with any flag.
+  - Write per snapshot to `"official"` in the validation file:
+    - the share of officially named soums that ZudRisk flags (recall);
+    - the share of ZudRisk-flagged soums that are officially named (precision).
+  - A soum absent from a snapshot is not counted as an official "no"; say so on the site.
 
 - [ ] **Step 1: Add to `check()`**
 
