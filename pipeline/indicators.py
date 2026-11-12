@@ -15,6 +15,7 @@ from pipeline.era5 import load_era5
 from pipeline.gldas import OUT as GLDAS_CSV, load_series
 from pipeline.ndvi import OUT as NDVI_CSV
 from pipeline.nso import load_livestock, sheep_units
+from pipeline.pasture import load_shares as load_pasture
 from pipeline.score import risk, risk_class, zscore
 
 BASELINE = range(2001, 2021)  # winters 2001/02 .. 2020/21, summers 2001 .. 2020
@@ -106,15 +107,18 @@ def pressure_raw(stock_by_type: dict[str, float], area_km2: float) -> float | No
     return math.log(su * 1000 / area_km2)
 
 
-def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, float | None]:
-    """log sheep units per km2. An aimag centre is a town: the herds registered there graze the aimag, so it takes
-    the aimag's density rather than a town's 5,000-13,000 per km2, which clipped every centre at z = 3."""
+def pressure_by_soum(soums: list[dict], herds: dict, census: int, pasture: dict[str, float] | None = None) -> dict[str, float | None]:
+    """log sheep units per km2 of pasture. An aimag centre is a town: the herds registered there graze the aimag, so it
+    takes the aimag's density rather than a town's 5,000-13,000 per km2, which clipped every centre at z = 3.
+    pasture: each soum's pasture share (pipeline.pasture); a soum missing from it counts whole."""
+    pasture = pasture or {}
+    km2 = {s["pcode"]: s["area_km2"] * pasture.get(s["pcode"], 1.0) for s in soums}
     su = {s["pcode"]: sheep_units(herds.get((s["pcode"], census, "stock"), {})) for s in soums}
     aimag: dict[str, list[float]] = {}
     for s in soums:
         if su[s["pcode"]] is not None:
             tot = aimag.setdefault(s["aimag_pcode"], [0.0, 0.0])
-            tot[0], tot[1] = tot[0] + su[s["pcode"]], tot[1] + s["area_km2"]
+            tot[0], tot[1] = tot[0] + su[s["pcode"]], tot[1] + km2[s["pcode"]]
     out = {}
     for s in soums:
         pc = s["pcode"]
@@ -122,7 +126,7 @@ def pressure_by_soum(soums: list[dict], herds: dict, census: int) -> dict[str, f
             a_su, a_km2 = aimag[s["aimag_pcode"]]
             out[pc] = math.log(a_su * 1000 / a_km2) if a_su > 0 else None
         else:
-            out[pc] = pressure_raw(herds.get((pc, census, "stock"), {}), s["area_km2"])
+            out[pc] = pressure_raw(herds.get((pc, census, "stock"), {}), km2[pc])
     return out
 
 
@@ -160,7 +164,7 @@ def compute(year: int, as_of: date) -> dict[str, dict]:
     """Every soum's indicators and score for winter year/year+1, from what was published by as_of."""
     soums, herds, era5, gldas_s, ndvi_s = _inputs()
     census = census_year(year, as_of)
-    pressure = pressure_by_soum(soums, herds, census)
+    pressure = pressure_by_soum(soums, herds, census, load_pasture())
     rows = {}
     for s in soums:
         pc = s["pcode"]
@@ -263,6 +267,10 @@ def check() -> None:
     empty = pressure_by_soum([ub_rural, ub_city], {("MN1101", 2025, "stock"): {**full, "sheep": 0.9},
                                                     ("MN1107", 2025, "stock"): full}, 2025)
     assert empty["MN1107"] is None, empty
+    half = pressure_by_soum([town, rural], herds, 2025, pasture={"MN4616": 0.5})
+    assert abs(half["MN4616"] - math.log(900 / 495)) < 1e-12, "a soum half lake or closed forest: its herd on half the land"
+    assert abs(half["MN4601"] - math.log(1000 / 505)) < 1e-12, "the aimag centre takes the aimag's pasture, not its area"
+    assert pressure_by_soum([town, rural], herds, 2025, pasture={}) == pr, "no shares: the whole soum, as before"
     assert no_herd({("A", 2025, "stock"): full}, "A", 2025), "a census row of zeros is no herd"
     assert not no_herd({}, "A", 2025), "a missing census row is missing data, not no herd: score it on the rest"
     assert not no_herd({("A", 2025, "stock"): {**full, "sheep": 0.1}}, "A", 2025)

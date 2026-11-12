@@ -7,47 +7,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.347
+        "spearman_aimag": 0.261
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.054,
-        "excess_spearman_soum": -0.058,
+        "spearman_soum": 0.078,
+        "excess_spearman_soum": -0.08,
         "n_aimag": 21,
-        "spearman_aimag": 0.022
+        "spearman_aimag": 0.052
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
-        "spearman_soum": 0.12,
-        "excess_spearman_soum": 0.08,
+        "spearman_soum": 0.121,
+        "excess_spearman_soum": 0.063,
         "n_aimag": 21,
-        "spearman_aimag": -0.103
+        "spearman_aimag": -0.117
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.127,
-        "excess_spearman_soum": 0.094,
+        "spearman_soum": 0.167,
+        "excess_spearman_soum": 0.122,
         "n_aimag": 21,
-        "spearman_aimag": 0.284
+        "spearman_aimag": 0.3
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.332,
-        "excess_spearman_soum": 0.346,
+        "spearman_soum": 0.342,
+        "excess_spearman_soum": 0.352,
         "n_aimag": 21,
-        "spearman_aimag": 0.296
+        "spearman_aimag": 0.322
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.215,
-        "excess_spearman_soum": 0.21,
+        "spearman_soum": 0.209,
+        "excess_spearman_soum": 0.201,
         "n_aimag": 21,
-        "spearman_aimag": -0.19
+        "spearman_aimag": -0.203
       }
     },
     "pooled": {
@@ -59,9 +59,9 @@
         2022,
         2023
       ],
-      "spearman": 0.221,
+      "spearman": 0.231,
       "n_excess": 1683,
-      "spearman_excess": 0.193
+      "spearman_excess": 0.191
     },
     "pooled_aimag": {
       "n": 525,
@@ -92,7 +92,7 @@
         2023,
         2024
       ],
-      "spearman": 0.335
+      "spearman": 0.33
     }
   },
   "nov": {
@@ -103,47 +103,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.861
+        "spearman_aimag": 0.856
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.23,
-        "excess_spearman_soum": -0.05,
+        "spearman_soum": 0.24,
+        "excess_spearman_soum": -0.063,
         "n_aimag": 21,
-        "spearman_aimag": 0.318
+        "spearman_aimag": 0.319
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
-        "spearman_soum": 0.346,
-        "excess_spearman_soum": 0.414,
+        "spearman_soum": 0.351,
+        "excess_spearman_soum": 0.411,
         "n_aimag": 21,
-        "spearman_aimag": 0.449
+        "spearman_aimag": 0.44
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.015,
-        "excess_spearman_soum": 0.008,
+        "spearman_soum": 0.04,
+        "excess_spearman_soum": 0.019,
         "n_aimag": 21,
-        "spearman_aimag": -0.11
+        "spearman_aimag": -0.049
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.244,
-        "excess_spearman_soum": 0.234,
+        "spearman_soum": 0.252,
+        "excess_spearman_soum": 0.237,
         "n_aimag": 21,
-        "spearman_aimag": 0.148
+        "spearman_aimag": 0.125
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.676,
-        "excess_spearman_soum": 0.691,
+        "spearman_soum": 0.679,
+        "excess_spearman_soum": 0.692,
         "n_aimag": 21,
-        "spearman_aimag": 0.842
+        "spearman_aimag": 0.839
       }
     },
     "pooled": {
@@ -155,7 +155,7 @@
         2022,
         2023
       ],
-      "spearman": 0.496,
+      "spearman": 0.503,
       "n_excess": 1683,
       "spearman_excess": 0.477
     }
@@ -168,47 +168,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.717
+        "spearman_aimag": 0.723
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.212,
-        "excess_spearman_soum": -0.087,
+        "spearman_soum": 0.222,
+        "excess_spearman_soum": -0.097,
         "n_aimag": 21,
-        "spearman_aimag": 0.2
+        "spearman_aimag": 0.183
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
-        "spearman_soum": 0.381,
-        "excess_spearman_soum": 0.457,
+        "spearman_soum": 0.389,
+        "excess_spearman_soum": 0.458,
         "n_aimag": 21,
-        "spearman_aimag": 0.612
+        "spearman_aimag": 0.603
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.162,
-        "excess_spearman_soum": 0.077,
+        "spearman_soum": 0.191,
+        "excess_spearman_soum": 0.095,
         "n_aimag": 21,
-        "spearman_aimag": 0.243
+        "spearman_aimag": 0.327
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.287,
+        "spearman_soum": 0.291,
         "excess_spearman_soum": 0.274,
         "n_aimag": 21,
-        "spearman_aimag": 0.226
+        "spearman_aimag": 0.213
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.671,
-        "excess_spearman_soum": 0.693,
+        "spearman_soum": 0.672,
+        "excess_spearman_soum": 0.692,
         "n_aimag": 21,
-        "spearman_aimag": 0.813
+        "spearman_aimag": 0.806
       }
     },
     "pooled": {
@@ -220,9 +220,9 @@
         2022,
         2023
       ],
-      "spearman": 0.634,
+      "spearman": 0.64,
       "n_excess": 1683,
-      "spearman_excess": 0.626
+      "spearman_excess": 0.627
     }
   },
   "jan": {
@@ -233,47 +233,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.675
+        "spearman_aimag": 0.664
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.218,
-        "excess_spearman_soum": -0.162,
+        "spearman_soum": 0.227,
+        "excess_spearman_soum": -0.169,
         "n_aimag": 21,
         "spearman_aimag": 0.053
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
-        "spearman_soum": 0.453,
+        "spearman_soum": 0.461,
         "excess_spearman_soum": 0.516,
         "n_aimag": 21,
-        "spearman_aimag": 0.69
+        "spearman_aimag": 0.7
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.128,
-        "excess_spearman_soum": 0.087,
+        "spearman_soum": 0.156,
+        "excess_spearman_soum": 0.103,
         "n_aimag": 21,
-        "spearman_aimag": 0.279
+        "spearman_aimag": 0.274
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.345,
-        "excess_spearman_soum": 0.336,
+        "spearman_soum": 0.347,
+        "excess_spearman_soum": 0.333,
         "n_aimag": 21,
-        "spearman_aimag": 0.306
+        "spearman_aimag": 0.299
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.669,
-        "excess_spearman_soum": 0.691,
+        "spearman_soum": 0.668,
+        "excess_spearman_soum": 0.688,
         "n_aimag": 21,
-        "spearman_aimag": 0.758
+        "spearman_aimag": 0.753
       }
     },
     "pooled": {
@@ -285,12 +285,77 @@
         2022,
         2023
       ],
-      "spearman": 0.631,
+      "spearman": 0.635,
       "n_excess": 1683,
-      "spearman_excess": 0.618
+      "spearman_excess": 0.617
     }
   },
   "feb": {
+    "winters": {
+      "2009-10": {
+        "validation_unit": "aimag",
+        "n": 0,
+        "spearman_soum": null,
+        "excess_spearman_soum": null,
+        "n_aimag": 21,
+        "spearman_aimag": 0.596
+      },
+      "2013-14": {
+        "validation_unit": "soum+aimag",
+        "n": 337,
+        "spearman_soum": 0.268,
+        "excess_spearman_soum": -0.129,
+        "n_aimag": 21,
+        "spearman_aimag": 0.123
+      },
+      "2015-16": {
+        "validation_unit": "soum+aimag",
+        "n": 338,
+        "spearman_soum": 0.473,
+        "excess_spearman_soum": 0.523,
+        "n_aimag": 21,
+        "spearman_aimag": 0.684
+      },
+      "2021-22": {
+        "validation_unit": "soum+aimag",
+        "n": 336,
+        "spearman_soum": 0.108,
+        "excess_spearman_soum": 0.062,
+        "n_aimag": 21,
+        "spearman_aimag": 0.262
+      },
+      "2022-23": {
+        "validation_unit": "soum+aimag",
+        "n": 336,
+        "spearman_soum": 0.326,
+        "excess_spearman_soum": 0.317,
+        "n_aimag": 21,
+        "spearman_aimag": 0.339
+      },
+      "2023-24": {
+        "validation_unit": "soum+aimag",
+        "n": 336,
+        "spearman_soum": 0.661,
+        "excess_spearman_soum": 0.679,
+        "n_aimag": 21,
+        "spearman_aimag": 0.712
+      }
+    },
+    "pooled": {
+      "n": 1683,
+      "winters": [
+        2013,
+        2015,
+        2021,
+        2022,
+        2023
+      ],
+      "spearman": 0.602,
+      "n_excess": 1683,
+      "spearman_excess": 0.578
+    }
+  },
+  "mar": {
     "winters": {
       "2009-10": {
         "validation_unit": "aimag",
@@ -303,97 +368,32 @@
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.258,
-        "excess_spearman_soum": -0.115,
+        "spearman_soum": 0.261,
+        "excess_spearman_soum": -0.131,
         "n_aimag": 21,
-        "spearman_aimag": 0.164
+        "spearman_aimag": 0.142
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
         "spearman_soum": 0.465,
-        "excess_spearman_soum": 0.523,
+        "excess_spearman_soum": 0.511,
         "n_aimag": 21,
-        "spearman_aimag": 0.683
+        "spearman_aimag": 0.653
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.084,
-        "excess_spearman_soum": 0.05,
+        "spearman_soum": 0.104,
+        "excess_spearman_soum": 0.063,
         "n_aimag": 21,
-        "spearman_aimag": 0.147
+        "spearman_aimag": 0.265
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.326,
-        "excess_spearman_soum": 0.321,
-        "n_aimag": 21,
-        "spearman_aimag": 0.344
-      },
-      "2023-24": {
-        "validation_unit": "soum+aimag",
-        "n": 336,
-        "spearman_soum": 0.661,
-        "excess_spearman_soum": 0.681,
-        "n_aimag": 21,
-        "spearman_aimag": 0.723
-      }
-    },
-    "pooled": {
-      "n": 1683,
-      "winters": [
-        2013,
-        2015,
-        2021,
-        2022,
-        2023
-      ],
-      "spearman": 0.597,
-      "n_excess": 1683,
-      "spearman_excess": 0.579
-    }
-  },
-  "mar": {
-    "winters": {
-      "2009-10": {
-        "validation_unit": "aimag",
-        "n": 0,
-        "spearman_soum": null,
-        "excess_spearman_soum": null,
-        "n_aimag": 21,
-        "spearman_aimag": 0.573
-      },
-      "2013-14": {
-        "validation_unit": "soum+aimag",
-        "n": 337,
-        "spearman_soum": 0.249,
-        "excess_spearman_soum": -0.119,
-        "n_aimag": 21,
-        "spearman_aimag": 0.182
-      },
-      "2015-16": {
-        "validation_unit": "soum+aimag",
-        "n": 338,
-        "spearman_soum": 0.459,
-        "excess_spearman_soum": 0.515,
-        "n_aimag": 21,
-        "spearman_aimag": 0.671
-      },
-      "2021-22": {
-        "validation_unit": "soum+aimag",
-        "n": 336,
-        "spearman_soum": 0.081,
-        "excess_spearman_soum": 0.05,
-        "n_aimag": 21,
-        "spearman_aimag": 0.171
-      },
-      "2022-23": {
-        "validation_unit": "soum+aimag",
-        "n": 336,
-        "spearman_soum": 0.332,
-        "excess_spearman_soum": 0.33,
+        "spearman_soum": 0.333,
+        "excess_spearman_soum": 0.326,
         "n_aimag": 21,
         "spearman_aimag": 0.338
       },
@@ -401,9 +401,9 @@
         "validation_unit": "soum+aimag",
         "n": 336,
         "spearman_soum": 0.655,
-        "excess_spearman_soum": 0.674,
+        "excess_spearman_soum": 0.673,
         "n_aimag": 21,
-        "spearman_aimag": 0.717
+        "spearman_aimag": 0.714
       }
     },
     "pooled": {
@@ -415,9 +415,9 @@
         2022,
         2023
       ],
-      "spearman": 0.596,
+      "spearman": 0.6,
       "n_excess": 1683,
-      "spearman_excess": 0.577
+      "spearman_excess": 0.576
     }
   },
   "oct_seas5": {
@@ -428,47 +428,47 @@
         "spearman_soum": null,
         "excess_spearman_soum": null,
         "n_aimag": 21,
-        "spearman_aimag": 0.492
+        "spearman_aimag": 0.471
       },
       "2013-14": {
         "validation_unit": "soum+aimag",
         "n": 337,
-        "spearman_soum": 0.071,
-        "excess_spearman_soum": -0.118,
+        "spearman_soum": 0.097,
+        "excess_spearman_soum": -0.139,
         "n_aimag": 21,
-        "spearman_aimag": -0.109
+        "spearman_aimag": -0.114
       },
       "2015-16": {
         "validation_unit": "soum+aimag",
         "n": 338,
-        "spearman_soum": 0.1,
-        "excess_spearman_soum": 0.054,
+        "spearman_soum": 0.098,
+        "excess_spearman_soum": 0.035,
         "n_aimag": 21,
-        "spearman_aimag": -0.165
+        "spearman_aimag": -0.2
       },
       "2021-22": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.256,
-        "excess_spearman_soum": 0.22,
+        "spearman_soum": 0.29,
+        "excess_spearman_soum": 0.246,
         "n_aimag": 21,
-        "spearman_aimag": 0.514
+        "spearman_aimag": 0.531
       },
       "2022-23": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.341,
-        "excess_spearman_soum": 0.356,
+        "spearman_soum": 0.35,
+        "excess_spearman_soum": 0.36,
         "n_aimag": 21,
-        "spearman_aimag": 0.321
+        "spearman_aimag": 0.353
       },
       "2023-24": {
         "validation_unit": "soum+aimag",
         "n": 336,
-        "spearman_soum": 0.169,
-        "excess_spearman_soum": 0.166,
+        "spearman_soum": 0.166,
+        "excess_spearman_soum": 0.161,
         "n_aimag": 21,
-        "spearman_aimag": 0.003
+        "spearman_aimag": -0.022
       }
     },
     "pooled": {
@@ -480,9 +480,9 @@
         2022,
         2023
       ],
-      "spearman": 0.09,
+      "spearman": 0.097,
       "n_excess": 1683,
-      "spearman_excess": 0.05
+      "spearman_excess": 0.046
     },
     "pooled_aimag": {
       "n": 525,
@@ -513,7 +513,7 @@
         2023,
         2024
       ],
-      "spearman": 0.312
+      "spearman": 0.308
     }
   }
 }

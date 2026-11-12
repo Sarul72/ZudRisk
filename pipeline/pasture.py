@@ -1,4 +1,4 @@
-"""Usable pasture per soum, for the grazing-pressure denominator (plan.md, task Z3).
+"""Usable pasture per soum, the grazing-pressure denominator (plan.md, 2026-11-13).
 
 Grazing pressure is sheep units per km² of the whole soum, so a soum that is half lake or closed forest looks half as
 grazed as it is. The Environmental Information Center's hayland and pasture map (Хадлан, бэлчээрийн зураг, eic.mn,
@@ -11,6 +11,9 @@ area less its share of zone E. The map is static and undated (uploaded 2020).
 The rule, fixed before the run (2026-11-13): the pasture denominator is kept only if both the pre-registered pooled
 soum rho (0.596, n 1683) and the every-soum-winter rho (0.434, n 4688) rise. The aimag rho (0.547) and the learned
 model's held-out soum rho and AUC (0.372, 0.745) are reported, not decided on.
+Run 2026-11-13, all 25 validated winters rescored:
+  pre-registered soum rho 0.596 -> 0.600 (n 1683), every soum-winter 0.434 -> 0.440 (n 4688): both rose, so kept;
+  every aimag-winter 0.547 -> 0.544, model held-out rho 0.372 -> 0.373, AUC 0.745 -> 0.745.
 
 The map is read once over WFS (GML in EPSG:32648, WGS 84 / UTM 48N) and projected here with the standard library;
 only the derived shares are published, citing EIC as Government Resolution 85 (2010) asks."""

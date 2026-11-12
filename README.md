@@ -4,7 +4,9 @@ An open, reproducible estimate of dzud (зуд) risk for every soum of Mongolia,
 - Copernicus ERA5-Land winter temperature and snow;
 - NASA MODIS summer NDVI;
 - NSO livestock counts and losses;
-- OCHA COD-AB soum boundaries.
+- OCHA COD-AB soum boundaries;
+- the Environmental Information Center's hayland and pasture map (Байгаль орчны мэдээллийн сан, eic.mn), for
+  each soum's pasture area. Only the derived shares are published (`data/derived/soum_pasture.csv`), citing EIC.
 
 It covers research hindcasts of 25 winters (2000/01-2024/25) plus a 2026/27 outlook updated monthly. It is not a
 warning.
@@ -14,7 +16,8 @@ Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "
 ## What the site shows
 
 - **Risk** per soum, aimag or natural zone for any winter: four indicators (cold, snow, summer pasture, grazing
-  pressure) as z-scores, weighted into one score and five classes.
+  pressure) as z-scores, weighted into one score and five classes. Grazing pressure is sheep units per km² of
+  pasture: the soum less EIC's "other land" (large lakes, closed forest), 4.5 % of the country.
 - **Chance** of adult losses of 5 % or more. The map is coloured by it at soum and aimag level; the five classes stay
   one click away ("Өнгө / Colour"). Soums are calibrated per outlook stage on 2011/12-2024/25, aimags on their own
   525 aimag-winters 2000/01-2024/25. A stage whose held-out Brier skill is 0 or below shows classes, not a chance.
@@ -22,19 +25,19 @@ Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "
 - **Greenness trend** (desertification) and the six natural zones.
 - **Validation** beside every map: how each winter and each outlook stage ranked the losses that followed.
 
-## How well it works (2026-11-08)
+## How well it works (2026-11-13)
 
 Spearman rho of the risk score against adult livestock mortality:
 
 | Test | rho | n |
 |---|---|---|
-| Pre-registered winters, soum level (2013/14, 2015/16, 2021/22-2023/24) | 0.596 | 1683 |
-| Every soum-winter with losses, 2011/12-2024/25 | 0.434 | 4688 |
-| Every aimag-winter, 2000/01-2024/25 | 0.547 | 525 |
-| Outlook stage, pre-registered winters: Oct / Nov / Dec / Jan / Feb / Mar | 0.22 / 0.50 / 0.63 / 0.63 / 0.60 / 0.60 | 1683 |
+| Pre-registered winters, soum level (2013/14, 2015/16, 2021/22-2023/24) | 0.600 | 1683 |
+| Every soum-winter with losses, 2011/12-2024/25 | 0.440 | 4688 |
+| Every aimag-winter, 2000/01-2024/25 | 0.544 | 525 |
+| Outlook stage, pre-registered winters: Oct / Nov / Dec / Jan / Feb / Mar | 0.23 / 0.50 / 0.64 / 0.64 / 0.60 / 0.60 | 1683 |
 
-The learned model ranks below the fixed weights when each winter is held out: soum rho 0.372 against 0.434, and AUC
-0.745 against 0.763. The site says so. October, before any winter weather, is the weakest stage.
+The learned model ranks below the fixed weights when each winter is held out: soum rho 0.373 against 0.440, and AUC
+0.745 against 0.762. The site says so. October, before any winter weather, is the weakest stage.
 
 ## Docs
 
@@ -58,6 +61,7 @@ Needs `uv`. The boundaries and NSO steps need no login. The other sources need f
 uv sync
 uv run python -m pipeline.boundaries          # OCHA COD-AB soums -> data/derived/soums.geojson
 uv run python -m pipeline.nso                 # NSO herds, losses and hay -> data/derived/
+uv run python -m pipeline.pasture             # EIC pasture map -> each soum's pasture share (data/derived/soum_pasture.csv)
 uv run python -m pipeline.era5                # ERA5-Land t2m, snow depth/density/cover, Nov-Mar, to the latest month (CDS)
 uv run python -m pipeline.gldas               # GLDAS-2.1 snow depth, for the snow comparison only (Earthdata)
 uv run python -m pipeline.ndvi                # MODIS MOD13C2 NDVI, Jul-Aug 2000 to the latest summer (Earthdata)

@@ -28,6 +28,13 @@ score or the model carries the rule that decides it, fixed before the run.
   `site/data` itself after it publishes a stage.
 - **Needs from you.** One `git push` by hand first, so Git keeps the GitHub sign-in.
 
+## Done on 2026-11-13
+
+| Idea | Outcome |
+|---|---|
+| 2025/26 on the map | Scored and shown, not validated until NSO publishes its losses (`hindcast.PENDING`). |
+| Pasture area as the grazing-pressure denominator | EIC's rangeland map less its "other land" (`pipeline.pasture`). Rule fixed before the run: keep only if both soum rhos rise. Pre-registered 0.596 -> 0.600, every soum-winter 0.434 -> 0.440: kept. Aimag 0.547 -> 0.544, model rho 0.372 -> 0.373, AUC 0.745 -> 0.745. |
+
 ## Done in this round (2026-11-12)
 
 | Idea | Outcome |

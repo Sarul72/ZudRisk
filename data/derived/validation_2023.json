@@ -19,9 +19,9 @@
     "no mortality": 0
   },
   "spearman_soum": 0.655,
-  "excess_spearman_soum": 0.674,
-  "top_quintile_hit": 0.672,
+  "excess_spearman_soum": 0.673,
+  "top_quintile_hit": 0.657,
   "n_aimag": 21,
-  "spearman_aimag": 0.717,
+  "spearman_aimag": 0.714,
   "mortality_pct": 13.83
 }

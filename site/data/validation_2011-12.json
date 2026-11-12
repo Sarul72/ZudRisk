@@ -18,10 +18,10 @@
   "dropped_reasons": {
     "no mortality": 12
   },
-  "spearman_soum": -0.004,
-  "excess_spearman_soum": -0.117,
+  "spearman_soum": 0.006,
+  "excess_spearman_soum": -0.12,
   "top_quintile_hit": 0.185,
   "n_aimag": 21,
-  "spearman_aimag": -0.082,
+  "spearman_aimag": -0.109,
   "mortality_pct": 1.21
 }
