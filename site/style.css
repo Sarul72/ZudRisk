@@ -16,6 +16,12 @@ header select, header input { font: inherit; padding: 3px 6px; border: 1px solid
 header input { width: 170px; }
 header button { font: inherit; padding: 4px 10px; border: 1px solid var(--line); background: #fff; border-radius: 6px; cursor: pointer; }
 aside { overflow-y: auto; padding: 14px 16px; background: #fff; border-right: 1px solid var(--line); }
+aside .tabs { position: sticky; top: -14px; z-index: 2; display: flex; margin: -14px -16px 14px; background: #fff; border-bottom: 1px solid var(--line); }
+aside .tabs button { flex: 1; font: inherit; font-size: 14px; padding: 10px 0; border: 0; background: none; color: var(--muted); cursor: pointer; }
+aside .tabs button[aria-selected="true"] { color: var(--ink); font-weight: 600; box-shadow: inset 0 -2px var(--accent); }
+aside .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.pane[hidden] { display: none; }
+.intro { margin: 0 0 12px; }
 aside h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; }
 aside h2:first-child { margin-top: 0; }
 #map { height: 100%; }
@@ -48,6 +54,7 @@ aside svg { display: block; margin: 4px 0; }
 @media (max-width: 760px), (pointer: coarse) {
   header button, header select, header input, .seg button, .scale-row .seg button { min-height: 44px; font-size: 16px; }
   aside button.link { display: inline-flex; align-items: center; min-height: 44px; }
+  aside .tabs button { min-height: 44px; font-size: 16px; }
   .leaflet-touch .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; }
 }
 @media (max-width: 760px) {

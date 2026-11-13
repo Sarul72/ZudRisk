@@ -18,6 +18,12 @@
   <button id="lang" type="button">EN</button>
 </header>
 <aside>
+  <div class="tabs" role="tablist">
+    <button type="button" role="tab" data-tab-btn="map" data-t="tab_map"></button>
+    <button type="button" role="tab" data-tab-btn="res" data-t="tab_res"></button>
+    <button type="button" role="tab" data-tab-btn="how" data-t="tab_how"></button>
+  </div>
+  <section class="pane" data-tab="map">
   <p class="note sub-m" data-t="subtitle"></p>
   <p class="banner" id="banner" hidden></p>
   <h2 data-t="legend"></h2>
@@ -29,6 +35,8 @@
   <p class="note" id="zone_note"></p>
   <h2 data-t="aimags"></h2>
   <table id="aimags" class="aimags"></table>
+  </section>
+  <section class="pane" data-tab="res" hidden>
   <h2 id="validation_h"></h2>
   <table id="validation"></table>
   <p class="note" id="unit_note"></p>
@@ -39,6 +47,9 @@
   <table id="pooled"></table>
   <h2 data-t="stages"></h2>
   <div id="stages"></div>
+  </section>
+  <section class="pane" data-tab="how" hidden>
+  <p class="intro" data-t="intro"></p>
   <h2 data-t="model"></h2>
   <table id="model_table"></table>
   <p class="note" id="model_note"></p>
@@ -50,9 +61,11 @@
   <p class="note" data-t="limits_text"></p>
   <h2 data-t="sources"></h2>
   <p class="attr" data-t="sources_text"></p>
+  </section>
 </aside>
 <div id="map"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="ui.js?v=0.7.0"></script>
 <script src="app.js?v=0.7.0"></script>
 </body>
 </html>

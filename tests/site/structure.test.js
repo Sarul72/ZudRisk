@@ -17,3 +17,16 @@ test("every id app.js writes into exists exactly once", () => {
     "model_table", "model_note", "model_chart", "weights", "map"])
     assert.equal((html.match(new RegExp(`id="${id}"`, "g")) || []).length, 1, id);
 });
+
+test("each section sits in its tab", () => {
+  const { TAB_OF } = require("../../site/ui.js");
+  const h2s = [...html.matchAll(/<h2 (?:data-t="([^"]+)"|id="([^"]+)")/g)];
+  assert.equal(h2s.length, 12, "all twelve sections are still there");
+  for (const m of h2s) {
+    const key = m[1] || m[2];
+    const before = html.slice(0, m.index);
+    const pane = [...before.matchAll(/<section class="pane" data-tab="(\w+)"/g)].pop();
+    assert.ok(pane, `${key} is inside a pane`);
+    assert.equal(pane[1], TAB_OF[key], key);
+  }
+});

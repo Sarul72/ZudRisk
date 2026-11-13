@@ -57,6 +57,8 @@ const T = {
     snow_days: "Цастай өдөр", density: "Цасны хамгийн их нягт", unit_density: "кг/м³",
     months: { oct: "10-р сар", nov: "11-р сар", dec: "12-р сар", jan: "1-р сар", feb: "2-р сар", mar: "3-р сар", oct_seas5: "10-р сар + SEAS5" },
     outlook_opt: (m) => `төлөв (${m} хүртэл)`, not_observed: "ажиглагдаагүй",
+    tab_map: "Газрын зураг", tab_res: "Үр дүн", tab_how: "Арга зүй",
+    intro: "Зуд гэдэг нь өвөл, хаврын хүнд нөхцөлд (их цас, хүйтэн, өмнөх зуны ган) мал их хэмжээгээр хорогдох үзэгдэл. ZudRisk нь Монголын сум бүрийн зудын эрсдэлийг хиймэл дагуулын болон цаг агаарын нээлттэй өгөгдлөөр (ERA5-Land, MODIS NDVI) ба ҮСХ-ны малын тоогоор тооцож, өнгөрсөн 25 өвлийн хорогдолтой тулгаж шалгадаг.",
     banner: "Өвөл үргэлжилж байна: энэ бол урьдчилсан төлөв, ажигласан өвөл биш. Хүйтэн ба цасны мэдээ сар бүр нэмэгдэнэ.",
     stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)", seas5_note: (o, f) => `10-р сарын 1-ний ECMWF SEAS5 улирлын таамгийг 10-р сарын шатанд нэмэхэд нарийвчлал буурсан: сум-өвөл ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, бүх аймаг-өвөл ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. Тиймээс төлөвт ашиглахгүй.`,
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
@@ -134,6 +136,8 @@ const T = {
     snow_days: "Snow-cover days", density: "Densest monthly snow", unit_density: "kg/m³",
     months: { oct: "Oct", nov: "Nov", dec: "Dec", jan: "Jan", feb: "Feb", mar: "Mar", oct_seas5: "Oct + SEAS5" },
     outlook_opt: (m) => `outlook (data to ${m})`, not_observed: "not observed yet",
+    tab_map: "Map", tab_res: "Results", tab_how: "Method",
+    intro: "A dzud is a winter or spring disaster in which deep snow, cold or a dry summer before kills many livestock. ZudRisk estimates the risk for every soum of Mongolia from open satellite and weather data (ERA5-Land, MODIS NDVI) and NSO livestock counts, and checks it against the losses of the past 25 winters.",
     banner: "Winter under way: an outlook, not an observed winter. Cold and snow are added month by month.",
     stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)", seas5_note: (o, f) => `Adding the 1 October ECMWF SEAS5 seasonal forecast to the October stage lowered its skill: soum-winter ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, every aimag-winter ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. The outlook does not use it.`,
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
@@ -664,4 +668,5 @@ Promise.all([
   await load(sel.value);
   map.fitBounds(layer.getBounds());
 }).catch(fail);
+ZRui.initTabs(document.querySelector("aside"), (() => { try { return localStorage; } catch { return null; } })());
 render();
