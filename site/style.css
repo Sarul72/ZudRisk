@@ -10,7 +10,9 @@
 html, body { margin: 0; height: 100%; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); }
 body { display: grid; grid-template-columns: 340px 1fr; grid-template-rows: auto 1fr; height: 100vh; }
 header { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; padding: 10px 16px; border-bottom: 1px solid var(--line); background: #fff; }
-header h1 { margin: 0; font-size: 18px; }
+header h1 { margin: 0; font-size: 20px; letter-spacing: -.01em; }
+header h1 .brand { font-size: 14px; font-weight: 500; color: var(--muted); }
+header .lbl { color: var(--muted); }
 header .sub { color: var(--muted); font-size: 14px; flex: 1 1 360px; }  /* too narrow for 360 px: its own row, not a column */
 header select, header input { font: inherit; padding: 3px 6px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
 header input { width: 170px; }

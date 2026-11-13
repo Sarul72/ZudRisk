@@ -9,10 +9,12 @@ const RISK_CUTS = [-1, -0.5, 0.5, 1]; // pipeline/score.py CUTS
 const CHANCE = ["#ffffb2", "#fed976", "#feb24c", "#fd8d3c", "#f03b20", "#bd0026"]; // ColorBrewer YlOrRd-6
 const CHANCE_CUTS = [0.05, 0.1, 0.2, 0.35, 0.5]; // the base rate of losses >= 5 % is about 15 %
 const GREY = "#bbbbbb";
+// the page's own colours (axes, labels, bars) come from the tokens in style.css
+const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const DECREE_COLORS = { black: "#1a1a1a", white: "#2c7fb8", black_moderate: "#7f7f7f", white_moderate: "#a6cee3", none: "#f7f7f7" };
 const DECREE_ORDER = ["black", "white", "black_moderate", "white_moderate", "none"];
 const DECREE_THRESH = { mountain: [25, 16], taiga: [25, 16], forest_steppe: [25, 16], steppe: [22, 11], desert: [12, 5] }; // cm, pipeline.decree286
-const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert: "#d95f0e" };
+const ZONE_COLORS = { mountain: "#9e9ac8", taiga: "#1b7837", forest_steppe: "#78c679", steppe: "#f0e68c", desert: "#8c510a" };
 const KEYS = ["cold", "snow", "summer", "pressure"];
 
 const T = {
@@ -287,20 +289,20 @@ function histChart(h, nowRisk) {
   const W = 280, top = 12, mh = 46, bw = W / (last - first + 1), ys = top + mh + 4;
   const ms = h.mort.filter((v) => v != null), mx = Math.max(0.05, ...ms);
   const strip = (x, r, hi, label) => `<rect x="${x + 1}" y="${ys}" width="${bw - 2}" height="10" fill="${r == null ? GREY : COLORS[bin(r, RISK_CUTS)]}"` +
-    `${hi ? ' stroke="#1d2433" stroke-width="1.5"' : ""}><title>${esc(label)}: ${r == null ? "–" : fmt(r, 3)}</title></rect>`;
+    `${hi ? ' stroke="${css("--ink")}" stroke-width="1.5"' : ""}><title>${esc(label)}: ${r == null ? "–" : fmt(r, 3)}</title></rect>`;
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} 92" width="${W}" role="img" aria-label="${esc(t.hist_caption)}">`;
-  s += `<text x="0" y="10" font-size="11" fill="#5b6475">${Math.round(mx * 100)}%</text>`;
-  s += `<line x1="0" x2="${W}" y1="${top + mh}" y2="${top + mh}" stroke="#d9dde5"/>`;
+  s += `<text x="0" y="10" font-size="11" fill="${css("--muted")}">${Math.round(mx * 100)}%</text>`;
+  s += `<line x1="0" x2="${W}" y1="${top + mh}" y2="${top + mh}" stroke="${css("--line")}"/>`;
   hist.winters.forEach((w, i) => {
     const m = h.mort[i], x = (years[i] - first) * bw, label = w.replace("-", "/");
     if (m != null) {
       const bh = Math.max(1, (m / mx) * mh);
-      s += `<rect x="${x + 1}" y="${top + mh - bh}" width="${bw - 2}" height="${bh}" fill="${w === shown ? "#1d2433" : "#8a93a6"}"><title>${esc(label)}: ${fmt(m * 100, 1)}%</title></rect>`;
+      s += `<rect x="${x + 1}" y="${top + mh - bh}" width="${bw - 2}" height="${bh}" fill="${w === shown ? css("--ink") : css("--bar")}"><title>${esc(label)}: ${fmt(m * 100, 1)}%</title></rect>`;
     }
     s += strip(x, h.risk[i], w === shown, label);
   });
   if (out !== null) s += strip((out - first) * bw, nowRisk, true, `${outlook.winter.replace("-", "/")} ${t.outlook_opt(t.months[outlook.stage])}`);
-  for (let y = first; y <= last; y++) if (y % 5 === 0) s += `<text x="${(y - first + 0.5) * bw}" y="88" font-size="11" text-anchor="middle" fill="#5b6475">'${String(y).slice(2)}</text>`;
+  for (let y = first; y <= last; y++) if (y % 5 === 0) s += `<text x="${(y - first + 0.5) * bw}" y="88" font-size="11" text-anchor="middle" fill="${css("--muted")}">'${String(y).slice(2)}</text>`;
   return `${s}</svg><br><small>${esc(t.hist_caption)}${out !== null ? ` ${esc(t.hist_outlook)}` : ""}</small>`;
 }
 
@@ -314,15 +316,15 @@ function hbars(rows, colors, { d = 2, unit = "", aria = "" } = {}) {
   const lo = Math.min(0, ...vals), hi = Math.max(0, ...vals) || 1;
   const x = (v) => LW + ((v - lo) / (hi - lo)) * (W - LW - VW);
   let s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${rows.length * rh + 4}" width="100%" role="img" aria-label="${esc(aria)}">`;
-  s += `<line x1="${x(0)}" x2="${x(0)}" y1="0" y2="${rows.length * rh + 2}" stroke="#9aa1ae"/>`;
+  s += `<line x1="${x(0)}" x2="${x(0)}" y1="0" y2="${rows.length * rh + 2}" stroke="${css("--axis")}"/>`;
   rows.forEach((r, i) => {
     const y = i * rh + 3, w = r.hi ? 700 : 400;
-    s += `<text x="${LW - 4}" y="${y + rh / 2}" font-size="12" text-anchor="end" dominant-baseline="middle" font-weight="${w}" fill="#1d2433">${esc(r.label)}</text>`;
+    s += `<text x="${LW - 4}" y="${y + rh / 2}" font-size="12" text-anchor="end" dominant-baseline="middle" font-weight="${w}" fill="${css("--ink")}">${esc(r.label)}</text>`;
     r.values.forEach((v, j) => {
       if (v == null) return;
       s += `<rect x="${Math.min(x(0), x(v))}" y="${y + rh / 2 - (colors.length * (bh + 1) - 1) / 2 + j * (bh + 1)}" width="${Math.max(1, Math.abs(x(v) - x(0)))}" height="${bh}" fill="${colors[j]}"/>`;
     });
-    s += `<text x="${W - VW + 4}" y="${y + rh / 2}" font-size="12" dominant-baseline="middle" font-weight="${w}" fill="#1d2433">${esc(texts[i])}</text>`;
+    s += `<text x="${W - VW + 4}" y="${y + rh / 2}" font-size="12" dominant-baseline="middle" font-weight="${w}" fill="${css("--ink")}">${esc(texts[i])}</text>`;
   });
   return `${s}</svg>`;
 }
@@ -459,8 +461,8 @@ function renderModel(t) {
       ...(a ? [[t.model_rows[2], `${fmt(a.rho_fixed, 3)} / ${fmt(a.rho_model, 3)}`], [t.model_rows[3], `${fmt(a.auc_fixed, 3)} / ${fmt(a.auc_model, 3)}`]] : [])]);
   $("model_note").textContent = t.model_verdict(modelBetter(p));
   $("model_chart").innerHTML = hbars(Object.entries(model.lowo).map(([w, v]) => ({ label: w.replace("-", "/"), values: [v.rho_fixed, v.rho_model], hi: w === shown })),
-    ["#8a93a6", "#d95f02"], { aria: t.model_by_winter }) +
-    `<div class="note"><i class="chip" style="background:#8a93a6"></i>${esc(t.fixed)} <i class="chip" style="background:#d95f02;margin-left:8px"></i>${esc(t.learned)}</div>`;
+    [css("--bar"), "#d95f02"], { aria: t.model_by_winter }) +
+    `<div class="note"><i class="chip" style="background:var(--bar)"></i>${esc(t.fixed)} <i class="chip" style="background:#d95f02;margin-left:8px"></i>${esc(t.learned)}</div>`;
   $("weights").innerHTML = table(model.features.map((f) => [t.feat[f], fmt(model.weights[f], 2)]));
 }
 
@@ -488,7 +490,7 @@ function render() {
   $("validation_h").textContent = isOutlook() ? t.stage_validation : t.validation;
   if (asof) {
     $("stages").innerHTML = hbars(Object.entries(asof).map(([k, s]) => ({ label: t.months[k], values: [s.pooled.spearman],
-      hi: isOutlook() && outlook && k === outlook.stage })), ["#3b6fd8"], { aria: t.stages }) +
+      hi: isOutlook() && outlook && k === outlook.stage })), [css("--accent")], { aria: t.stages }) +
       (asof.oct_seas5?.pooled_aimag && asof.oct?.pooled_aimag ? `<div class="note">${esc(t.seas5_note(asof.oct, asof.oct_seas5))}</div>` : "");
   }
   if (isOutlook() && validation) {

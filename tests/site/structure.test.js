@@ -30,3 +30,16 @@ test("each section sits in its tab", () => {
     assert.equal(pane[1], TAB_OF[key], key);
   }
 });
+
+test("no chrome hex in app.js, and a desert colour apart from the risk colours", () => {
+  const js = fs.readFileSync("site/app.js", "utf8");
+  for (const hex of ["#1d2433", "#5b6475", "#d9dde5", "#8a93a6", "#9aa1ae", "#3b6fd8"])
+    assert.ok(!js.includes(hex), `${hex} still hard-coded`);
+  const rgb = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+  const palette = (name) => JSON.parse(js.match(new RegExp(String.raw`const ${name} = (\[[^\]]*\])`))[1]);
+  const desert = js.match(/desert: "(#[0-9a-fA-F]{6})"/)[1];
+  for (const c of [...palette("COLORS"), ...palette("CHANCE")]) {
+    const d = Math.hypot(...rgb(desert).map((v, i) => v - rgb(c)[i]));
+    assert.ok(d > 60, `desert ${desert} too close to ${c} (${d.toFixed(0)})`);
+  }
+});
