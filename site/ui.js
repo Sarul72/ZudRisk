@@ -9,19 +9,17 @@
   };
   const TABS = ["map", "res", "how"];
 
-  /** Wires the [data-tab-btn] buttons under root to its section.pane[data-tab]; opens the stored tab, else "map". */
-  function initTabs(root, store) {
+  /** Wires the [data-tab-btn] buttons under root to its section.pane[data-tab] and opens "map": every visit, and every
+   *  talk, starts on the map and the status card. */
+  function initTabs(root) {
     const buttons = [...root.querySelectorAll("[data-tab-btn]")];
     const panes = [...root.querySelectorAll("section.pane[data-tab]")];
     const show = (tab) => {
       for (const b of buttons) b.setAttribute("aria-selected", String(b.dataset.tabBtn === tab));
       for (const p of panes) p.hidden = p.dataset.tab !== tab;
-      try { store?.setItem("zudrisk.tab", tab); } catch { /* private window: the tab is not remembered */ }
     };
     for (const b of buttons) b.addEventListener("click", () => show(b.dataset.tabBtn));
-    let first = "map";
-    try { const t = store?.getItem("zudrisk.tab"); if (TABS.includes(t)) first = t; } catch { /* ignore */ }
-    show(first);
+    show("map");
   }
 
   const label = (w) => w.replace("-", "/");

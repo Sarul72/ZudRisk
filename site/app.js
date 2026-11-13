@@ -59,6 +59,7 @@ const T = {
     snow_days: "Цастай өдөр", density: "Цасны хамгийн их нягт", unit_density: "кг/м³",
     months: { oct: "10-р сар", nov: "11-р сар", dec: "12-р сар", jan: "1-р сар", feb: "2-р сар", mar: "3-р сар", oct_seas5: "10-р сар + SEAS5" },
     outlook_opt: (m) => `төлөв (${m} хүртэл)`, not_observed: "ажиглагдаагүй",
+    caption_title: "Зудын эрсдэл, сум бүрээр", caption_src: "ERA5-Land · MODIS NDVI · ҮСХ",
     tab_map: "Газрын зураг", tab_res: "Үр дүн", tab_how: "Арга зүй",
     intro: "Зуд гэдэг нь өвөл, хаврын хүнд нөхцөлд (их цас, хүйтэн, өмнөх зуны ган) мал их хэмжээгээр хорогдох үзэгдэл. ZudRisk нь Монголын сум бүрийн зудын эрсдэлийг хиймэл дагуулын болон цаг агаарын нээлттэй өгөгдлөөр (ERA5-Land, MODIS NDVI) ба ҮСХ-ны малын тоогоор тооцож, өнгөрсөн 25 өвлийн хорогдолтой тулгаж шалгадаг.",
     card_outlook: (w, m) => `${w} өвлийн төлөв · ${m}`, card_oct_line: "Өвлийн цаг агаар хараахан ороогүй; 11-р сараас сар бүр шинэчлэгдэнэ.",
@@ -141,6 +142,7 @@ const T = {
     snow_days: "Snow-cover days", density: "Densest monthly snow", unit_density: "kg/m³",
     months: { oct: "Oct", nov: "Nov", dec: "Dec", jan: "Jan", feb: "Feb", mar: "Mar", oct_seas5: "Oct + SEAS5" },
     outlook_opt: (m) => `outlook (data to ${m})`, not_observed: "not observed yet",
+    caption_title: "Dzud risk by soum", caption_src: "ERA5-Land · MODIS NDVI · NSO",
     tab_map: "Map", tab_res: "Results", tab_how: "Method",
     intro: "A dzud is a winter or spring disaster in which deep snow, cold or a dry summer before kills many livestock. ZudRisk estimates the risk for every soum of Mongolia from open satellite and weather data (ERA5-Land, MODIS NDVI) and NSO livestock counts, and checks it against the losses of the past 25 winters.",
     card_outlook: (w, m) => `${w} outlook · ${m}`, card_oct_line: "No winter weather is in yet; it is updated every month from November.",
@@ -212,7 +214,7 @@ const chanceFill = (q) => (q === null ? GREY : CHANCE[bin(q, CHANCE_CUTS)]);
 
 const MONGOLIA = [[41.5, 87.7], [52.2, 119.9]];
 // the pan box is larger than the view at the fitted zoom, or Leaflet would undo a popup's auto-pan
-const map = L.map("map", { minZoom: 4, maxBounds: [[28, 68], [60, 140]] }).fitBounds(MONGOLIA);
+const map = L.map("map", { minZoom: 4, maxBounds: [[20, 60], [66, 150]] }).fitBounds(MONGOLIA);
 const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 12,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -705,5 +707,5 @@ Promise.all([
   await load(sel.value);
   map.fitBounds(MONGOLIA);
 }).catch(fail);
-ZRui.initTabs(document.querySelector("aside"), (() => { try { return localStorage; } catch { return null; } })());
+ZRui.initTabs(document.querySelector("aside"));
 render();

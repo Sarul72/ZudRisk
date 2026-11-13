@@ -15,6 +15,12 @@ Online: <https://sarul72.github.io/ZudRisk/> (GitHub Pages serves `site/`; see "
 
 ## What the site shows
 
+The side panel has three tabs: the map (a status card naming the winter shown, with a jump to the 2009/10 dzud and
+back, then the legend and the zone and aimag tables), results (the validation) and method (a short introduction, the
+model, weights, limits and sources). The default basemap is Esri's light grey canvas; the site falls back to
+OpenStreetMap by itself if those tiles do not load. `node --test "tests/site/*.test.js"` checks the page's structure and
+its small decisions (`site/ui.js`).
+
 - **Risk** per soum, aimag or natural zone for any winter: four indicators (cold, snow, summer pasture, grazing
   pressure) as z-scores, weighted into one score and five classes. Grazing pressure is sheep units per km² of
   pasture: the soum less EIC's "other land" (large lakes, closed forest), 4.5 % of the country.

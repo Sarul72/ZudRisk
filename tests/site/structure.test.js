@@ -43,3 +43,13 @@ test("no chrome hex in app.js, and a desert colour apart from the risk colours",
     assert.ok(d > 60, `desert ${desert} too close to ${c} (${d.toFixed(0)})`);
   }
 });
+
+test("caption on the map, in both languages, and capped popups", () => {
+  assert.match(html, /id="caption"/);
+  const js = fs.readFileSync("site/app.js", "utf8");
+  assert.equal((js.match(/caption_title: "/g) || []).length, 2, "caption_title in MN and EN");
+  assert.equal((js.match(/caption_src: "/g) || []).length, 2, "caption_src in MN and EN");
+  const css = fs.readFileSync("site/style.css", "utf8");
+  assert.match(css, /\.leaflet-popup-content\s*\{[^}]*max-height:\s*280px/);
+  assert.match(css, /backdrop-filter/);
+});
