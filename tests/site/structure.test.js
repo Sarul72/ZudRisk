@@ -53,3 +53,14 @@ test("caption on the map, in both languages, and capped popups", () => {
   assert.match(css, /\.leaflet-popup-content\s*\{[^}]*max-height:\s*280px/);
   assert.match(css, /backdrop-filter/);
 });
+
+test("plain words: no 'retro', greenness not called desertification outright, the chance says what may happen", () => {
+  const js = fs.readFileSync("site/app.js", "utf8");
+  for (const bad of ["ретро", "(цөлжилт)", "Нийлүүлсэн шалгалт", "11–2 сарын дундаж", "Хорогдол ≥5% болох магадлал",
+    "(desertification)", "Pooled test", "Chance of losses ≥5%"])
+    assert.ok(!js.includes(bad), `still says: ${bad}`);
+  assert.ok(js.includes("Малын 5% ба түүнээс дээш нь хорогдох магадлал"), "MN chance names the event");
+  assert.ok(js.includes("Chance that 5% or more of the herd dies"), "EN chance names the event");
+  assert.equal((js.match(/res_q: "/g) || []).length, 2, "the Results tab opens with its question, MN and EN");
+  assert.match(html, /data-t="res_q"/);
+});
