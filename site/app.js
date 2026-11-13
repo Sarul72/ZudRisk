@@ -59,6 +59,9 @@ const T = {
     outlook_opt: (m) => `төлөв (${m} хүртэл)`, not_observed: "ажиглагдаагүй",
     tab_map: "Газрын зураг", tab_res: "Үр дүн", tab_how: "Арга зүй",
     intro: "Зуд гэдэг нь өвөл, хаврын хүнд нөхцөлд (их цас, хүйтэн, өмнөх зуны ган) мал их хэмжээгээр хорогдох үзэгдэл. ZudRisk нь Монголын сум бүрийн зудын эрсдэлийг хиймэл дагуулын болон цаг агаарын нээлттэй өгөгдлөөр (ERA5-Land, MODIS NDVI) ба ҮСХ-ны малын тоогоор тооцож, өнгөрсөн 25 өвлийн хорогдолтой тулгаж шалгадаг.",
+    card_outlook: (w, m) => `${w} өвлийн төлөв · ${m}`, card_oct_line: "Өвлийн цаг агаар хараахан ороогүй; 11-р сараас сар бүр шинэчлэгдэнэ.",
+    card_winter: (w) => `${w} өвөл`, card_observed: (w) => `${w} өвөл · ажигласан`,
+    card_go: "2009/10-ын зудыг үзэх →", card_back: "← Одоогийн төлөв рүү буцах",
     banner: "Өвөл үргэлжилж байна: энэ бол урьдчилсан төлөв, ажигласан өвөл биш. Хүйтэн ба цасны мэдээ сар бүр нэмэгдэнэ.",
     stage_validation: "Энэ шатны өмнөх өвлүүдийн шалгалт", stages: "Шат бүрийн нарийвчлал (өвлүүд нийлүүлсэн ρ)", seas5_note: (o, f) => `10-р сарын 1-ний ECMWF SEAS5 улирлын таамгийг 10-р сарын шатанд нэмэхэд нарийвчлал буурсан: сум-өвөл ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, бүх аймаг-өвөл ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. Тиймээс төлөвт ашиглахгүй.`,
     stage_note: "Өмнөх зургаан өвлийг зөвхөн энэ шатанд гарсан байх мэдээгээр дахин тооцож, бодит хорогдолтой харьцуулав. Ганц үл хамаарал: 2001–2020 оны суурь нь 2009/10, 2013/14, 2015/16-аас хойших жилүүдийг агуулдаг.",
@@ -138,6 +141,9 @@ const T = {
     outlook_opt: (m) => `outlook (data to ${m})`, not_observed: "not observed yet",
     tab_map: "Map", tab_res: "Results", tab_how: "Method",
     intro: "A dzud is a winter or spring disaster in which deep snow, cold or a dry summer before kills many livestock. ZudRisk estimates the risk for every soum of Mongolia from open satellite and weather data (ERA5-Land, MODIS NDVI) and NSO livestock counts, and checks it against the losses of the past 25 winters.",
+    card_outlook: (w, m) => `${w} outlook · ${m}`, card_oct_line: "No winter weather is in yet; it is updated every month from November.",
+    card_winter: (w) => `Winter ${w}`, card_observed: (w) => `Winter ${w} · observed`,
+    card_go: "See the 2009/10 dzud →", card_back: "← Back to the current outlook",
     banner: "Winter under way: an outlook, not an observed winter. Cold and snow are added month by month.",
     stage_validation: "How this stage did on past winters", stages: "Skill by stage (ρ over pooled winters)", seas5_note: (o, f) => `Adding the 1 October ECMWF SEAS5 seasonal forecast to the October stage lowered its skill: soum-winter ρ ${fmt(o.pooled.spearman)} → ${fmt(f.pooled.spearman)}, every aimag-winter ρ ${fmt(o.pooled_aimag.spearman)} → ${fmt(f.pooled_aimag.spearman)}. The outlook does not use it.`,
     stage_note: "The six past winters re-scored with only the data this stage would have had, against their recorded losses. One exception: the 2001–2020 baseline post-dates 2009/10, 2013/14 and 2015/16.",
@@ -449,8 +455,16 @@ function render() {
   renderLegend(t);
   const outlookOpt = sel.querySelector('option[value="outlook"]');
   if (outlook && outlookOpt) outlookOpt.textContent = `${outlook.winter.replace("-", "/")} — ${t.outlook_opt(t.months[outlook.stage])}`;
-  $("banner").hidden = !isOutlook();
-  $("banner").textContent = t.banner;
+  const card = shown ? ZRui.statusCard(t, { shown, outlookWinter: outlook?.winter ?? null, stage: outlook?.stage ?? null, pending: pending.has(shown) }) : null;
+  $("status").hidden = !card;
+  if (card) {
+    $("status_title").textContent = card.title;
+    $("banner").hidden = !card.line;
+    $("banner").textContent = card.line ?? "";
+    $("status_go").textContent = card.button;
+    $("status_go").hidden = !card.target || !(card.target === "outlook" || winters.includes(card.target));
+    $("status_go").dataset.target = card.target ?? "";
+  }
   $("validation_h").textContent = isOutlook() ? t.stage_validation : t.validation;
   if (asof) {
     $("stages").innerHTML = hbars(Object.entries(asof).map(([k, s]) => ({ label: t.months[k], values: [s.pooled.spearman],
@@ -613,6 +627,7 @@ $("view").addEventListener("change", (e) => {
   else draw();
 });
 $("search").addEventListener("change", findSoum);
+$("status_go").addEventListener("click", (e) => { sel.value = e.currentTarget.dataset.target; sel.dispatchEvent(new Event("change")); });
 $("aimags").addEventListener("click", (e) => { const b = e.target.closest("[data-aimag]"); if (b) zoomTo(aimagGeo, "aimag", b.dataset.aimag); });
 $("zones").addEventListener("click", (e) => { const b = e.target.closest("[data-zone]"); if (b) zoomTo(zoneGeo, "zone", b.dataset.zone); });
 sel.addEventListener("change", () => load(sel.value).catch(fail));

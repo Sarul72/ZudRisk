@@ -24,7 +24,20 @@
     show(first);
   }
 
-  const ui = { TAB_OF, TABS, initTabs };
+  const label = (w) => w.replace("-", "/");
+  const SHOWCASE = "2009-10"; // a well-known dzud winter, one click from the first screen
+
+  /** What the status card says for what the map shows, and where its button goes ("outlook", a winter, or null). */
+  function statusCard(t, s) {
+    const outlook = s.shown === "outlook";
+    const title = outlook ? t.card_outlook(label(s.outlookWinter), t.months[s.stage])
+      : s.pending ? t.card_winter(label(s.shown)) : t.card_observed(label(s.shown));
+    const line = outlook ? (s.stage === "oct" ? t.card_oct_line : t.banner) : s.pending ? t.no_losses_yet : null;
+    const back = s.shown === SHOWCASE;
+    return { title, line, button: back ? t.card_back : t.card_go, target: back ? (s.outlookWinter ? "outlook" : null) : SHOWCASE };
+  }
+
+  const ui = { TAB_OF, TABS, initTabs, statusCard };
   if (typeof module !== "undefined" && module.exports) module.exports = ui;
   else window.ZRui = ui;
 })();

@@ -22,6 +22,12 @@ aside .tabs button[aria-selected="true"] { color: var(--ink); font-weight: 600; 
 aside .tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .pane[hidden] { display: none; }
 .intro { margin: 0 0 12px; }
+.card { margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; }
+.card b { display: block; font-size: 15px; }
+.card .note { margin: 4px 0 0; }
+#status_go { margin-top: 8px; font: inherit; font-size: 14px; border: 0; border-radius: 8px; padding: 6px 12px; background: var(--accent); color: #fff; cursor: pointer; }
+#status_go:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+#status_go[hidden] { display: none; }
 aside h2 { font-size: 14px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 18px 0 8px; }
 aside h2:first-child { margin-top: 0; }
 #map { height: 100%; }
@@ -55,6 +61,7 @@ aside svg { display: block; margin: 4px 0; }
   header button, header select, header input, .seg button, .scale-row .seg button { min-height: 44px; font-size: 16px; }
   aside button.link { display: inline-flex; align-items: center; min-height: 44px; }
   aside .tabs button { min-height: 44px; font-size: 16px; }
+  #status_go { min-height: 44px; font-size: 16px; }
   .leaflet-touch .leaflet-bar a { width: 44px; height: 44px; line-height: 44px; }
 }
 @media (max-width: 760px) {
