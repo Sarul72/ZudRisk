@@ -37,7 +37,10 @@
     return { title, line, button: back ? t.card_back : t.card_go, target: back ? (s.outlookWinter ? "outlook" : null) : SHOWCASE };
   }
 
-  const ui = { TAB_OF, TABS, initTabs, statusCard };
+  /** After the light grey basemap's first view settles: switch to OSM only if not one of its tiles loaded. */
+  const shouldFallback = (loaded, errored) => loaded === 0 && errored > 0;
+
+  const ui = { TAB_OF, TABS, initTabs, statusCard, shouldFallback };
   if (typeof module !== "undefined" && module.exports) module.exports = ui;
   else window.ZRui = ui;
 })();

@@ -26,3 +26,9 @@ test("status card says what is shown", () => {
 test("status card without an outlook offers no way back", () => {
   assert.equal(ui.statusCard(T, { shown: "2009-10", outlookWinter: null, stage: null, pending: false }).target, null);
 });
+
+test("basemap falls back to OSM only when every first tile failed", () => {
+  assert.equal(ui.shouldFallback(0, 6), true);
+  assert.equal(ui.shouldFallback(1, 5), false);
+  assert.equal(ui.shouldFallback(0, 0), false); // slow, not dead: nothing settled yet
+});

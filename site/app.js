@@ -40,7 +40,7 @@ const T = {
     limits: "Хязгаарлалт",
     limits_text: "Дөрвөн үзүүлэлт: өвлийн хүйтэн ба цасны зузаан (Copernicus ERA5-Land — загварын үр дүн, хэмжилт биш), зуны бэлчээр (MODIS NDVI), малын нягт. Бүгдийг 2001–2020 оны дундажтай харьцуулна. ҮСХ сумын хорогдлыг 2011/12-оос эхэлж гаргадаг тул түүнээс өмнөх өвлүүдийг (2000/01–2010/11) бодит хорогдолтой зөвхөн аймгаар харьцуулна. 2001/02–2019/20 оны өвлүүд энэ суурь үед өөрөө багтдаг тул тэдний z-оноо 2021 оноос хойших өвлүүдийнхээс бага зэрэг сулардаг. Цасыг v0.3-аас ERA5-Land-аас авна: шинэчлэгдэх хоцрогдол бага гэдгээр харьцуулалтаас өмнө сонгосон. NASA GLDAS-2.1-ийг зөвхөн харьцуулалтад үлдээсэн (docs/research/snow-comparison.md). Цастай өдөр ба цасны нягт нь зөвхөн харуулах зориулалттай, оноонд ороогүй, шалгагдаагүй. Хүйтнийг v0.4-өөс NASA POWER-оос биш ERA5-Land-аас авна: POWER 5–6 долоо хоног хоцордог. Аймгийн төвийн малын нягтыг аймгийн дунджаар авна: тэнд бүртгэлтэй мал аймгийн бэлчээрт бэлчдэг. Улаанбаатарын малтай зургаан дүүрэг хотын нийт нягтыг мөн ийм байдлаар авна; мал бүртгэлгүй гурван дүүргийг тооцоогүй: мал байхгүй бол зудын эрсдэл ч байхгүй. Урьдчилсан төлөвт малын тооллогыг нийтлэгдсэний дараа (дараа оны 2-р сарын 1-нээс гэж үзэв) л ашиглана. Өвс тэжээлийн нөөц, малчдын бэлтгэл нь хорогдлын хэлбэлзлийн тал орчмыг тайлбарладаг (Nandintsetseg нар, 2018). ҮСХ-ны бэлтгэсэн өвс тэжээлийг (зөвхөн аймгаар, сумаар байхгүй) хонин толгойд ногдуулж сургасан загварт оруулсан, тогтмол оноонд оруулаагүй; малчдын бэлтгэлийн өгөгдөл байхгүй хэвээр. Оноо нь жигнэсэн дундаж тул ганц аюул (жишээ нь зөвхөн их цас) хэт өндөр байсан ч бусад нь хэвийн бол оноо сулардаг. Энэ нь судалгааны ретро тооцоо бөгөөд сэрэмжлүүлэг биш.",
     sources: "Эх сурвалж",
-    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: Монгол орны байгалийн бүсчлэлийн зураг, төсөлд өгсөн (цөлжүү хээрийг цөлд оруулсан). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn).",
+    sources_text: "Суурь зураг © OpenStreetMap contributors (ODbL); топограф: OpenTopoMap (CC-BY-SA), SRTM. Сумын хил: OCHA COD-AB, ҮСХ (CC BY-IGO). Агаарын температур, цас: Copernicus ERA5-Land (C3S, CC BY); цасны харьцуулалт: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Байгалийн бүс: Монгол орны байгалийн бүсчлэлийн зураг, төсөлд өгсөн (цөлжүү хээрийг цөлд оруулсан). Мал, хорогдол: Үндэсний статистикийн хороо (1212.mn). Саарал суурь зураг: Esri (World Light Gray Canvas).",
     chance: (p, bss) => `Хорогдол ≥5% болох магадлал: <b>${p}%</b> <small>(өнгөрсөн өвлүүдээр тохируулсан, Brier skill ${fmt(bss, 2)})</small>`,
     scale: "Өнгө", scale_chance: "Магадлал", scale_class: "Ангилал",
     chance_legend: (stage, bss) => `Хорогдол ≥5% болох магадлал (${stage}, Brier skill ${fmt(bss, 2)})`,
@@ -122,7 +122,7 @@ const T = {
     limits: "Limits",
     limits_text: "Four indicators: winter cold and snow depth (Copernicus ERA5-Land — model output, not observed), summer pasture (MODIS NDVI) and herd density, each against 2001–2020. NSO publishes soum losses from 2011/12 only, so the winters before (2000/01–2010/11) are checked against losses by aimag. Winters 2001/02 to 2019/20 lie inside that baseline, so their z-scores are somewhat damped against winters from 2021 on. From v0.3 snow comes from ERA5-Land, chosen before any comparison because it is updated sooner. NASA GLDAS-2.1 is kept as a comparison only (docs/research/snow-comparison.md). Snow-cover days and snow density are shown, not scored, and are unvalidated. From v0.4 cold also comes from ERA5-Land rather than NASA POWER, which runs 5–6 weeks late. An aimag centre takes its aimag's herd density: the herds registered in the town graze the aimag. Ulaanbaatar's six districts with herds take the city's density the same way; the three with no registered herd are not scored: no herd, no dzud risk. The outlook uses a livestock census only once published (taken as 1 February of the next year). Hay reserves and herder preparedness explain about half of the variation in losses (Nandintsetseg et al. 2018). NSO's hay laid in (by aimag only; there is no soum figure), per sheep unit, enters the learned model, not the fixed score; herder preparedness is still not in the data. The score is a weighted mean, so one extreme hazard (deep snow alone, say) is diluted when the others are normal. A research hindcast, not a warning.",
     sources: "Sources",
-    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: Mongolia's natural zoning map, supplied to the project (desert steppe counted as desert). Livestock and losses: NSO Mongolia (1212.mn).",
+    sources_text: "Base map © OpenStreetMap contributors (ODbL); topographic: OpenTopoMap (CC-BY-SA), SRTM. Soum boundaries: OCHA COD-AB, NSO Mongolia (CC BY-IGO). Air temperature and snow: Copernicus ERA5-Land (C3S, CC BY); snow comparison: NASA GLDAS-2.1 Noah. Contains modified Copernicus Climate Change Service information (2026). NDVI: NASA MODIS MOD13C2. Natural zones: Mongolia's natural zoning map, supplied to the project (desert steppe counted as desert). Livestock and losses: NSO Mongolia (1212.mn). Grey base map: Esri (World Light Gray Canvas).",
     chance: (p, bss) => `Chance of losses ≥5%: <b>${p}%</b> <small>(calibrated on past winters, Brier skill ${fmt(bss, 2)})</small>`,
     scale: "Colour", scale_chance: "Chance", scale_class: "Class",
     chance_legend: (stage, bss) => `Chance of losses ≥5% (${stage}, Brier skill ${fmt(bss, 2)})`,
@@ -208,17 +208,37 @@ const chanceLine = (t, p, lvl = "soum") => {
 const useChance = () => view === "risk" && level !== "zone" && scale === "chance" && !!calOf(level, curStage());
 const chanceFill = (q) => (q === null ? GREY : CHANCE[bin(q, CHANCE_CUTS)]);
 
-const map = L.map("map", { minZoom: 4 }).setView([46.8, 103.5], 5);
+const MONGOLIA = [[41.5, 87.7], [52.2, 119.9]];
+// the pan box is larger than the view at the fitted zoom, or Leaflet would undo a popup's auto-pan
+const map = L.map("map", { minZoom: 4, maxBounds: [[28, 68], [60, 140]] }).fitBounds(MONGOLIA);
 const osm = L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
   maxZoom: 12,
   attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-}).addTo(map);
+});
 const topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
   maxZoom: 12,
   attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | ' +
     'Map style &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
 });
-const control = L.control.layers({ OpenStreetMap: osm, OpenTopoMap: topo }, null, { position: "topright" }).addTo(map);
+// Esri World Light Gray Canvas: a quiet base, its labels in a pane above the soums. Under the Esri Master License
+// Agreement; keyless public use is unconfirmed, so the map falls back to OSM by itself if the first view gets no tile.
+const ESRI = "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/";
+const greyBase = L.tileLayer(`${ESRI}World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`, {
+  maxZoom: 16, attribution: "Tiles &copy; Esri — Esri, HERE, Garmin, (c) OpenStreetMap contributors, and the GIS user community",
+});
+map.createPane("labels");
+map.getPane("labels").style.zIndex = 650;
+map.getPane("labels").style.pointerEvents = "none";
+const grey = L.layerGroup([greyBase, L.tileLayer(`${ESRI}World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}`, { maxZoom: 16, pane: "labels" })]).addTo(map);
+const control = L.control.layers({ "Саарал / Light grey": grey, OpenStreetMap: osm, OpenTopoMap: topo }, null, { position: "topright" }).addTo(map);
+{
+  let loaded = 0, errored = 0;
+  const count = (e) => { if (e.type === "tileload") loaded++; else errored++; };
+  greyBase.on("tileload tileerror", count).once("load", () => {
+    greyBase.off("tileload tileerror", count);
+    if (ZRui.shouldFallback(loaded, errored)) { map.removeLayer(grey); osm.addTo(map); } // the control's radio follows
+  });
+}
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 const fmt = (v, d = 2) => (v === null || v === undefined ? "–" : Number(v).toFixed(d));
@@ -681,7 +701,7 @@ Promise.all([
     winters.map((x) => `<option value="${esc(x)}">${esc(x.replace("-", "/"))}</option>`).join("");
   sel.value = outlook ? "outlook" : winters[winters.length - 1];
   await load(sel.value);
-  map.fitBounds(layer.getBounds());
+  map.fitBounds(MONGOLIA);
 }).catch(fail);
 ZRui.initTabs(document.querySelector("aside"), (() => { try { return localStorage; } catch { return null; } })());
 render();
