@@ -32,3 +32,9 @@ test("basemap falls back to OSM only when every first tile failed", () => {
   assert.equal(ui.shouldFallback(1, 5), false);
   assert.equal(ui.shouldFallback(0, 0), false); // slow, not dead: nothing settled yet
 });
+
+test("a capped popup says when more lies below", () => {
+  assert.equal(ui.moreBelow(0, 551, 280), true);    // the history chart sits under the fold
+  assert.equal(ui.moreBelow(271, 551, 280), false); // scrolled to the end
+  assert.equal(ui.moreBelow(0, 200, 200), false);   // a short popup does not scroll
+});

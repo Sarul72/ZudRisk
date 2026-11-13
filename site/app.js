@@ -651,6 +651,14 @@ $("view").addEventListener("change", (e) => {
   else draw();
 });
 $("search").addEventListener("change", findSoum);
+// a capped popup (style.css) fades out at the bottom with an arrow while its chart is still below the fold
+map.on("popupopen", (e) => {
+  const box = e.popup.getElement()?.querySelector(".leaflet-popup-content");
+  if (!box) return;
+  const mark = () => box.parentElement.classList.toggle("more", ZRui.moreBelow(box.scrollTop, box.scrollHeight, box.clientHeight));
+  mark();
+  box.addEventListener("scroll", mark, { passive: true });
+});
 $("status_go").addEventListener("click", (e) => { sel.value = e.currentTarget.dataset.target; sel.dispatchEvent(new Event("change")); });
 $("aimags").addEventListener("click", (e) => { const b = e.target.closest("[data-aimag]"); if (b) zoomTo(aimagGeo, "aimag", b.dataset.aimag); });
 $("zones").addEventListener("click", (e) => { const b = e.target.closest("[data-zone]"); if (b) zoomTo(zoneGeo, "zone", b.dataset.zone); });

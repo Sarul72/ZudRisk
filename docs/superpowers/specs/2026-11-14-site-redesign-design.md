@@ -44,7 +44,7 @@ The page opens on the 2026/27 outlook, as now. A card at the top of the panel sa
 
 3. **Map first.**
    - The map opens fitted to Mongolia (about 41.5–52.2° N, 87.7–119.9° E).
-   - Panning is limited to a box around Mongolia (28–60° N, 68–140° E). `minZoom` stays 4.
+   - Panning is limited to a box around Mongolia (20–66° N, 60–150° E; widened from 28–60° N, 68–140° E in build, because at 375 px a northern popup's auto-pan reaches 66° N). `minZoom` stays 4.
    - The box must be larger than the map view at the fitted zoom, on both desktop and phone. Otherwise Leaflet undoes the popup's auto-pan, and a northern soum's popup is cut off.
    - The default basemap is Esri World Light Gray Canvas:
      - base: `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}`;
