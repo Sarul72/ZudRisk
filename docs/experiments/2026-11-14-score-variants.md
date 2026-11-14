@@ -35,3 +35,23 @@ E3 never replaces the headline. It is reported beside it to show how much small 
 - A kept variant reaches the site only after the owner agrees, and only after the competition (2026-11-15).
 - **E3:** no decision. It is reported only.
 - Weights are not tuned after seeing results. If E1 and E2 both pass, they are not combined without a new pre-registration.
+
+## Results (run after the pre-registration commit `aca4e02`)
+
+`uv run python docs/experiments/score_variants.py`. It reproduced the baseline from the indicator files: 0.600 (n 1,683)
+and 0.440 (n 4,688).
+
+| Variant | Pre-registered ρ | Every soum-winter ρ | Rule |
+|---|---|---|---|
+| Published score | 0.600 | 0.440 | baseline |
+| E1 snow × drought | **0.603** | **0.443** | both rose: **kept** |
+| E2 snow-covered days | 0.599 | 0.428 | both must rise: **not used** |
+| E3 smallest 10% of herds left out (under 126 thousand sheep units) | 0.608 (n 1,547) | 0.464 (n 4,220) | reported only |
+
+- **E1.** The gain is small, +0.003 on both pools. A bootstrap over winters (1,000 resamples of the 14 winters; not part
+  of the pre-registration, added to judge size) gives a gain on every soum-winter of +0.0023, 95% interval −0.0001 to
+  +0.0076, positive in 97% of resamples. It is consistent but small. E1 is kept by the rule. It goes on the site only
+  if the owner agrees, after 2026-11-15.
+- **E2.** Snow-covered days add nothing beyond snow depth and lower the every-winter ρ by 0.012. Not used.
+- **E3.** Leaving out the smallest herds raises ρ by 0.008 and 0.024. Part of the gap between the score and the losses
+  is measurement noise in small herds, not the model. The headline stays on every soum-winter.

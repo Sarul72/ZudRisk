@@ -150,6 +150,9 @@ for m in boundaries http era5 ndvi gldas nso indicators validate export aimags c
 - **Herd composition (`pipeline.herdmix`)**: each species' share of the census in sheep units (camel, horse, cattle,
   goat; sheep the reference) added to the model. Held-out soum rho fell 0.372 -> 0.352 and AUC 0.745 -> 0.732
   (aimag rho rose 0.523 -> 0.538). The rule fixed before the run was to keep them only if both soum figures rose.
+- **Snow-covered days (`docs/experiments/2026-11-14-score-variants.md`, E2)**: the z-score of snow-covered days as a
+  fifth term (weight 0.24). Pre-registered rho 0.600 -> 0.599, every soum-winter 0.440 -> 0.428. The rule fixed before
+  the run was to keep it only if both rose.
 - **SEAS5 seasonal forecast (`pipeline.seasonal`)**: shown on the site as the "Oct + SEAS5" stage; it lowers the
   October stage's skill, so the outlook does not use it.
 
