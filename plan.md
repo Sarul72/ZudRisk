@@ -5,15 +5,15 @@ score or the model carries the rule that decides it, fixed before the run.
 
 ## Next
 
-### 1. Turn on GitHub Pages (one setting)
+### 1. After 2026-11-15: add the snow × drought term to the score (owner agreed)
 
-- **Why.** The workflow is in (`.github/workflows/pages.yml`), but Pages serves nothing until it is switched on.
-- **What.** In the repository on GitHub: Settings -> Pages -> Build and deployment -> Source: **GitHub Actions**.
-  Then Actions -> Pages -> Run workflow, or push anything under `site/`. The site appears at
-  <https://sarul72.github.io/ZudRisk/>.
-- **Needs from you.** The click, signed in as Sarul72.
+- **Why.** Pre-registered experiment E1 passed its rule: rho 0.600 -> 0.603 and 0.440 -> 0.443
+  (`docs/experiments/2026-11-14-score-variants.md`). The owner agreed on 2026-11-14 to add it after the competition.
+- **What.** In `pipeline.score`, a fifth term x = min(3, max(z_snow, 0) x max(z_summer, 0)) with weight 0.24, exactly as
+  pre-registered; then rerun `pipeline.hindcast`, check that pooled.json shows 0.603 / 0.443, update README, plan.md and
+  the site's weight table, and push.
 
-### 2. Run the daily iron-dzud test
+### 2. Run the daily iron-dzud test (after 2026-11-15, owner agreed)
 
 - **Why.** The code is in (`pipeline.thaw`); the data is not, because it needs the CDS account.
 - **What.** `uv run python -m pipeline.thaw --fetch`, then `uv run python -m pipeline.thaw`.
