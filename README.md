@@ -52,6 +52,21 @@ Spearman rho of the risk score against adult livestock mortality:
 The learned model ranks below the fixed weights when each winter is held out: soum rho 0.373 against 0.440, and AUC
 0.745 against 0.762. The site says so. October, before any winter weather, is the weakest stage.
 
+## Use of AI (Super Intelligence) tools
+
+Much of this project was written with **Claude (Anthropic)**, an AI assistant, working through Claude Code under the
+author's direction and review. It helped with:
+
+- **Code:** the Python pipeline (`pipeline/`), the site (`site/`), the tests, and the experiment and slide scripts
+  (`docs/experiments/`, `docs/pitch/`).
+- **Text:** this README, the site's Mongolian and English text, the docs, and the pitch deck.
+- **Data analysis:** running the pipeline checks, the validation and the pre-registered experiments.
+
+The input data are not AI-generated. They come from the sources listed in "Data" and the site's "Sources", and every
+figure on the site is computed from them by the code in this repository. No AI-generated images are used: the slides
+show screenshots of the live sites. Commits made with the assistant say so in their metadata
+(`Co-Authored-By: Claude …`).
+
 ## Docs
 
 - [plan.md](plan.md): what next, ranked, and what this round did.
