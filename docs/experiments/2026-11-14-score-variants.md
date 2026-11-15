@@ -36,7 +36,7 @@ E3 never replaces the headline. It is reported beside it to show how much small 
 - **E3:** no decision. It is reported only.
 - Weights are not tuned after seeing results. If E1 and E2 both pass, they are not combined without a new pre-registration.
 
-## Results (run after the pre-registration commit `aca4e02`)
+## Results (run after the pre-registration commit `264c1c3`)
 
 `uv run python docs/experiments/score_variants.py`. It reproduced the baseline from the indicator files: 0.600 (n 1,683)
 and 0.440 (n 4,688).
