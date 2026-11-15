@@ -101,28 +101,29 @@ SLIDES = [
     ], notes="Dzud took a fifth of the national herd in 2009/10 and almost 14 percent in 2023/24. Floods, wildfires and "
              "dust storms come every year. The satellite data to watch all of them exists, but it is scattered."),
     dict(dark=False, transition="morph", items=[
-        R("!!orb", 9.55, 2.0, 3.2, 3.2, ORANGE, "oval", alpha=22),
+        R("!!orb", 11.7, 0.25, 1.2, 1.2, ORANGE, "oval", alpha=22),
         brand(False),
-        title("ZudRisk: four signals, one dzud score per soum"),
-        *[c for i, (head, body) in enumerate([
-            ("Snow depth", "Deepest monthly snow, November to March · ERA5-Land"),
-            ("Winter cold", "Mean air temperature, November to February · ERA5-Land"),
-            ("Summer pasture", "July–August greenness · NASA MODIS NDVI"),
-            ("Grazing pressure", "Sheep units per km² of pasture · NSO census"),
-        ]) for c in (
-            R(f"card{i}", 0.6 + (i % 2) * 4.3, 1.95 + (i // 2) * 2.35, 4.05, 2.1, LIGHT, "rect", radius=True),
-            R(f"num{i}", 0.85 + (i % 2) * 4.3, 2.2 + (i // 2) * 2.35, 0.55, 0.55, ACCENT, "oval"),
-            T(f"numt{i}", 0.85 + (i % 2) * 4.3, 2.2 + (i // 2) * 2.35, 0.55, 0.55, str(i + 1), size=16, bold=True,
-              color=WHITE, align="c", anchor="m"),
-            T(f"head{i}", 1.6 + (i % 2) * 4.3, 2.2 + (i // 2) * 2.35, 2.9, 0.55, head, size=20, bold=True, anchor="m"),
-            T(f"body{i}", 0.85 + (i % 2) * 4.3, 3.0 + (i // 2) * 2.35, 3.6, 0.9, body, size=15, color=MUTED),
-        )],
-        T("one", 9.55, 2.75, 3.2, 1.0, "1 score", size=36, bold=True, color=INK, align="c", anchor="m"),
-        T("one_l", 9.55, 3.65, 3.2, 1.0, "339 soums × 25 winters, plus a monthly outlook", size=15, color=INK, align="c"),
-        T("w", 9.0, 5.55, 4.3, 0.9, "Each signal against the soum's own 2001–2020 normal; weights fixed from the literature",
-          size=13, color=MUTED, align="c", italic=True),
-    ], notes="ZudRisk scores all 339 soums from four signals, each compared with that soum's own normal year, so the map "
-             "shows how unusual a winter is. The weights come from published research, fixed before any test."),
+        title("The trend: greener pastures, nearly twice the herd"),
+        I("green", 0.6, 1.8, 6.6, 6.6 / RATIO, MAPS["green"]),
+        T("green_cap", 0.6, 1.85 + 6.6 / RATIO, 6.6, 0.6,
+          "Trend in July–August greenness per soum, 2001–2026 (NASA MODIS NDVI, Theil–Sen slope). "
+          "Darker green: greening faster. Brown: browning.", size=11, color=MUTED),
+        T("g_stat", 7.65, 1.75, 5.1, 0.9, "+15%", size=50, bold=True, color="2E7D32"),
+        T("g_lab", 7.65, 2.65, 5.1, 1.0, "summer greenness of the median soum since 2001. Greener in 322 of 339 soums "
+          "(significant in 157); browner in 17, all in the far west, none significant.", size=14, color=INK),
+        T("h_stat", 7.65, 3.7, 5.1, 0.9, "×1.9", size=50, bold=True, color=RED),
+        T("h_lab", 7.65, 4.6, 5.1, 0.8, "the herd in sheep units, 2000 to 2025 (NSO). More grass, but far more "
+          "animals on it.", size=14, color=INK),
+        R("scorebox", 0.6, 5.85, 12.15, 1.2, LIGHT, "rect", radius=True),
+        T("score", 0.85, 5.85, 11.7, 1.2, [[("One dzud score per soum  ", {"bold": True, "color": INK}),
+                                            ("snow depth and winter cold (ERA5-Land), summer pasture (NASA MODIS NDVI) "
+                                             "and grazing pressure (NSO), each against the soum's own 2001–2020 normal; "
+                                             "weights fixed from the literature. 339 soums × 25 winters, plus a monthly "
+                                             "outlook.", {})]], size=14, color=MUTED, anchor="m"),
+    ], notes="The trend first. Since 2001, NASA MODIS shows summer pasture greening in 322 of 339 soums, by 15 percent in "
+             "the median soum; only the far west browned. But the herd grazing it nearly doubled. That is why grazing "
+             "pressure is one of the four signals in our dzud score, next to snow depth, winter cold and summer pasture, "
+             "each compared with the soum's own normal, with weights fixed from published research before any test."),
     dict(dark=False, transition="morph", items=[
         R("!!orb", 12.2, 6.45, 0.7, 0.7, ORANGE, "oval", alpha=30),
         brand(False),
@@ -131,13 +132,19 @@ SLIDES = [
         I("map_a", 0.6, 2.3, 6.0, mh, MAPS["outlook"]),
         T("cap_b", 6.73, 1.75, 6.0, 0.5, [[("2009/10", {"bold": True, "color": RED}), (" · the dzud winter", {})]], size=16),
         I("!!map", 6.73, 2.3, 6.0, mh, MAPS["dzud"]),
-        T("leg", 0.6, 2.3 + mh + 0.3, 12.1, 0.9, [[("Spearman ρ 0.60 ", {"bold": True, "color": ACCENT}),
-                                                  ("between our ranking and real losses (pre-registered winters).  ", {}),
-                                                  ("58% vs 15%: ", {"bold": True, "color": RED}),
-                                                  ("soums we rated very high lost 5% or more of their herd far more often.", {})]],
-          size=15, color=MUTED),
+        T("leg", 0.6, 2.3 + mh + 0.2, 12.1, 1.6, [
+            [("Do we rank the soums in the order of their real losses? ", {"bold": True, "color": INK}),
+             ("Spearman ρ, 1 = same order, 0 = no link: ", {}),
+             ("0.60", {"bold": True, "color": ACCENT}), (" in the five test winters fixed in advance, ", {}),
+             ("0.44", {"bold": True, "color": ACCENT}), (" over all 4,688 soum-winters 2011–2025.", {})],
+            [("58% vs 15%: ", {"bold": True, "color": RED}),
+             ("soums we rated very high lost 5% or more of their herd, against 15% overall. The outlook sharpens as "
+              "winter comes: ρ 0.23 in October, 0.50 in November, 0.64 by December.", {})]],
+          size=14, color=MUTED),
     ], notes="Live demo. The October outlook before any snow is mostly yellow; 2009/10 turns red in the west and centre, "
-             "where the losses happened. Tested against real losses, the ranking reaches a Spearman correlation of 0.6."),
+             "where the losses happened. We check the order of soums against real losses: a rank correlation of 0.60 in "
+             "the dzud winters we fixed in advance, 0.44 over every winter. The outlook is weak in October and useful "
+             "from December, so that is when governors should act on it."),
     dict(dark=False, transition="morph", items=[
         R("!!orb", 11.0, 5.3, 2.0, 2.0, "7F77DD", "oval", alpha=22),
         brand(False),
