@@ -1,4 +1,4 @@
-"""ZudRisk pitch deck: 7 slides, 16:9, built from one spec into a PowerPoint file and an HTML twin.
+"""Project Satellite Spies pitch deck (ZudRisk and Mongolia Hazard Watch): 7 slides, 16:9, built from one spec into a PowerPoint file and an HTML twin.
 
 The .pptx carries Morph transitions with a Fade fallback (older PowerPoint, Google Slides and LibreOffice show the fade).
 The HTML twin draws the same boxes at the same positions so the deck can be checked, and printed to PDF, on a machine
@@ -40,6 +40,8 @@ MAPS = {
     "dzud": crop("dzud2010.png", "c_dzud.png", (340, 400, 1540, 985)),
     "green": crop("greenness.png", "c_green.png", (340, 400, 1540, 985)),
     "popup": crop("popup2010.png", "c_popup.png", (470, 120, 1300, 1000)),
+    "hz": crop("hz_combined.png", "c_hz.png", (380, 250, 2320, 1220)),
+    "hzflood": crop("hz_flood.png", "c_hzflood.png", (0, 100, 1150, 1350)),
 }
 RATIO = 1200 / 585
 
@@ -62,7 +64,7 @@ def I(name, x, y, w, h, path):
 
 
 def brand(dark):
-    return T("!!brand", 0.6, 0.32, 3.0, 0.35, [[("Zud", {}), ("Risk", {"color": ORANGE})]], size=14, bold=True,
+    return T("!!brand", 0.6, 0.32, 3.0, 0.35, [[("Satellite ", {}), ("Spies", {"color": ORANGE})]], size=14, bold=True,
              color=WHITE if dark else INK)
 
 
@@ -71,40 +73,42 @@ def title(text, dark=False):
 
 
 mh = 6.0 / RATIO
+HR = 1940 / 970
 SLIDES = [
     dict(dark=True, transition="fade", items=[
-        R("!!orb", 6.6, -0.9, 7.6, 7.6, ACCENT, "oval", alpha=28),
-        I("!!map", 6.2, 1.75, 6.6, 6.6 / RATIO, MAPS["dzud"]),
+        R("!!orb", 6.9, -0.9, 7.2, 7.2, ACCENT, "oval", alpha=28),
+        I("!!map", 7.0, 0.75, 5.8, 5.8 / RATIO, MAPS["dzud"]),
+        I("hz", 7.0, 0.75 + 5.8 / RATIO + 0.3, 5.8, 5.8 / HR, MAPS["hz"]),
         brand(True),
-        T("!!title", 0.6, 1.9, 5.6, 2.0, "Watching dzud coming from space", size=44, bold=True, color=WHITE),
-        T("sub", 0.6, 4.05, 5.4, 1.0, "Soum-level dzud risk for Mongolia from Earth observation trends", size=20, color=SOFT),
-        T("event", 0.6, 6.45, 9.0, 0.5, "NASA Space Apps Challenge 2026  ·  Ulaanbaatar  ·  Be An Earth System Trend Detective!",
+        T("!!title", 0.6, 1.7, 6.0, 2.1, "Watching Mongolia's slow disasters from space", size=42, bold=True, color=WHITE),
+        T("sub", 0.6, 4.0, 5.8, 1.1, [[("Project Satellite Spies", {"bold": True, "color": WHITE})],
+                                       "ZudRisk  ·  Mongolia Hazard Watch"], size=20, color=SOFT),
+        T("event", 0.6, 6.45, 6.3, 0.6, "NASA Space Apps Challenge 2026  ·  Ulaanbaatar  ·  Be An Earth System Trend Detective!",
           size=12, color="9AA6BD"),
-    ], notes="In the winter of 2009/10, Mongolia lost more than a fifth of its livestock, 21.7 percent, to a dzud: deep "
-             "snow and extreme cold after a dry summer. A dzud does not arrive overnight. It builds up over months, in "
-             "data we can see from space. We asked: can Earth observation trends tell us which soums are heading into trouble?"),
+    ], notes="Mongolia lives with hazards that build up slowly and strike different places: dzud in winter, floods, "
+             "wildfires and dust storms. We built two linked, open maps that read the trends behind them from space."),
     dict(dark=False, transition="morph", items=[
         R("!!orb", 11.7, 0.25, 1.2, 1.2, ORANGE, "oval", alpha=30),
         brand(False),
-        title("A slow disaster that took a fifth of the herd"),
+        title("Slow disasters that hit different places"),
         T("stat", 0.6, 2.05, 4.0, 1.3, "21.7%", size=72, bold=True, color=RED),
-        T("stat_l", 0.6, 3.45, 3.9, 1.4, "of Mongolia's adult livestock died in the 2009/10 dzud. In 2023/24 it was 13.8%.",
+        T("stat_l", 0.6, 3.45, 3.9, 1.3, "of Mongolia's adult livestock died in the 2009/10 dzud. In 2023/24 it was 13.8%.",
           size=18, color=INK),
-        T("why", 0.6, 5.05, 3.9, 1.2, "Deep snow and cold after a dry summer: herds starve over weeks, not hours.",
-          size=15, color=MUTED, italic=True),
+        T("why", 0.6, 4.95, 3.9, 1.4, "Floods, wildfires and dust storms strike every year too. The data to see them is open, "
+          "but scattered across a dozen portals.", size=15, color=MUTED, italic=True),
         dict(kind="chart", name="losses", x=4.9, y=1.85, w=7.9, h=4.75, data=LOSSES, hi={"09/10": RED, "23/24": ORANGE}),
         T("src", 4.9, 6.65, 7.9, 0.4, "Adult livestock lost by winter, % (NSO, aimag totals excl. Ulaanbaatar)", size=11, color=MUTED),
-    ], notes="Losses come in waves. 2000/01 and 2009/10 each took about a fifth of the national herd, 2023/24 almost "
-             "14 percent. Between them, most winters lose 1 to 4 percent."),
+    ], notes="Dzud took a fifth of the national herd in 2009/10 and almost 14 percent in 2023/24. Floods, wildfires and "
+             "dust storms come every year. The satellite data to watch all of them exists, but it is scattered."),
     dict(dark=False, transition="morph", items=[
         R("!!orb", 9.55, 2.0, 3.2, 3.2, ORANGE, "oval", alpha=22),
         brand(False),
-        title("Four signals, one risk score per soum"),
+        title("ZudRisk: four signals, one dzud score per soum"),
         *[c for i, (head, body) in enumerate([
             ("Snow depth", "Deepest monthly snow, November to March · ERA5-Land"),
             ("Winter cold", "Mean air temperature, November to February · ERA5-Land"),
             ("Summer pasture", "July–August greenness · NASA MODIS NDVI"),
-            ("Grazing pressure", "Sheep units per km² of pasture · NSO census, EIC pasture map"),
+            ("Grazing pressure", "Sheep units per km² of pasture · NSO census"),
         ]) for c in (
             R(f"card{i}", 0.6 + (i % 2) * 4.3, 1.95 + (i // 2) * 2.35, 4.05, 2.1, LIGHT, "rect", radius=True),
             R(f"num{i}", 0.85 + (i % 2) * 4.3, 2.2 + (i // 2) * 2.35, 0.55, 0.55, ACCENT, "oval"),
@@ -115,77 +119,76 @@ SLIDES = [
         )],
         T("one", 9.55, 2.75, 3.2, 1.0, "1 score", size=36, bold=True, color=INK, align="c", anchor="m"),
         T("one_l", 9.55, 3.65, 3.2, 1.0, "339 soums × 25 winters, plus a monthly outlook", size=15, color=INK, align="c"),
-        T("w", 9.0, 5.55, 4.3, 0.9, "Weights fixed from the literature before any test", size=13, color=MUTED, align="c", italic=True),
-    ], notes="ZudRisk scores dzud risk for all 339 soums. It combines four signals: snow depth and winter cold from "
-             "ERA5-Land, summer pasture greenness from NASA's MODIS NDVI, and grazing pressure from the national livestock "
-             "census over each soum's pasture area. We compute it for 25 past winters, and as a live outlook for this "
-             "winter that updates every month."),
+        T("w", 9.0, 5.55, 4.3, 0.9, "Each signal against the soum's own 2001–2020 normal; weights fixed from the literature",
+          size=13, color=MUTED, align="c", italic=True),
+    ], notes="ZudRisk scores all 339 soums from four signals, each compared with that soum's own normal year, so the map "
+             "shows how unusual a winter is. The weights come from published research, fixed before any test."),
     dict(dark=False, transition="morph", items=[
         R("!!orb", 12.2, 6.45, 0.7, 0.7, ORANGE, "oval", alpha=30),
         brand(False),
-        title("Same map, two winters"),
+        title("Same map, two winters, checked against real losses"),
         T("cap_a", 0.6, 1.75, 6.0, 0.5, [[("2026/27 outlook", {"bold": True}), (" · October, before any snow", {})]], size=16),
         I("map_a", 0.6, 2.3, 6.0, mh, MAPS["outlook"]),
         T("cap_b", 6.73, 1.75, 6.0, 0.5, [[("2009/10", {"bold": True, "color": RED}), (" · the dzud winter", {})]], size=16),
         I("!!map", 6.73, 2.3, 6.0, mh, MAPS["dzud"]),
-        T("leg", 0.6, 2.3 + mh + 0.25, 12.1, 0.5,
-          "Darker red: a higher chance that 5% or more of the herd dies. The model put the 2009/10 losses in the west and centre.",
+        T("leg", 0.6, 2.3 + mh + 0.3, 12.1, 0.9, [[("Spearman ρ 0.60 ", {"bold": True, "color": ACCENT}),
+                                                  ("between our ranking and real losses (pre-registered winters).  ", {}),
+                                                  ("58% vs 15%: ", {"bold": True, "color": RED}),
+                                                  ("soums we rated very high lost 5% or more of their herd far more often.", {})]],
           size=15, color=MUTED),
-    ], notes="Live demo. This is this winter's outlook, as of October, before any snow: mostly yellow, honestly, because "
-             "the winter has not started. Now 2009/10: the model turns the west and centre red, where the losses happened. "
-             "For each soum the popup gives the chance that 5 percent or more of the herd dies, and which signals drove it."),
+    ], notes="Live demo. The October outlook before any snow is mostly yellow; 2009/10 turns red in the west and centre, "
+             "where the losses happened. Tested against real losses, the ranking reaches a Spearman correlation of 0.6."),
     dict(dark=False, transition="morph", items=[
-        R("!!orb", 11.0, 5.2, 2.0, 2.0, "238B45", "oval", alpha=22),
+        R("!!orb", 11.0, 5.3, 2.0, 2.0, "7F77DD", "oval", alpha=22),
         brand(False),
-        title("The trend detective: 25 years of summer greenness"),
-        I("!!map", 0.6, 1.85, 7.6, 7.6 / RATIO, MAPS["green"]),
-        T("t1", 8.65, 1.95, 4.2, 1.3, [[("What  ", {"bold": True, "color": INK}),
-                                        ("Theil–Sen slope of July–August NDVI per soum, every summer since 2000", {})]],
+        title("Mongolia Hazard Watch: four hazards since 2001"),
+        I("!!map", 0.6, 1.85, 7.8, 7.8 / HR, MAPS["hz"]),
+        T("t1", 8.85, 1.95, 4.0, 1.4, [[("What  ", {"bold": True, "color": INK}),
+                                        ("flood, wildfire, dust storm and dzud risk on a 0.1° grid", {})]], size=16, color=MUTED),
+        T("t2", 8.85, 3.35, 4.0, 1.4, [[("When  ", {"bold": True, "color": INK}),
+                                        ("any day since 2001; step or play through the years", {})]], size=16, color=MUTED),
+        T("t3", 8.85, 4.75, 4.0, 1.4, [[("Data  ", {"bold": True, "color": INK}),
+                                        ("NASA MODIS, VIIRS, HLS and GIBS imagery, computed in Google Earth Engine", {})]],
           size=16, color=MUTED),
-        T("t2", 8.65, 3.35, 4.2, 1.3, [[("Why  ", {"bold": True, "color": INK}),
-                                        ("browning pasture leaves herds weaker before the snow", {})]], size=16, color=MUTED),
-        T("t3", 8.65, 4.75, 4.2, 1.0, [[("Data  ", {"bold": True, "color": INK}), ("NASA MODIS MOD13C2", {})]],
-          size=16, color=MUTED),
-        *[R(f"g{i}", 0.6 + i * 0.55, 1.85 + 7.6 / RATIO + 0.25, 0.5, 0.22, c)
-          for i, c in enumerate(["A6611A", "F5F5F5", "C7E9C0", "74C476", "238B45"])],
-        T("gl", 3.5, 1.85 + 7.6 / RATIO + 0.15, 4.7, 0.42, "browning  →  strong greening, per decade", size=12, color=MUTED,
-          anchor="m"),
-    ], notes="And here is the long-term trend: 25 years of summer greenness per soum, from NASA MODIS. Where pasture is "
-             "browning, a dzud hits harder. It is a sign of desertification, not the official desertification map: "
-             "NDVI cannot tell rain from grazing."),
+    ], notes="Mongolia Hazard Watch puts four hazards on one map, day by day since 2001, on NASA imagery. "
+             "Pick a hazard, pick a day, and watch where each one comes back."),
     dict(dark=False, transition="morph", items=[
-        R("!!orb", 0.6, 5.35, 1.1, 1.1, ORANGE, "oval", alpha=30),
+        R("!!orb", 0.3, 5.9, 1.2, 1.2, "7F77DD", "oval", alpha=25),
         brand(False),
-        title("Does it work?"),
-        *[c for i, (big, color, small) in enumerate([
-            ("0.60", ACCENT, "Spearman ρ between our risk score and real losses, pre-registered winters (n = 1,683 soum-winters)"),
-            ("58%", RED, "of soum-winters we rated very high lost 5% or more of the herd, against 15% overall"),
-            ("0.23 → 0.64", INK, "the ranking sharpens as the winter unfolds: October to December outlook"),
+        title("Draw any area, compute it in the browser"),
+        I("panel", 0.6, 1.8, 4.4, 4.4 / (1150 / 1250), MAPS["hzflood"]),
+        *[c for i, (head, body) in enumerate([
+            ("Flood extent", "Sentinel-1 radar sees through cloud; Sentinel-2 checks it"),
+            ("Burned area", "Sentinel-2 dNBR before and after a fire"),
+            ("Dust conditions", "bare ground, wind and rain for the chosen day"),
         ]) for c in (
-            R(f"sc{i}", 0.6 + i * 4.15, 1.95, 3.9, 2.95, LIGHT, "rect", radius=True),
-            T(f"sb{i}", 0.85 + i * 4.15, 2.2, 3.45, 1.2, big, size=48 if i < 2 else 40, bold=True, color=color, anchor="m"),
-            T(f"ss{i}", 0.85 + i * 4.15, 3.5, 3.45, 1.3, small, size=16, color=INK),
+            R(f"hc{i}", 5.3, 1.85 + i * 1.12, 7.45, 0.98, LIGHT, "rect", radius=True),
+            T(f"hh{i}", 5.55, 1.85 + i * 1.12, 2.4, 0.98, head, size=18, bold=True, anchor="m"),
+            T(f"hb{i}", 7.95, 1.85 + i * 1.12, 4.6, 0.98, body, size=15, color=MUTED, anchor="m"),
         )],
-        T("lim", 2.0, 5.55, 10.7, 0.9, [[("Limits we state openly: ", {"bold": True, "color": INK}),
-                                          ("snow comes from a model, not pasture measurements; the October outlook is weak; "
-                                           "this is not an official warning.", {})]], size=14, color=MUTED),
-    ], notes="Did it work? Across pre-registered winters, our risk ranking matched real losses with a Spearman "
-             "correlation of 0.6. In soums we rated very high, losses of 5 percent or more followed 58 percent of the time, "
-             "against 15 percent overall. We also say openly what we cannot do: the October outlook is weak, and snow "
-             "comes from a model."),
+        T("dl", 5.3, 5.3, 7.45, 0.5, [[("Download  ", {"bold": True, "color": INK}),
+                                       ("GeoTIFF · Shapefile · GeoJSON · KML · KMZ, straight into QGIS or ArcGIS", {})]],
+          size=15, color=MUTED),
+        R("devbox", 5.3, 5.95, 7.45, 0.95, "FFF4E8", "rect", radius=True),
+        T("dev", 5.55, 5.95, 7.0, 0.95, [[("In development: ", {"bold": True, "color": "8A3B00"}),
+                                          ("the flood and wildfire risk indices are not yet calibrated against recorded events; "
+                                           "that is our next step.", {})]], size=14, color="8A3B00", anchor="m"),
+    ], notes="Draw any area and the browser computes flood extent from Sentinel-1 radar, burned area from Sentinel-2, or "
+             "dust conditions, and you download it as GIS files. Honestly: the flood and wildfire risk indices are still "
+             "being developed; calibrating them against recorded events is our next step."),
     dict(dark=True, transition="fade", items=[
         R("!!orb", -1.6, 3.6, 6.0, 6.0, ACCENT, "oval", alpha=28),
         brand(True),
-        T("!!title", 0.6, 0.95, 11.6, 1.0, "Built for those who act before the snow", size=40, bold=True, color=WHITE),
-        T("who", 0.6, 2.25, 7.4, 2.4, [
-            [("Soum and aimag governors", {"bold": True, "color": WHITE}), ("  where to stock hay and fodder", {})],
+        T("!!title", 0.6, 0.95, 11.6, 1.0, "Built for those who act before disaster", size=40, bold=True, color=WHITE),
+        T("who", 0.6, 2.25, 7.6, 2.4, [
+            [("Soum and aimag governors", {"bold": True, "color": WHITE}), ("  where to stock hay, where floods and fires threaten", {})],
             [("NEMA", {"bold": True, "color": WHITE}), ("  where to send support first", {})],
-            [("Aid agencies", {"bold": True, "color": WHITE}), ("  where to pre-position feed and cash", {})],
+            [("Aid agencies and researchers", {"bold": True, "color": WHITE}), ("  open maps and GIS files, no coding", {})],
         ], size=20, color=SOFT),
-        T("url", 5.0, 5.0, 7.8, 0.8, "sarul72.github.io/ZudRisk", size=36, bold=True, color="8FB4FF", align="r"),
-        T("open", 5.0, 5.85, 7.8, 0.5, "Open code and data · github.com/Sarul72/ZudRisk", size=14, color="9AA6BD", align="r"),
-    ], notes="Dzud is a slow disaster we can watch coming from space. ZudRisk turns NASA's Earth observations into a map "
-             "a herder, a governor or an aid agency can act on, before the animals die. Thank you."),
+        T("url", 4.4, 4.95, 8.4, 0.8, "mongolia-risk.vercel.app", size=38, bold=True, color="8FB4FF", align="r"),
+        T("open", 4.4, 5.85, 8.4, 0.5, "Open code · github.com/Sarul72/ZudRisk · github.com/Sigma0sanaa/hazard", size=14,
+          color="9AA6BD", align="r"),
+    ], notes="Two open maps, one goal: let governors, NEMA and aid agencies act before the disaster, not after. Thank you."),
 ]
 
 # ---------- PowerPoint ----------
