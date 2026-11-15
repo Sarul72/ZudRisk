@@ -8,3 +8,7 @@ __pycache__/
 *.netrc
 *credentials*
 *service-account*.json
+
+# Vercel CLI link and its OIDC token: never commit
+.vercel
+.env*.local
