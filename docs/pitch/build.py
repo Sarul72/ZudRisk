@@ -1,4 +1,4 @@
-"""Project Satellite Spies pitch deck (ZudRisk and Mongolia Hazard Watch): 7 slides, 16:9, built from one spec into a PowerPoint file and an HTML twin.
+"""Hazard Watch pitch deck by team Spy Kids (ZudRisk and Mongolia Hazard Watch): 7 slides, 16:9, built from one spec into a PowerPoint file and an HTML twin.
 
 The .pptx carries Morph transitions with a Fade fallback (older PowerPoint, Google Slides and LibreOffice show the fade).
 The HTML twin draws the same boxes at the same positions so the deck can be checked, and printed to PDF, on a machine
@@ -64,7 +64,7 @@ def I(name, x, y, w, h, path):
 
 
 def brand(dark):
-    return T("!!brand", 0.6, 0.32, 3.0, 0.35, [[("Satellite ", {}), ("Spies", {"color": ORANGE})]], size=14, bold=True,
+    return T("!!brand", 0.6, 0.32, 3.0, 0.35, [[("Hazard ", {}), ("Watch", {"color": ORANGE})]], size=14, bold=True,
              color=WHITE if dark else INK)
 
 
@@ -81,7 +81,7 @@ SLIDES = [
         I("hz", 7.0, 0.75 + 5.8 / RATIO + 0.3, 5.8, 5.8 / HR, MAPS["hz"]),
         brand(True),
         T("!!title", 0.6, 1.7, 6.0, 2.1, "Watching Mongolia's slow disasters from space", size=42, bold=True, color=WHITE),
-        T("sub", 0.6, 4.0, 5.8, 1.1, [[("Project Satellite Spies", {"bold": True, "color": WHITE})],
+        T("sub", 0.6, 4.0, 5.8, 1.1, [[("Hazard Watch", {"bold": True, "color": WHITE}), ("  by team Spy Kids", {})],
                                        "ZudRisk  ·  Mongolia Hazard Watch"], size=20, color=SOFT),
         T("event", 0.6, 6.45, 6.3, 0.6, "NASA Space Apps Challenge 2026  ·  Ulaanbaatar  ·  Be An Earth System Trend Detective!",
           size=12, color="9AA6BD"),
