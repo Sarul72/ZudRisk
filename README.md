@@ -62,7 +62,7 @@ author's direction and review. It helped with:
 - **Text:** this README, the site's Mongolian and English text, the docs, and the pitch deck.
 - **Data analysis:** running the pipeline checks, the validation and the pre-registered experiments.
 
-The input data are not AI-generated. They come from the sources listed in "Data" and the site's "Sources", and every
+The input data are not AI-generated. They come from the sources listed at the top of this README and in the site's "Sources", and every
 figure on the site is computed from them by the code in this repository. No AI-generated images are used: the slides
 show screenshots of the live sites. Commits made with the assistant say so in their metadata
 (`Co-Authored-By: Claude …`).
